@@ -18,7 +18,7 @@ public class TileableSprite : MonoBehaviour {
 				float yTileSize = tileSize/thisScale.y;
 				GameObject newSprite = GameObject.Instantiate(tiledSpritePrefab);
 				newSprite.transform.parent = transform;
-				newSprite.transform.localPosition = new Vector3(offset.x + i * xTileSize, offset.y + j * yTileSize);
+				newSprite.transform.localPosition = new Vector3((offset.x + i + 0.5f) * xTileSize,  (offset.y + j + 0.5f) * yTileSize);
 				newSprite.transform.localScale = new Vector3(xTileSize, yTileSize, 1);
 			}
 		}
