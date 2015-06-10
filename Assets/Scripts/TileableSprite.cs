@@ -10,10 +10,10 @@ public class TileableSprite : MonoBehaviour {
 	
 	void SetupTiles(){
 		Vector3 thisScale = transform.localScale;
-		Vector3 offset = -thisScale * 0.5f;
+		Vector3 offset = -thisScale * 0.5f/ tileSize;
 		
-		for (int i = 0; i < thisScale.x; i++){
-			for (int j = 0; j < thisScale.y; j++){
+		for (int i = 0; i < thisScale.x / tileSize; i++){
+			for (int j = 0; j < thisScale.y / tileSize; j++){
 				float xTileSize = tileSize/thisScale.x;
 				float yTileSize = tileSize/thisScale.y;
 				GameObject newSprite = GameObject.Instantiate(tiledSpritePrefab);
