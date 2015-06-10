@@ -21,3 +21,6 @@ Cmd: compileSnippet
   api=0 type=0 insize=7914 outsize=1545 kw=DIRECTIONAL ok=1
 Cmd: compileSnippet
   api=0 type=1 insize=7914 outsize=6 kw=DIRECTIONAL ok=1
+End of pipe
+
+Quitting shader compiler process
