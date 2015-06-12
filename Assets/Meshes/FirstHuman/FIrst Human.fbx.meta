@@ -1,0 +1,166 @@
+fileFormatVersion: 2
+guid: 3cd487fce53ba4bbf94c19d8788a031a
+timeCreated: 1433964337
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: chest
+    100002: clavicle.L
+    100004: clavicle.R
+    100006: eye.L
+    100008: eye.R
+    100010: eyebrow011Mesh
+    100012: eyelashes01Mesh
+    100014: f_index.01.L
+    100016: f_index.01.R
+    100018: f_ring.01.L
+    100020: f_ring.01.R
+    100022: //RootNode
+    100024: foot.L
+    100026: foot.R
+    100028: forearm.L
+    100030: forearm.R
+    100032: hand.L
+    100034: hand.R
+    100036: head
+    100038: high-polyMesh
+    100040: hips
+    100042: jaw
+    100044: jeans01Mesh
+    100046: neck
+    100048: python
+    100050: pythonMesh
+    100052: shin.L
+    100054: shin.R
+    100056: shirt01Mesh
+    100058: shoes02Mesh
+    100060: spine
+    100062: teeth_shape01Mesh
+    100064: thigh.L
+    100066: thigh.R
+    100068: thumb.02.L
+    100070: thumb.02.R
+    100072: thumb.03.L
+    100074: thumb.03.R
+    100076: toe.L
+    100078: toe.R
+    100080: upper_arm.L
+    100082: upper_arm.R
+    400000: chest
+    400002: clavicle.L
+    400004: clavicle.R
+    400006: eye.L
+    400008: eye.R
+    400010: eyebrow011Mesh
+    400012: eyelashes01Mesh
+    400014: f_index.01.L
+    400016: f_index.01.R
+    400018: f_ring.01.L
+    400020: f_ring.01.R
+    400022: //RootNode
+    400024: foot.L
+    400026: foot.R
+    400028: forearm.L
+    400030: forearm.R
+    400032: hand.L
+    400034: hand.R
+    400036: head
+    400038: high-polyMesh
+    400040: hips
+    400042: jaw
+    400044: jeans01Mesh
+    400046: neck
+    400048: python
+    400050: pythonMesh
+    400052: shin.L
+    400054: shin.R
+    400056: shirt01Mesh
+    400058: shoes02Mesh
+    400060: spine
+    400062: teeth_shape01Mesh
+    400064: thigh.L
+    400066: thigh.R
+    400068: thumb.02.L
+    400070: thumb.02.R
+    400072: thumb.03.L
+    400074: thumb.03.R
+    400076: toe.L
+    400078: toe.R
+    400080: upper_arm.L
+    400082: upper_arm.R
+    4300000: pythonMesh
+    4300002: high-polyMesh
+    4300004: eyebrow011Mesh
+    4300006: eyelashes01Mesh
+    4300008: teeth_shape01Mesh
+    4300010: jeans01Mesh
+    4300012: shoes02Mesh
+    4300014: shirt01Mesh
+    9500000: //RootNode
+    13700000: eyebrow011Mesh
+    13700002: eyelashes01Mesh
+    13700004: high-polyMesh
+    13700006: jeans01Mesh
+    13700008: pythonMesh
+    13700010: shirt01Mesh
+    13700012: shoes02Mesh
+    13700014: teeth_shape01Mesh
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
