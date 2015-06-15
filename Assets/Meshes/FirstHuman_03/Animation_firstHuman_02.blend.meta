@@ -944,6 +944,7 @@ ModelImporter:
     7400006: Walk_Forward_Cycle
     7400008: Jump
     7400010: Jump_New
+    7400012: Jump_Loop
     9500000: //RootNode
     13700000: FIrst_Human_Body
     13700002: FIrst_Human_Eyebrow008
@@ -3505,10 +3506,10 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: Jump
-      takeName: Jump
-      firstFrame: 0
-      lastFrame: 1
+      name: Jump_New
+      takeName: Jump_New
+      firstFrame: -1
+      lastFrame: 4
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -3530,9 +3531,11 @@ ModelImporter:
       transformMask:
       - path: 
         weight: 1
-      - path: Empty
+      - path: Amin_Ref__Walk_front
         weight: 1
-      - path: Empty_001
+      - path: Anim_Ref__Jump_Side
+        weight: 1
+      - path: Anim_Ref__Walk_side
         weight: 1
       - path: FIrst_Human
         weight: 1
@@ -4139,16 +4142,16 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: Jump_New
-      takeName: Jump_New
+      name: Jump_Loop
+      takeName: Jump_Loop
       firstFrame: -1
-      lastFrame: 4
+      lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
