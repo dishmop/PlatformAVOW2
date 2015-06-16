@@ -20,6 +20,8 @@ public class TileableSprite : MonoBehaviour {
 				newSprite.transform.parent = transform;
 				newSprite.transform.localPosition = new Vector3((offset.x + i + 0.5f) * xTileSize,  (offset.y + j + 0.5f) * yTileSize);
 				newSprite.transform.localScale = new Vector3(xTileSize, yTileSize, 1);
+				
+				newSprite.GetComponent<SpriteRenderer>().sortingLayerID = GetComponent<SpriteRenderer>().sortingLayerID;
 			}
 		}
 	}
