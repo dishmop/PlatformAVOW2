@@ -6,11 +6,11 @@ public class PlayerController : MonoBehaviour {
 	public float walkSpeed = 10;
 	
 	public CircleCollider2D footCollider;
-	public bool enableMovement = true;
+
 
 	
 	GameObject model;
-	bool isGrounded = false;
+	public bool isGrounded = false;
 	bool tryJump = false;
 	
 	float horizontalSpeed;
@@ -35,17 +35,18 @@ public class PlayerController : MonoBehaviour {
 		
 		tryJump = Input.GetMouseButton(0);
 		
+		
 	}
 	
 	void FixedUpdate () {
-		Debug.Log("FixedUpdate: " + Time.fixedTime);
+//		Debug.Log("FixedUpdate: " + Time.fixedTime);
 
 		Vector3 newVel = GetComponent<Rigidbody2D>().velocity;
 		newVel.x = horizontalSpeed;
 		GetComponent<Rigidbody2D>().velocity = newVel;
-		if (enableMovement){
-			model.GetComponent<Animator>().SetFloat("speed", Mathf.Abs (horizontalSpeed));
-		}
+		model.GetComponent<Animator>().SetFloat("speed", Mathf.Abs (horizontalSpeed));
+		
+		model.GetComponent<Animator>().SetBool ("isGrounded", isGrounded);
 		
 		
 		
@@ -63,15 +64,12 @@ public class PlayerController : MonoBehaviour {
 		foreach (ContactPoint2D contactPoint in collision.contacts){
 			if (contactPoint.otherCollider != footCollider) continue;
 			
-
-			
-			
 			Vector2 collisionNormal = contactPoint.normal;
 			Vector2 startPos = contactPoint.point;
 			Vector2 endPos =  startPos + collisionNormal;
 
 			float dotResult = Vector2.Dot(collisionNormal.normalized, upDir);
-			Debug.Log("Dot = " + dotResult);
+//			Debug.Log("Dot = " + dotResult);
 			if (dotResult > 0.8f){
 				isGrounded = true;
 				Debug.DrawLine(startPos, endPos, Color.green);
@@ -93,6 +91,13 @@ public class PlayerController : MonoBehaviour {
 		void OnCollisionStay2D(Collision2D collision){
 		//Debug.Log("OnCollisionStay2D: " + col.collider.gameObject.name);
 		TestForGround(collision);
+	}
+	
+	void OnGUI(){
+		float lineHeight = 20.0f;
+		int lineNum = 0;
+		GUI.Label(new Rect(10, lineHeight * lineNum++, Screen.width, lineHeight), "Idle: " + model.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Idle").ToString());
+		GUI.Label(new Rect(10, lineHeight * lineNum++, Screen.width, lineHeight), "Jump_New3: " + model.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Jump_New3").ToString());
 	}
 	
 }
