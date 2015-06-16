@@ -4,9 +4,10 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 
 	public float walkSpeed = 10;
-	public BoxCollider2D standingBox;
-	public BoxCollider2D jumpingBox;
-	BoxCollider2D activeBox;
+	
+	public CircleCollider2D footCollider;
+	public bool enableMovement = true;
+
 	
 	GameObject model;
 	bool isGrounded = false;
@@ -37,58 +38,61 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void FixedUpdate () {
-		//transform.position = transform.position + horizontalVel * Time.fixedDeltaTime;
-		
-		activeBox = isGrounded ? standingBox : jumpingBox;
-		Vector3 footPos = transform.position + new Vector3(0, activeBox.offset.y, 0) - 0.5f * new Vector3(0, activeBox.size.y, 0);
-		
-		
-		bool lineTestFwd = false;
-		if (Mathf.Abs(horizontalSpeed) > 0.1f){
-			Vector3 testVec = (new Vector3(horizontalSpeed, 0, 0)).normalized * (0.1f + activeBox.size.x * 0.5f);
-			Vector3 shinAdd = new Vector3(0, 0.01f, 0);
-			lineTestFwd = Physics2D.Linecast(footPos + shinAdd, footPos + shinAdd + testVec, 1 << LayerMask.NameToLayer("Ground"));
-			Debug.DrawLine(footPos + shinAdd, footPos + shinAdd + testVec, Color.yellow);
-			
-		}
-		if (lineTestFwd){
-			horizontalSpeed = 0f;
-		}
+		Debug.Log("FixedUpdate: " + Time.fixedTime);
+
 		Vector3 newVel = GetComponent<Rigidbody2D>().velocity;
 		newVel.x = horizontalSpeed;
 		GetComponent<Rigidbody2D>().velocity = newVel;
-		model.GetComponent<Animator>().SetFloat("speed", Mathf.Abs (horizontalSpeed));
-		
-		
-		
-
-		//Debug.DrawLine(transform.position, footPos, Color.yellow);
-		
-		Vector3 startPos = footPos + new Vector3(0, 1f, 0);
-		Vector3 endPos = footPos + new Vector3(0, -0.1f, 0);
-		
-		
-		Vector3 widthVec = new Vector3(0.2f, 0, 0);
-		
-		bool lineTest1 = Physics2D.Linecast(startPos - widthVec, endPos - widthVec, 1 << LayerMask.NameToLayer("Ground"));
-		bool lineTest2 = Physics2D.Linecast(startPos + widthVec, endPos + widthVec, 1 << LayerMask.NameToLayer("Ground"));
-		
-		Debug.DrawLine(startPos - widthVec, endPos - widthVec, Color.red);
-		Debug.DrawLine(startPos + widthVec, endPos + widthVec, Color.red);
-		
-		isGrounded = lineTest1 || lineTest2;
-		model.GetComponent<Animator>().SetBool("isGrounded", isGrounded);
-		
-		if (tryJump && isGrounded){
-			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 1.5f), ForceMode2D.Impulse);
+		if (enableMovement){
+			model.GetComponent<Animator>().SetFloat("speed", Mathf.Abs (horizontalSpeed));
 		}
 		
-		// Set the collision box to the correct size
-		standingBox.enabled = isGrounded;
-		jumpingBox.enabled = !isGrounded;
 		
+		
+		if (tryJump && isGrounded){
+			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 2.5f), ForceMode2D.Impulse);
+		}
+		
+		// Reset (so it can be set asgain by any collision messages)
+		isGrounded = false;
+	}
+	
+	void TestForGround(Collision2D collision){
+	
+		Vector2 upDir = new Vector3(0, 	1);
+		foreach (ContactPoint2D contactPoint in collision.contacts){
+			if (contactPoint.otherCollider != footCollider) continue;
+			
 
 			
+			
+			Vector2 collisionNormal = contactPoint.normal;
+			Vector2 startPos = contactPoint.point;
+			Vector2 endPos =  startPos + collisionNormal;
+
+			float dotResult = Vector2.Dot(collisionNormal.normalized, upDir);
+			Debug.Log("Dot = " + dotResult);
+			if (dotResult > 0.8f){
+				isGrounded = true;
+				Debug.DrawLine(startPos, endPos, Color.green);
+			}
+			else{
+				Debug.DrawLine(startPos, endPos, Color.red);
+				
+			}
+			
+		}
+		
 		
 	}
+	
+	void OnCollisionEnter2D(Collision2D collision){
+		//Debug.Log("OnCollisionEnter2D: " + col.collider.gameObject.name);
+		TestForGround(collision);
+	}
+		void OnCollisionStay2D(Collision2D collision){
+		//Debug.Log("OnCollisionStay2D: " + col.collider.gameObject.name);
+		TestForGround(collision);
+	}
+	
 }
