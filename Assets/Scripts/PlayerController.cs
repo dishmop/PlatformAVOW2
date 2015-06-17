@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
 	
 	public AudioSource footStep1;
 	public AudioSource footStep2;
+	public AudioSource thud1;
+	public AudioSource thud2;
 	
 	// Footstep generator (hacky!)	
 	public GameObject leftFoot;
@@ -75,7 +77,7 @@ public class PlayerController : MonoBehaviour {
 		isGrounded = false;
 	}
 	
-	void TestForGround(Collision2D collision){
+	bool TestForGround(Collision2D collision){
 	
 		Vector2 upDir = new Vector3(0, 	1);
 		foreach (ContactPoint2D contactPoint in collision.contacts){
@@ -88,7 +90,7 @@ public class PlayerController : MonoBehaviour {
 			float dotResult = Vector2.Dot(collisionNormal.normalized, upDir);
 //			Debug.Log("Dot = " + dotResult);
 			if (dotResult > 0.8f){
-				isGrounded = true;
+				return true;
 				Debug.DrawLine(startPos, endPos, Color.green);
 			}
 			else{
@@ -97,17 +99,25 @@ public class PlayerController : MonoBehaviour {
 			}
 			
 		}
+		return false;
 		
 		
 	}
 	
 	void OnCollisionEnter2D(Collision2D collision){
 		//Debug.Log("OnCollisionEnter2D: " + col.collider.gameObject.name);
-		TestForGround(collision);
+		if (TestForGround(collision)){
+			isGrounded = true;
+			thud1.Play ();
+		}
+
 	}
-		void OnCollisionStay2D(Collision2D collision){
+	
+	void OnCollisionStay2D(Collision2D collision){
 		//Debug.Log("OnCollisionStay2D: " + col.collider.gameObject.name);
-		TestForGround(collision);
+		if (TestForGround(collision)){
+			isGrounded = true;
+		}
 	}
 	
 	void OnGUI2(){
