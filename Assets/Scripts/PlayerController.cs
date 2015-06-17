@@ -84,19 +84,19 @@ public class PlayerController : MonoBehaviour {
 			if (contactPoint.otherCollider != footCollider) continue;
 			
 			Vector2 collisionNormal = contactPoint.normal;
-			Vector2 startPos = contactPoint.point;
-			Vector2 endPos =  startPos + collisionNormal;
+//			Vector2 startPos = contactPoint.point;
+//			Vector2 endPos =  startPos + collisionNormal;
 
 			float dotResult = Vector2.Dot(collisionNormal.normalized, upDir);
 //			Debug.Log("Dot = " + dotResult);
 			if (dotResult > 0.8f){
 				return true;
-				Debug.DrawLine(startPos, endPos, Color.green);
+//				Debug.DrawLine(startPos, endPos, Color.green);
 			}
-			else{
-				Debug.DrawLine(startPos, endPos, Color.red);
-				
-			}
+//			else{
+//				Debug.DrawLine(startPos, endPos, Color.red);
+//				
+//			}
 			
 		}
 		return false;
