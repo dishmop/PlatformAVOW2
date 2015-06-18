@@ -17,6 +17,27 @@ public class Circuit : MonoBehaviour {
 		return electricalComponents[index];
 	}
 	
+	public void AddWire(GameObject wire){
+		wire.transform.SetParent(transform);
+		wires.Add (wire);
+	}
+	
+	public void RemoveWire(GameObject wire){
+		int index = wires.IndexOf(wire);
+		wires.RemoveAt(index);
+		ElectricalComponent component0 = wire.GetComponent<Wire>().ends[0].component.GetComponent<ElectricalComponent>();
+		ElectricalComponent component1 = wire.GetComponent<Wire>().ends[1].component.GetComponent<ElectricalComponent>();
+		
+		int index0 = component0.GetConnectionDataIndex(wire);
+		int index1 = component1.GetConnectionDataIndex(wire);
+		
+		component0.ClearConnectionData(index0);
+		component1.ClearConnectionData(index1);
+		
+		Destroy(wire);
+	}
+	
+	
 	
 	public void AddConnection(GameObject component0, int connector0, GameObject component1, int connector1){
 		GameObject newWire = GameObject.Instantiate(Factory.singleton.wire);

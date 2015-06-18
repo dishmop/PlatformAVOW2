@@ -34,6 +34,27 @@ public class ElectricalComponent : MonoBehaviour {
 		
 	}
 	
+	public int GetConnectionDataIndex(GameObject wire){
+		for (int i = 0; i < connectionData.Length; ++i){
+		
+			if (connectionData[i].wire == wire){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public void ClearConnectionData(int index){
+		connectionData[index].wire = null;
+		connectionData[index].uiIsSelected = false;
+		connectionData[index].uiIsAttached = false;
+		
+		
+		connectionData[index].emptyConnector.SetActive(true);
+		
+	}
+	
+	
 	
 	void Start(){
 		Circuit.singleton.RegisterComponent(gameObject);
@@ -66,9 +87,11 @@ public class ElectricalComponent : MonoBehaviour {
 			HandleMouseInput();
 		}
 		for (int i = 0; i < connectionData.Length; ++i){
-			connectionData[i].emptyConnector.SetActive(active);
+			connectionData[i].emptyConnector.SetActive(active && connectionData[i].wire == null);
 		}
 	}
+	
+	
 	
 	
 	void HandleMouseInput(){
@@ -80,6 +103,7 @@ public class ElectricalComponent : MonoBehaviour {
 			for (int i = 0; i < connectionData.Length; ++i){
 				connectionData[i].uiIsSelected = false;
 				connectionData[i].uiIsAttached = false;
+				UI.singleton.ReleaseConnector();
 			}
 		}
 		else{
@@ -92,6 +116,12 @@ public class ElectricalComponent : MonoBehaviour {
 				Vector3 maxPos = transform.TransformPoint(connectionData[i].pos) + new Vector3(halfWidth, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
 				
 				connectionData[i].uiIsSelected = (mouseWorldPos.x > minPos.x && mouseWorldPos.x < maxPos.x && mouseWorldPos.y > minPos.y && mouseWorldPos.y < maxPos.y);
+				if (connectionData[i].uiIsSelected){
+					UI.singleton.RegisterSelected(gameObject, i);
+				}
+				else{
+					UI.singleton.UnregisterSelected(gameObject, i);
+				}
 			}
 			
 			for (int i = 0; i < connectionData.Length; ++i){
@@ -99,6 +129,13 @@ public class ElectricalComponent : MonoBehaviour {
 					if (connectionData[i].wire == null){
 						connectionData[i].uiIsAttached = true;
 						UI.singleton.AttachConnector(gameObject, i);
+					}
+					else{
+						// Get the wire
+						//Wire thisWire = connectionData[i].wire.GetComponent<Wire>();
+						Circuit.singleton.RemoveWire(connectionData[i].wire);
+						
+						
 					}
 					
 				}
