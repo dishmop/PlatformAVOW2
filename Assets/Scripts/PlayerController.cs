@@ -29,7 +29,10 @@ public class PlayerController : MonoBehaviour {
 	
 	GameObject model;
 	public bool isGrounded = false;
+	public bool isAtTerminal  = false;
+	
 	bool tryJump = false;
+	bool tryAction = false;
 	
 	float horizontalSpeed;
 
@@ -42,7 +45,7 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		horizontalSpeed = walkSpeed * Input.GetAxis("Horizontal");
-		if (Mathf.Abs (horizontalSpeed) > 0.01f){
+		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit){
 			if (horizontalSpeed > 0){
 				model.transform.rotation = Quaternion.Euler(0, 90, 0);
 			}
@@ -52,6 +55,14 @@ public class PlayerController : MonoBehaviour {
 		}
 		
 		tryJump = Input.GetMouseButton(0);
+		
+		if (!isAtTerminal){
+			tryAction = false;
+		}
+		if (Input.GetKeyDown(KeyCode.Space)){
+			tryAction = !tryAction;
+		}
+		
 		ProcessFootsteps();
 		
 		
@@ -61,20 +72,28 @@ public class PlayerController : MonoBehaviour {
 //		Debug.Log("FixedUpdate: " + Time.fixedTime);
 		model.GetComponent<Animator>().SetFloat("speed", Mathf.Abs (GetComponent<Rigidbody2D>().velocity.x));
 		
-		Vector3 newVel = GetComponent<Rigidbody2D>().velocity;
-		newVel.x = horizontalSpeed;
-		GetComponent<Rigidbody2D>().velocity = newVel;
-		
+		if (!GameMode.singleton.isEditingCircuit){
+			Vector3 newVel = GetComponent<Rigidbody2D>().velocity;
+			newVel.x = horizontalSpeed;
+			GetComponent<Rigidbody2D>().velocity = newVel;
+			
+		}
 		model.GetComponent<Animator>().SetBool ("isGrounded", isGrounded);
 		
 		
-		
-		if (tryJump && isGrounded){
+		if (tryJump && isGrounded && !GameMode.singleton.isEditingCircuit){
 			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 2.5f), ForceMode2D.Impulse);
 		}
 		
+		
+		GameMode.singleton.isEditingCircuit = (tryAction && isAtTerminal);
+		
+		model.GetComponent<Animator>().SetBool("isActioning", GameMode.singleton.isEditingCircuit);
+
+		
 		// Reset (so it can be set asgain by any collision messages)
 		isGrounded = false;
+		isAtTerminal = false;
 	}
 	
 	bool TestForGround(Collision2D collision){
@@ -104,13 +123,31 @@ public class PlayerController : MonoBehaviour {
 		
 	}
 	
+	bool TestForTerminal(Collision2D collision){
+		if (collision.gameObject.GetComponent<Terminal>() != null){
+			foreach (ContactPoint2D contactPoint in collision.contacts){
+				if (contactPoint.otherCollider != footCollider) continue;
+				
+				Vector2 collisionNormal = contactPoint.normal;
+				if (Mathf.Abs (collisionNormal.y) < 0.1f){
+					return true;
+				}
+			}
+		
+		}
+		return false;
+	}
+	
 	void OnCollisionEnter2D(Collision2D collision){
 		//Debug.Log("OnCollisionEnter2D: " + col.collider.gameObject.name);
 		if (TestForGround(collision)){
 			isGrounded = true;
 			thud1.Play ();
 		}
-
+		if (TestForTerminal(collision)){
+			isAtTerminal = true;
+		}
+		
 	}
 	
 	void OnCollisionStay2D(Collision2D collision){
@@ -118,9 +155,14 @@ public class PlayerController : MonoBehaviour {
 		if (TestForGround(collision)){
 			isGrounded = true;
 		}
+		
+		if (TestForTerminal(collision)){
+			isAtTerminal = true;
+		}
 	}
 	
 	void OnGUI2(){
+
 		float lineHeight = 20.0f;
 		int lineNum = 0;
 		if (isGrounded){

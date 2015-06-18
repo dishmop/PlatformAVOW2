@@ -6,9 +6,6 @@ public class GameConfig : MonoBehaviour {
 
 	public float routingFirstStepDist = 1f;
 	
-
-	
-	
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
 		singleton = this;

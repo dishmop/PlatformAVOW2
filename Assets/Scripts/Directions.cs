@@ -60,6 +60,24 @@ public class Directions{
 		
 	}
 	
+	public static int GetDominantDirection(Vector3 dirVec){
+		float bestScore = -1;
+		int bestDir = kNull;
+		dirVec.Normalize();
+
+		for (int i = 0; i < kNumDirections; ++i){
+			Vector3 testDir = GetDirVec(i);
+			float score = Vector3.Dot(dirVec, testDir);
+			if (score > bestScore){
+				bestScore = score;
+				bestDir = i;
+			}
+		}
+		return bestDir;
+			
+		
+	}
+	
 	public static int GetStrictDirection(Vector3 startPos, Vector3 endPos){
 		if (MathUtils.FP.Feq(startPos.x, endPos.x)){
 			if (MathUtils.FP.Feq(startPos.y, endPos.y)) return Directions.kNull;

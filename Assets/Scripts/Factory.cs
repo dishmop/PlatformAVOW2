@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GraphicalPrimitives : MonoBehaviour {
+public class Factory : MonoBehaviour {
 
-	public static GraphicalPrimitives singleton = null;
+	public static Factory singleton = null;
 	
 	public GameObject wireLinePrefab;
 	public GameObject wireRectPrefab;
+	public GameObject wire;
 	
 
 

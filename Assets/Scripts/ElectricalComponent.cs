@@ -1,0 +1,135 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class ElectricalComponent : MonoBehaviour {
+	
+	public bool active = true;
+
+
+
+	[System.Serializable]
+	public struct ConnectionData{
+		public GameObject wire;
+		public Vector3 pos;
+		public int dir;
+		public GameObject emptyConnector;
+		public bool uiIsSelected;
+		public bool uiIsAttached;
+		
+	};
+	
+	public ConnectionData[] connectionData;
+	
+	
+	public void GetConnectionData(GameObject wire, out int dir, out Vector3 pos){
+		foreach (ConnectionData data in connectionData){
+			if (data.wire == wire){
+				dir = data.dir;
+				pos = transform.TransformPoint(data.pos);
+				return;
+			}
+		}
+		dir = Directions.kNull;
+		pos = Vector3.zero;
+		
+	}
+	
+	
+	void Start(){
+		Circuit.singleton.RegisterComponent(gameObject);
+		
+		// Set up the little bits of wire that are the conneciton points
+		for (int i = 0; i < connectionData.Length; ++i){
+			connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.wireLinePrefab);
+			connectionData[i].emptyConnector.transform.parent = transform;
+			Vector3 wirePos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
+			connectionData[i].emptyConnector.transform.localPosition = wirePos;
+			WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
+			float halfWidth =  wireLine.width * 0.501f;
+			wireLine.points = new Vector3[2];
+			wireLine.points[0] = new Vector3(0, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
+			wireLine.points[1] = new Vector3(0, -halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
+			wireLine.end0 = WireLine.EndType.kEnd;
+			wireLine.end1 = WireLine.EndType.kEnd;
+			wireLine.ConstructMesh();
+			
+		}
+		
+	}
+	
+	void Update(){
+		// Set the connectors to invisible if a wire is attached
+		foreach (ConnectionData data in connectionData){
+			data.emptyConnector.SetActive(data.wire == null);
+		}
+		if (active){
+			HandleMouseInput();
+		}
+		for (int i = 0; i < connectionData.Length; ++i){
+			connectionData[i].emptyConnector.SetActive(active);
+		}
+	}
+	
+	
+	void HandleMouseInput(){
+	
+		// Calc the mouse posiiton on world space
+		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
+		
+		if (!GameMode.singleton.isEditingCircuit){
+			for (int i = 0; i < connectionData.Length; ++i){
+				connectionData[i].uiIsSelected = false;
+				connectionData[i].uiIsAttached = false;
+			}
+		}
+		else{
+			
+			// Test if inside any of the connectors
+			for (int i = 0; i < connectionData.Length; ++i){
+				WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
+				float halfWidth =  wireLine.width * 0.501f;
+				Vector3 minPos = transform.TransformPoint(connectionData[i].pos) - new Vector3(halfWidth, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
+				Vector3 maxPos = transform.TransformPoint(connectionData[i].pos) + new Vector3(halfWidth, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
+				
+				connectionData[i].uiIsSelected = (mouseWorldPos.x > minPos.x && mouseWorldPos.x < maxPos.x && mouseWorldPos.y > minPos.y && mouseWorldPos.y < maxPos.y);
+			}
+			
+			for (int i = 0; i < connectionData.Length; ++i){
+				if (connectionData[i].uiIsSelected && Input.GetMouseButtonDown(0)){
+					if (connectionData[i].wire == null){
+						connectionData[i].uiIsAttached = true;
+						UI.singleton.AttachConnector(gameObject, i);
+					}
+					
+				}
+				if (Input.GetMouseButtonUp(0)){
+					UI.singleton.ReleaseConnector();
+					connectionData[i].uiIsAttached = false;
+				}
+			}
+		}
+		
+		// Visualise UI stat
+		foreach (ConnectionData data in connectionData){
+		
+			Color caseColor = Color.black;
+			if (data.uiIsAttached){
+				caseColor = Color.cyan;
+			}
+			else if (data.uiIsSelected){
+				caseColor = Color.green;
+			}
+			
+			
+			data.emptyConnector.GetComponent<WireLine>().caseColor = caseColor;
+		}
+		
+		
+		// Set the cursor cubes position
+		mouseWorldPos.z = transform.position.z;
+	}
+	
+
+	
+
+}

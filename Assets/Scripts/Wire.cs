@@ -12,6 +12,8 @@ public class Wire : MonoBehaviour {
 		
 	};
 	
+	public bool autoUpdateWires = true;
+	
 	public EndData[] ends = new EndData[2];
 	
 	List<Vector3>[] paths = new List<Vector3>[2];
@@ -40,7 +42,7 @@ public class Wire : MonoBehaviour {
 		// if we are attached to a component then copy the various connection info from it
 		for (int i = 0; i < 2; ++i){
 			if (ends[i].component != null){
-				Connections connections = ends[i].component.GetComponent<Connections>();
+				ElectricalComponent connections = ends[i].component.GetComponent<ElectricalComponent>();
 				connections.GetConnectionData(gameObject, out ends[i].dir, out ends[i].pos);
 			}
 		}
@@ -144,15 +146,15 @@ public class Wire : MonoBehaviour {
 
 	
 	GameObject ConstructCentralWire(){
-		GameObject wire =  GameObject.Instantiate(GraphicalPrimitives.singleton.wireLinePrefab);
+		GameObject wire =  GameObject.Instantiate(Factory.singleton.wireLinePrefab);
 		wire.transform.SetParent(transform);
 		wire.transform.localPosition = Vector3.zero;
 		
 		WireLine line = wire.GetComponent<WireLine>();
 		
 		line.points = paths[0].ToArray();
-		line.end0 = WireLine.EndType.kContinue;
-		line.end1 = WireLine.EndType.kContinue;
+		line.end0 = WireLine.EndType.kEnd;
+		line.end1 = WireLine.EndType.kEnd;
 		line.ConstructMesh();
 		return wire;
 	}
@@ -165,8 +167,11 @@ public class Wire : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		ClearMesh();
-		ConstructMesh();
+	
+		if (autoUpdateWires){
+			ClearMesh();
+			ConstructMesh();
+		}
 	
 	}
 }

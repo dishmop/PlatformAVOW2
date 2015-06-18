@@ -48,19 +48,24 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\ASDAudioSource.cs" />
      <Compile Include="Assets\Scripts\CamController.cs" />
-     <Compile Include="Assets\Scripts\Connections.cs" />
+     <Compile Include="Assets\Scripts\Circuit.cs" />
      <Compile Include="Assets\Scripts\DebugUtils.cs" />
      <Compile Include="Assets\Scripts\Directions.cs" />
+     <Compile Include="Assets\Scripts\ElectricalComponent.cs" />
+     <Compile Include="Assets\Scripts\Factory.cs" />
      <Compile Include="Assets\Scripts\GameConfig.cs" />
+     <Compile Include="Assets\Scripts\GameMode.cs" />
      <Compile Include="Assets\Scripts\Global.cs" />
-     <Compile Include="Assets\Scripts\GraphicalPrimitives.cs" />
      <Compile Include="Assets\Scripts\MathUtils.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\SlidingDoor.cs" />
+     <Compile Include="Assets\Scripts\Terminal.cs" />
+     <Compile Include="Assets\Scripts\TerminalFader.cs" />
      <Compile Include="Assets\Scripts\TileableSprite.cs" />
      <Compile Include="Assets\Scripts\Wire.cs" />
      <Compile Include="Assets\Scripts\WireLine.cs" />
      <Compile Include="Assets\Scripts\WireRect.cs" />
+     <Compile Include="Assets\UI.cs" />
      <None Include="Assets\Shaders\GlowLine.shader" />
      <None Include="Assets\Shaders\GlowSquare.shader" />
  <Reference Include="UnityEngine.UI">
