@@ -119,6 +119,10 @@ public class UI : MonoBehaviour {
 			
 			cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].dir = Directions.GetDominantDirection(otherEndPos - thisEnd);
 		}
+		
+		if (Input.GetMouseButtonUp(0)){
+			ReleaseConnector();
+		}
 
 	
 	}

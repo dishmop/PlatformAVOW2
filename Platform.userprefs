@@ -1,22 +1,29 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ElectricalComponent.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Wire.cs">
     <Files>
-      <File FileName="Assets/Scripts/GameConfig.cs" Line="8" Column="1" />
+      <File FileName="Assets/Scripts/GameConfig.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Terminal.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Factory.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/GameMode.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/TerminalFader.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/PlayerController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/ElectricalComponent.cs" Line="13" Column="22" />
-      <File FileName="Assets/Scripts/Circuit.cs" Line="36" Column="1" />
-      <File FileName="Assets/UI.cs" Line="104" Column="1" />
+      <File FileName="Assets/Scripts/Circuit.cs" Line="23" Column="1" />
       <File FileName="Assets/Scripts/Directions.cs" Line="1" Column="1" />
       <File FileName="Assets/Shaders/GlowLine.shader" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Wire.cs" Line="17" Column="41" />
+      <File FileName="Assets/Scripts/ASDAudioSource.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/CamController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/WireLine.cs" Line="273" Column="51" />
+      <File FileName="Assets/Scripts/ElectricalComponent.cs" Line="13" Column="21" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="43" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="101" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="115" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

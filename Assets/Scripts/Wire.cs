@@ -18,7 +18,6 @@ public class Wire : MonoBehaviour {
 	
 	List<Vector3>[] paths = new List<Vector3>[2];
 	
-	
 	GameObject 	  	currentWire;
 	
 	
@@ -153,8 +152,8 @@ public class Wire : MonoBehaviour {
 		WireLine line = wireLine.GetComponent<WireLine>();
 		
 		line.points = paths[0].ToArray();
-		line.end0 = WireLine.EndType.kEnd;
-		line.end1 = WireLine.EndType.kEnd;
+		line.end0 = WireLine.EndType.kContinue;
+		line.end1 = WireLine.EndType.kContinue;
 		line.ConstructMesh();
 		return wireLine;
 	}

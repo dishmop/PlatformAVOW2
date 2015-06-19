@@ -62,10 +62,10 @@
      <Compile Include="Assets\Scripts\Terminal.cs" />
      <Compile Include="Assets\Scripts\TerminalFader.cs" />
      <Compile Include="Assets\Scripts\TileableSprite.cs" />
+     <Compile Include="Assets\Scripts\UI.cs" />
      <Compile Include="Assets\Scripts\Wire.cs" />
      <Compile Include="Assets\Scripts\WireLine.cs" />
      <Compile Include="Assets\Scripts\WireRect.cs" />
-     <Compile Include="Assets\UI.cs" />
      <None Include="Assets\Shaders\GlowLine.shader" />
      <None Include="Assets\Shaders\GlowSquare.shader" />
  <Reference Include="UnityEngine.UI">

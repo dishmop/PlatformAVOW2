@@ -2,10 +2,19 @@
 using System.Collections;
 
 public class ElectricalComponent : MonoBehaviour {
+
+
+	public enum Type{
+		kUnknown,
+		kVoltageSource,
+		kLoad,
+		kCursor,
+		kJunction
+	};
+	
+	public Type type = Type.kUnknown;
 	
 	public bool active = true;
-
-
 
 	[System.Serializable]
 	public struct ConnectionData{
@@ -48,12 +57,27 @@ public class ElectricalComponent : MonoBehaviour {
 		connectionData[index].wire = null;
 		connectionData[index].uiIsSelected = false;
 		connectionData[index].uiIsAttached = false;
-		
-		
 		connectionData[index].emptyConnector.SetActive(true);
 		
 	}
 	
+	
+	void SetupConnectorPositions(){
+		for (int i = 0; i < connectionData.Length; ++i){
+			Vector3 wirePos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
+			connectionData[i].emptyConnector.transform.localPosition = wirePos;
+			WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
+			
+			Vector3 goDir = Directions.GetDirVec(connectionData[i].dir);
+			
+			wireLine.points = new Vector3[2];
+			wireLine.points[0] = Vector3.zero;
+			wireLine.points[1] = goDir * wireLine.width * 1.01f;
+			wireLine.end0 = WireLine.EndType.kContinue;
+			wireLine.end1 = WireLine.EndType.kEnd;
+			
+		}
+	}
 	
 	
 	void Start(){
@@ -64,17 +88,10 @@ public class ElectricalComponent : MonoBehaviour {
 		for (int i = 0; i < connectionData.Length; ++i){
 			connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.wireLinePrefab);
 			connectionData[i].emptyConnector.transform.parent = transform;
-			Vector3 wirePos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
-			connectionData[i].emptyConnector.transform.localPosition = wirePos;
-			WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
-			float halfWidth =  wireLine.width * 0.501f;
-			wireLine.points = new Vector3[2];
-			wireLine.points[0] = new Vector3(0, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
-			wireLine.points[1] = new Vector3(0, -halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
-			wireLine.end0 = WireLine.EndType.kEnd;
-			wireLine.end1 = WireLine.EndType.kEnd;
-			
 		}
+		SetupConnectorPositions();
+		
+
 		
 	}
 	
@@ -84,12 +101,13 @@ public class ElectricalComponent : MonoBehaviour {
 		foreach (ConnectionData data in connectionData){
 			data.emptyConnector.SetActive(data.wire == null);
 		}
-		if (active){
+		if (type != Type.kCursor){
 			HandleMouseInput();
 		}
 		for (int i = 0; i < connectionData.Length; ++i){
 			connectionData[i].emptyConnector.SetActive(active && connectionData[i].wire == null);
 		}
+		SetupConnectorPositions();
 	}
 	
 	
@@ -168,7 +186,6 @@ public class ElectricalComponent : MonoBehaviour {
 					
 				}
 				if (Input.GetMouseButtonUp(0)){
-					UI.singleton.ReleaseConnector();
 					connectionData[i].uiIsAttached = false;
 				}
 			}
