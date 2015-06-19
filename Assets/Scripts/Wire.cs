@@ -146,18 +146,24 @@ public class Wire : MonoBehaviour {
 
 	
 	GameObject ConstructCentralWire(){
-		GameObject wire =  GameObject.Instantiate(Factory.singleton.wireLinePrefab);
-		wire.transform.SetParent(transform);
-		wire.transform.localPosition = Vector3.zero;
+		GameObject wireLine =  GameObject.Instantiate(Factory.singleton.wireLinePrefab);
+		wireLine.transform.SetParent(transform);
+		wireLine.transform.localPosition = Vector3.zero;
 		
-		WireLine line = wire.GetComponent<WireLine>();
+		WireLine line = wireLine.GetComponent<WireLine>();
 		
 		line.points = paths[0].ToArray();
 		line.end0 = WireLine.EndType.kEnd;
 		line.end1 = WireLine.EndType.kEnd;
 		line.ConstructMesh();
-		return wire;
+		return wireLine;
 	}
+	
+	void UpdateCentralWire(){
+		currentWire.GetComponent<WireLine>().points = paths[0].ToArray();
+	
+	}
+	
 
 	// Use this for initialization
 	void Start () {
@@ -167,11 +173,14 @@ public class Wire : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-	
-		if (autoUpdateWires){
-			ClearMesh();
-			ConstructMesh();
-		}
+		SetupEnds();
+		SetupPath();
+		UpdateCentralWire();
+			
+//		if (autoUpdateWires){
+//			ClearMesh();
+//			ConstructMesh();
+//		}
 	
 	}
 }

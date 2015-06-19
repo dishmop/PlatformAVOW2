@@ -52,6 +52,13 @@ public class WireLine : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		// need to create the mesh initially
+		Mesh mesh = new Mesh();
+		GetComponent<MeshFilter>().mesh = mesh;
+		
+		// Ensure it is read/writable
+		mesh.UploadMeshData(false);
+				
 		ConstructMesh();
 	
 	}
@@ -292,13 +299,15 @@ public class WireLine : MonoBehaviour {
 	}
 	
 	void AssignMeshVars(){
-		Mesh mesh = new Mesh();
-		GetComponent<MeshFilter>().mesh = mesh;
+		Mesh mesh = GetComponent<MeshFilter>().mesh;
+		
+		mesh.Clear();
+		
 		mesh.vertices = newVertices;
 		mesh.uv = newUV;
 		mesh.triangles = newTriangles;
 		
-		mesh.UploadMeshData(true);
+		mesh.UploadMeshData(false);
 	}
 	
 	void SetupMaterials(){

@@ -58,6 +58,7 @@ public class ElectricalComponent : MonoBehaviour {
 	
 	void Start(){
 		Circuit.singleton.RegisterComponent(gameObject);
+
 		
 		// Set up the little bits of wire that are the conneciton points
 		for (int i = 0; i < connectionData.Length; ++i){
@@ -72,13 +73,13 @@ public class ElectricalComponent : MonoBehaviour {
 			wireLine.points[1] = new Vector3(0, -halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
 			wireLine.end0 = WireLine.EndType.kEnd;
 			wireLine.end1 = WireLine.EndType.kEnd;
-			wireLine.ConstructMesh();
 			
 		}
 		
 	}
 	
 	void Update(){
+
 		// Set the connectors to invisible if a wire is attached
 		foreach (ConnectionData data in connectionData){
 			data.emptyConnector.SetActive(data.wire == null);
@@ -133,7 +134,34 @@ public class ElectricalComponent : MonoBehaviour {
 					else{
 						// Get the wire
 						//Wire thisWire = connectionData[i].wire.GetComponent<Wire>();
+						GameObject comp0 = connectionData[i].wire.GetComponent<Wire>().ends[0].component;
+						int index0 = comp0.GetComponent<ElectricalComponent>().GetConnectionDataIndex(connectionData[i].wire);
+						
+						GameObject comp1 = connectionData[i].wire.GetComponent<Wire>().ends[1].component;
+						int index1 = comp1.GetComponent<ElectricalComponent>().GetConnectionDataIndex(connectionData[i].wire);
+						
+						GameObject otherComp = null;
+						int otherIndex = -1;
+						
+						if (comp0 == gameObject && index0 == i){
+							otherComp = comp1;
+							otherIndex = index1;
+							
+						}
+						else if (comp1 == gameObject && index1 == i){
+							otherComp = comp0;
+							otherIndex = index0;
+						}
+						else{
+							DebugUtils.Assert(false, "Removing a wire which is not attached as we thought.");
+						}
+						
 						Circuit.singleton.RemoveWire(connectionData[i].wire);
+						
+						connectionData[i].uiIsAttached = true;
+						UI.singleton.AttachConnector(otherComp, otherIndex);
+						UI.singleton.RegisterSelected(gameObject, i);
+						
 						
 						
 					}
