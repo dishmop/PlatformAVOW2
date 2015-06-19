@@ -16,16 +16,25 @@ public class Wire : MonoBehaviour {
 	
 	public EndData[] ends = new EndData[2];
 	
+	
+	public GameObject 	  	currentWire;
+	
+	public GameObject junction;
+	
+	
 	List<Vector3>[] paths = new List<Vector3>[2];
+	float			pathLength;
 	
-	GameObject 	  	currentWire;
 	
-	
-	public void ConstructMesh(){
+	void ConstructMesh(){
 		SetupEnds();
 		SetupPath();
 		currentWire = ConstructCentralWire();
 	
+	}
+	
+	public bool IsPointInside(Vector3 point, out float distAlong){
+		return currentWire.GetComponent<WireLine>().IsPointInside(point, out distAlong);
 	}
 	
 	
@@ -35,7 +44,76 @@ public class Wire : MonoBehaviour {
 		}
 	}
 	
-
+//	public float CalcPropFromPos(Vector3 pos){
+//		float lengthSoFar = 0;
+//		for (int i = 0; i < paths[0].Count-1; ++i){
+//			Vector3 segment = paths[0][i] - paths[0][i+1];
+//			float thisSegLen = segment.magnitude;
+//			
+//			// Is this a horizontal path
+//			if (MathUtils.FP.Feq(paths[0][i].x, paths[0][1].x)){
+//				
+//			
+//			}
+//			// Is this a vertical path
+//			else (MathUtils.FP.Feq(paths[0][i].y, paths[0][1].y)){
+//			}
+//			else{
+//				DebugUtils.Assert(false, "not horizontal or vertical");
+//			}
+//			
+//			if (distTraveledSoFar + thisSegLen > remainingLengthToTarget){
+//				startIndex = i;
+//				propAlongFinalSegment = remainingLengthToTarget / thisSegLen;
+//				break;
+//			}
+//			else{
+//				remainingLengthToTarget -= thisSegLen;
+//				distTraveledSoFar += thisSegLen;
+//			}
+//		}
+//		
+//	}
+	
+	// Given a proportion of the distance along the wire (from end0 to end1) and the 
+	// direction we would like to attach from, this returns the position and the direction we will attach from
+	// I.e. if we can attach from the right, we return 1
+	public void CalcInfoFromProp(float prop, Vector3 desAttachDir, out Vector3 pos, out int dir){
+		float targetDist = prop * pathLength;
+		
+		// Figure out which path segment we are in and how much more "length" we need to travel
+		int startIndex = -1;
+		float remainingLengthToTarget = targetDist;
+		float distTraveledSoFar = 0;
+		
+		float propAlongFinalSegment = -1;
+		
+		for (int i = 0; i < paths[0].Count-1; ++i){
+			Vector3 segment = paths[0][i] - paths[0][i+1];
+			float thisSegLen = segment.magnitude;
+			if (distTraveledSoFar + thisSegLen > remainingLengthToTarget){
+				startIndex = i;
+				propAlongFinalSegment = remainingLengthToTarget / thisSegLen;
+				break;
+			}
+			else{
+				remainingLengthToTarget -= thisSegLen;
+				distTraveledSoFar += thisSegLen;
+			}
+		}
+		
+		DebugUtils.Assert(startIndex >= 0);
+		
+		Vector3 localPos = Vector3.Lerp(paths[0][startIndex], paths[0][startIndex+1], propAlongFinalSegment);
+		
+		pos = transform.TransformPoint (localPos);
+		
+		dir = 1;
+		
+		
+	
+	}
+	
 	
 	void SetupEnds(){
 		// if we are attached to a component then copy the various connection info from it
@@ -129,14 +207,24 @@ public class Wire : MonoBehaviour {
 			Vector3 newPos = new Vector3(paths[0][i].x, paths[0][i].y, 0);
 			paths[0][i] = newPos;
 		}
-		centrePos.z = 0;
+		//centrePos.z = 0;
 		
+		
+		transform.position = new Vector3(centrePos.x, centrePos.y, -2);
 		
 		// Offset the path so the object can be positioned at its centre
-		transform.position = new Vector3(centrePos.x, centrePos.y, transform.position.z);
 		for (int i = 0; i < paths[0].Count; ++i){
 			paths[0][i] -= centrePos;
 		}
+		
+		// Figure out the length of the path
+		pathLength = 0;
+		for (int i = 0; i < paths[0].Count-1; ++i){
+			Vector3 segment = paths[0][i] - paths[0][i+1];
+			pathLength += segment.magnitude;
+		}
+		
+		
 		
 		
 	
@@ -154,7 +242,7 @@ public class Wire : MonoBehaviour {
 		line.points = paths[0].ToArray();
 		line.end0 = WireLine.EndType.kContinue;
 		line.end1 = WireLine.EndType.kContinue;
-		line.ConstructMesh();
+//		line.ConstructMesh();
 		return wireLine;
 	}
 	
@@ -168,6 +256,33 @@ public class Wire : MonoBehaviour {
 	void Start () {
 		ConstructMesh();
 	
+	}
+	
+	
+	void HandleMouseInput(){
+		// If this is the wire that is attaced to the cursor, then do nothing.
+		if (ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
+			return;
+		}
+		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
+		float distAlong = 0;
+		if (IsPointInside(mouseWorldPos, out distAlong)){
+			if (junction == null){
+				junction = GameObject.Instantiate(Factory.singleton.wireJunctionPrefab);
+				junction.GetComponent<WireJunction>().parentWire = gameObject;
+				junction.transform.SetParent(transform);
+			}
+			junction.GetComponent<WireJunction>().propAlongWire = distAlong / pathLength;
+			
+		}
+		else{
+			currentWire.GetComponent<WireLine>().wireIntensity = 1;
+		}
+		
+	}
+	
+	void Update(){
+		HandleMouseInput();
 	}
 	
 	// Update is called once per frame

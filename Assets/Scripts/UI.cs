@@ -69,7 +69,7 @@ public class UI : MonoBehaviour {
 	public void AttachConnector(GameObject electricalComponent, int connectionIndex){
 		DebugUtils.Assert(attachedWire == null, "Wire already attached");
 		
-		attachedWire = GameObject.Instantiate(Factory.singleton.wire);
+		attachedWire = GameObject.Instantiate(Factory.singleton.wirePrefab);
 		attachedWire.transform.SetParent(transform);
 		attachedWire.GetComponent<Wire>().ends[0].component = electricalComponent;
 		attachedWire.GetComponent<Wire>().ends[1].component = cursorTransform.gameObject;
@@ -101,6 +101,7 @@ public class UI : MonoBehaviour {
 		
 		if (Input.GetMouseButtonUp(0)){
 			if (attachedWire != null && selectedComponent != null){
+				attachedWire.GetComponent<Wire>().currentWire.GetComponent<WireLine>().caseColor = Color.black;
 				Circuit.singleton.AddWire(attachedWire);
 				attachedWire = null;
 			
@@ -122,6 +123,13 @@ public class UI : MonoBehaviour {
 		
 		if (Input.GetMouseButtonUp(0)){
 			ReleaseConnector();
+		}
+		
+		if (attachedWire != null){
+			GameObject wireLine = attachedWire.GetComponent<Wire>().currentWire;
+			if (wireLine != null){
+				wireLine.GetComponent<WireLine>().caseColor = GameConfig.singleton.selectedColor;
+			}
 		}
 
 	

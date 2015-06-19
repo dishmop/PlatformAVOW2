@@ -40,7 +40,54 @@ public class WireLine : MonoBehaviour {
 	
 	
 	
-	public void ConstructMesh(){
+	public bool IsPointInside(Vector3 point, out float distAlong){
+	
+		// Ever set of 4 vertices is an axis aligned quad
+		// I.e. mega trivial to determin if we are inside
+		distAlong = 0;
+		
+		for (int i = 0; i < numVertices; i += 4){
+			Vector3 rootPos = transform.TransformPoint(newVertices[i]);
+			Vector3 otherPos0 = transform.TransformPoint(newVertices[i+1]);
+			Vector3 otherPos1 = transform.TransformPoint(newVertices[i+2]);
+			
+			float minX = Mathf.Min (rootPos.x,  Mathf.Min (otherPos0.x, otherPos1.x));
+			float maxX = Mathf.Max (rootPos.x,  Mathf.Max (otherPos0.x, otherPos1.x));
+			float minY = Mathf.Min (rootPos.y,  Mathf.Min (otherPos0.y, otherPos1.y));
+			float maxY = Mathf.Max (rootPos.y,  Mathf.Max (otherPos0.y, otherPos1.y));
+			
+			if (point.x > minX && point.x < maxX && point.y > minY && point.y < maxY){
+				// If a mid segment (rather than an end or a coner)
+				if (i % 2 == 1){
+					// If horizontal segment
+					if (MathUtils.FP.Feq(rootPos.y, otherPos1.y)){
+						distAlong += point.x  - maxX;
+					}
+					// If vertical segment
+					else if (MathUtils.FP.Feq(rootPos.x, otherPos1.x)){
+						distAlong += point.y  - maxY;
+					}
+					else{
+						DebugUtils.Assert(false, "Not horizontal nor vertical");
+					}
+					    
+				}
+				else{
+					distAlong += 0.5f * (otherPos1 - rootPos).magnitude;
+					
+				}
+				return true;
+			}
+			else{
+				distAlong += (otherPos1 - rootPos).magnitude;
+				
+			}
+		}
+		return false;
+	
+	}
+	
+	void ConstructMesh(){
 		SimplifyLine();
 		CalcArraySizes();
 		ConstructArrays();
@@ -49,6 +96,8 @@ public class WireLine : MonoBehaviour {
 		SetupMaterials();
 		
 	}
+	
+	
 
 	// Use this for initialization
 	void Start () {
@@ -291,7 +340,7 @@ public class WireLine : MonoBehaviour {
 		
 		// Ensure all z values are the same as that of the WireLine itself
 		for (int i = 0; i < numVertices; ++i){
-			Vector3 newPos = new Vector3(newVertices[i].x, newVertices[i].y, transform.position.z);
+			Vector3 newPos = new Vector3(newVertices[i].x, newVertices[i].y, 0);
 			newVertices[i] = newPos;
 		}
 		
@@ -300,7 +349,6 @@ public class WireLine : MonoBehaviour {
 	
 	void AssignMeshVars(){
 		Mesh mesh = GetComponent<MeshFilter>().mesh;
-		
 		mesh.Clear();
 		
 		mesh.vertices = newVertices;
@@ -311,8 +359,10 @@ public class WireLine : MonoBehaviour {
 	}
 	
 	void SetupMaterials(){
-		GetComponent<MeshRenderer>().materials[0].color = caseColor;
-		GetComponent<MeshRenderer>().materials[1].color = wireColor;
+		GetComponent<MeshRenderer>().materials[0].SetFloat("_IntensityWire", wireIntensity);
+		GetComponent<MeshRenderer>().materials[0].SetFloat("_IntensityCase", caseIntensity);
+		GetComponent<MeshRenderer>().materials[0].SetColor("_ColorWire", wireColor);
+		GetComponent<MeshRenderer>().materials[0].SetColor("_ColorCase", caseColor);
 	}
 
 }

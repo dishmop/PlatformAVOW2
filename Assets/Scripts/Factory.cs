@@ -6,8 +6,9 @@ public class Factory : MonoBehaviour {
 	public static Factory singleton = null;
 	
 	public GameObject wireLinePrefab;
-	public GameObject wireRectPrefab;
-	public GameObject wire;
+//	public GameObject wireRectPrefab;
+	public GameObject wirePrefab;
+	public GameObject wireJunctionPrefab;
 	
 
 

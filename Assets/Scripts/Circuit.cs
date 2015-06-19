@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -40,7 +40,7 @@ public class Circuit : MonoBehaviour {
 	
 	
 	public void AddConnection(GameObject component0, int connector0, GameObject component1, int connector1){
-		GameObject newWire = GameObject.Instantiate(Factory.singleton.wire);
+		GameObject newWire = GameObject.Instantiate(Factory.singleton.wirePrefab);
 		newWire.transform.SetParent(transform);
 		newWire.GetComponent<Wire>().ends[0].component = component0;
 		newWire.GetComponent<Wire>().ends[1].component = component1;

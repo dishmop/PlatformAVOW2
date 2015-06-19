@@ -64,6 +64,7 @@
      <Compile Include="Assets\Scripts\TileableSprite.cs" />
      <Compile Include="Assets\Scripts\UI.cs" />
      <Compile Include="Assets\Scripts\Wire.cs" />
+     <Compile Include="Assets\Scripts\WireJunction.cs" />
      <Compile Include="Assets\Scripts\WireLine.cs" />
      <Compile Include="Assets\Scripts\WireRect.cs" />
      <None Include="Assets\Shaders\GlowLine.shader" />

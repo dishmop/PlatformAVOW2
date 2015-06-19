@@ -14,7 +14,6 @@ public class ElectricalComponent : MonoBehaviour {
 	
 	public Type type = Type.kUnknown;
 	
-	public bool active = true;
 
 	[System.Serializable]
 	public struct ConnectionData{
@@ -105,9 +104,18 @@ public class ElectricalComponent : MonoBehaviour {
 			HandleMouseInput();
 		}
 		for (int i = 0; i < connectionData.Length; ++i){
-			connectionData[i].emptyConnector.SetActive(active && connectionData[i].wire == null);
+			connectionData[i].emptyConnector.SetActive(ShouldRenderEmptyConnector(i));
 		}
 		SetupConnectorPositions();
+	}
+	
+	bool ShouldRenderEmptyConnector(int i){
+		
+		if (type == Type.kCursor || type == Type.kJunction) return false;
+		
+		if (connectionData[i].wire != null) return false;
+		
+		return true;
 	}
 	
 	
@@ -196,14 +204,15 @@ public class ElectricalComponent : MonoBehaviour {
 		
 			Color caseColor = Color.black;
 			if (data.uiIsAttached){
-				caseColor = Color.cyan;
+				caseColor = GameConfig.singleton.attachedColor;
 			}
 			else if (data.uiIsSelected){
-				caseColor = Color.green;
+				caseColor = GameConfig.singleton.selectedColor;
 			}
 			
 			
 			data.emptyConnector.GetComponent<WireLine>().caseColor = caseColor;
+
 		}
 		
 		
