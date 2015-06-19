@@ -69,9 +69,10 @@ public class ElectricalComponent : MonoBehaviour {
 			
 			Vector3 goDir = Directions.GetDirVec(connectionData[i].dir);
 			
-			wireLine.points = new Vector3[2];
-			wireLine.points[0] = Vector3.zero;
-			wireLine.points[1] = goDir * wireLine.width * 1.01f;
+			Vector3[] newPoints = new Vector3[2];
+			newPoints[0] = Vector3.zero;
+			newPoints[1] = goDir * wireLine.width * 1.01f;
+			wireLine.SetNewPoints(newPoints);
 			wireLine.end0 = WireLine.EndType.kContinue;
 			wireLine.end1 = WireLine.EndType.kEnd;
 			
@@ -100,7 +101,7 @@ public class ElectricalComponent : MonoBehaviour {
 		foreach (ConnectionData data in connectionData){
 			data.emptyConnector.SetActive(data.wire == null);
 		}
-		if (type != Type.kCursor){
+		if (type != Type.kCursor && type != Type.kJunction){
 			HandleMouseInput();
 		}
 		for (int i = 0; i < connectionData.Length; ++i){

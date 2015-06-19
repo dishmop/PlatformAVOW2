@@ -25,6 +25,9 @@ public class Wire : MonoBehaviour {
 	List<Vector3>[] paths = new List<Vector3>[2];
 	float			pathLength;
 	
+	// Debug (should be local)
+	float distAlong;
+	
 	
 	void ConstructMesh(){
 		SetupEnds();
@@ -79,6 +82,8 @@ public class Wire : MonoBehaviour {
 	// direction we would like to attach from, this returns the position and the direction we will attach from
 	// I.e. if we can attach from the right, we return 1
 	public void CalcInfoFromProp(float prop, Vector3 desAttachDir, out Vector3 pos, out int dir){
+	
+		DebugUtils.Assert(prop >= 0 && prop <= 1, "Prop passed in not between 0 and 1");
 		float targetDist = prop * pathLength;
 		
 		// Figure out which path segment we are in and how much more "length" we need to travel
@@ -91,7 +96,7 @@ public class Wire : MonoBehaviour {
 		for (int i = 0; i < paths[0].Count-1; ++i){
 			Vector3 segment = paths[0][i] - paths[0][i+1];
 			float thisSegLen = segment.magnitude;
-			if (distTraveledSoFar + thisSegLen > remainingLengthToTarget){
+			if (thisSegLen > remainingLengthToTarget){
 				startIndex = i;
 				propAlongFinalSegment = remainingLengthToTarget / thisSegLen;
 				break;
@@ -102,7 +107,8 @@ public class Wire : MonoBehaviour {
 			}
 		}
 		
-		DebugUtils.Assert(startIndex >= 0);
+		DebugUtils.Assert (startIndex >=0 && startIndex < paths[0].Count, "Trying to access wire segment outside of bounds");
+		
 		
 		Vector3 localPos = Vector3.Lerp(paths[0][startIndex], paths[0][startIndex+1], propAlongFinalSegment);
 		
@@ -239,7 +245,7 @@ public class Wire : MonoBehaviour {
 		
 		WireLine line = wireLine.GetComponent<WireLine>();
 		
-		line.points = paths[0].ToArray();
+		line.SetNewPoints(paths[0].ToArray());
 		line.end0 = WireLine.EndType.kContinue;
 		line.end1 = WireLine.EndType.kContinue;
 //		line.ConstructMesh();
@@ -247,7 +253,7 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void UpdateCentralWire(){
-		currentWire.GetComponent<WireLine>().points = paths[0].ToArray();
+		currentWire.GetComponent<WireLine>().SetNewPoints(paths[0].ToArray());
 	
 	}
 	
@@ -265,13 +271,14 @@ public class Wire : MonoBehaviour {
 			return;
 		}
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
-		float distAlong = 0;
+		distAlong = 0;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
 			if (junction == null){
 				junction = GameObject.Instantiate(Factory.singleton.wireJunctionPrefab);
 				junction.GetComponent<WireJunction>().parentWire = gameObject;
 				junction.transform.SetParent(transform);
 			}
+			DebugUtils.Assert (distAlong <= pathLength, "distAlong > path length!: " + distAlong + " : " + pathLength);
 			junction.GetComponent<WireJunction>().propAlongWire = distAlong / pathLength;
 			
 		}
@@ -281,8 +288,27 @@ public class Wire : MonoBehaviour {
 		
 	}
 	
+	void HandleMouseInput2(){
+		// If this is the wire that is attaced to the cursor, then do nothing.
+		if (ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
+			return;
+		}
+		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
+		distAlong = 0;
+		if (IsPointInside(mouseWorldPos, out distAlong)){
+			currentWire.GetComponent<WireLine>().wireIntensity = 2;
+			UI.singleton.RegisterWireSelect(gameObject, distAlong / pathLength);
+			
+		}
+		else{
+			currentWire.GetComponent<WireLine>().wireIntensity = 1;
+			UI.singleton.UnregisterWireSelect(gameObject);
+		}
+		
+	}
+	
 	void Update(){
-		HandleMouseInput();
+		HandleMouseInput2();
 	}
 	
 	// Update is called once per frame
@@ -296,5 +322,11 @@ public class Wire : MonoBehaviour {
 //			ConstructMesh();
 //		}
 	
+	}
+	
+	void OnGUI(){
+		if (pathLength > 1){
+			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "pathLength: " + pathLength + ", distAlong: " + distAlong);
+		}
 	}
 }

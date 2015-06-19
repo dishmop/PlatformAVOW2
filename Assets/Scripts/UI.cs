@@ -10,6 +10,8 @@ public class UI : MonoBehaviour {
 	GameObject selectedComponent = null;
 	int selectedConnectorIndex = -1;
 	
+	GameObject cursorJunction;
+	
 	public void RegisterSelected(GameObject electricalComponent, int index){
 	
 		if (attachedWire != null){
@@ -30,9 +32,6 @@ public class UI : MonoBehaviour {
 			}
 		}
 		
-	
-				
-		
 		selectedComponent = electricalComponent;
 		selectedConnectorIndex = index;
 		
@@ -46,6 +45,36 @@ public class UI : MonoBehaviour {
 		}
 	}
 	
+	public void RegisterWireSelect(GameObject wire, float propAlong){
+		if ( attachedWire == null) return;
+		
+		if (attachedWire == wire) return;
+		
+		if (cursorJunction == null){
+			cursorJunction = GameObject.Instantiate(Factory.singleton.wireJunctionPrefab);
+			cursorJunction.GetComponent<WireJunction>().parentWire = gameObject;
+			cursorJunction.transform.SetParent(transform);
+		}
+		cursorJunction.GetComponent<WireJunction>().parentWire = wire;
+		cursorJunction.GetComponent<WireJunction>().propAlongWire = propAlong;	
+		
+		attachedWire.GetComponent<Wire>().ends[1].component = cursorJunction;
+		cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = null;
+		cursorJunction.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
+	}
+
+	
+	public void UnregisterWireSelect(GameObject wire){
+		if (attachedWire != null && cursorJunction != null && cursorJunction.GetComponent<WireJunction>().parentWire == wire){
+		
+			attachedWire.GetComponent<Wire>().ends[1].component = cursorTransform.gameObject;
+			cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
+			Destroy (cursorJunction);
+		}
+	
+	}
+
+
 	public void UnregisterSelected(GameObject electricalComponent, int index){
 		if (selectedComponent == electricalComponent && selectedConnectorIndex == index){
 			

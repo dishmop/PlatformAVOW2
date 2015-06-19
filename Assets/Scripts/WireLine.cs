@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 public class WireLine : MonoBehaviour {
 
-	public Vector3[] points;
 	public float width;
 	
 	public enum EndType{
@@ -19,6 +18,9 @@ public class WireLine : MonoBehaviour {
 	public float 	caseIntensity;
 	public Color	wireColor;
 	public float 	wireIntensity;
+	
+	
+	Vector3[] points;
 	
 	
 	// For internal storage of vertex data
@@ -38,9 +40,19 @@ public class WireLine : MonoBehaviour {
 	Vector2[] newUV;
 	int[] newTriangles;
 	
+	bool pointsDirtyFlag = true;
 	
+	
+	public void SetNewPoints(Vector3[] newPoints){
+		points = newPoints;
+		pointsDirtyFlag = true;
+	}
 	
 	public bool IsPointInside(Vector3 point, out float distAlong){
+	
+		if (pointsDirtyFlag){
+			ConstructMesh();
+		}
 	
 		// Ever set of 4 vertices is an axis aligned quad
 		// I.e. mega trivial to determin if we are inside
@@ -58,14 +70,14 @@ public class WireLine : MonoBehaviour {
 			
 			if (point.x > minX && point.x < maxX && point.y > minY && point.y < maxY){
 				// If a mid segment (rather than an end or a coner)
-				if (i % 2 == 1){
+					if ((i/4) % 2 == 1){
 					// If horizontal segment
 					if (MathUtils.FP.Feq(rootPos.y, otherPos1.y)){
-						distAlong += point.x  - maxX;
+						distAlong += Mathf.Abs (point.x  - rootPos.x);
 					}
 					// If vertical segment
 					else if (MathUtils.FP.Feq(rootPos.x, otherPos1.x)){
-						distAlong += point.y  - maxY;
+						distAlong += Mathf.Abs (point.y  - rootPos.y);
 					}
 					else{
 						DebugUtils.Assert(false, "Not horizontal nor vertical");
@@ -88,12 +100,15 @@ public class WireLine : MonoBehaviour {
 	}
 	
 	void ConstructMesh(){
+	
 		SimplifyLine();
 		CalcArraySizes();
 		ConstructArrays();
 		FillArrays();
 		AssignMeshVars();
 		SetupMaterials();
+		
+		pointsDirtyFlag = false;
 		
 	}
 	
@@ -295,7 +310,7 @@ public class WireLine : MonoBehaviour {
 				newTriangles[triIndex++] = firstJoinVertexIndex + 3;
 			}
 			
-			// If this is the first point, then do an initial cap (of half a width in side)
+			// If this is the last point, then do an initial cap (of half a width in side)
 			if (i + 1 == points.Length - 1){
 				int firstCapVertexIndex = vertexIndex;
 				
@@ -364,5 +379,6 @@ public class WireLine : MonoBehaviour {
 		GetComponent<MeshRenderer>().materials[0].SetColor("_ColorWire", wireColor);
 		GetComponent<MeshRenderer>().materials[0].SetColor("_ColorCase", caseColor);
 	}
+	
 
 }

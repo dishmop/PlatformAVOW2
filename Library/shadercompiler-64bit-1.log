@@ -1,28 +1,3 @@
 Base path: /Applications/Unity/Unity.app/Contents
 Pipe name: \\.\pipe\UnityShaderCompiler-64bit-1-1894191888
 Cmd: getPlatforms
-Cmd: preprocess
-  insize=2167 outsize=517 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=1948 outsize=2274 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=1948 outsize=6 kw= ok=1
-Cmd: preprocess
-  insize=3424 outsize=583 ok=1
-Cmd: compileSnippet
-  error: 2 plat 0 at (64): 'CalcWireCol' : no matching overloaded function found; 'CalcCaseCol' : no matching overloaded function found\nCompiling Vertex program
-  error: 2 plat 0 at (81): 'CalcCol' : no matching overloaded function found\nCompiling Vertex program
-  error: 2 plat 0 at (88): 'CalcWireColVal' : no matching overloaded function found\nCompiling Vertex program
-  api=0 type=0 insize=3142 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=3446 outsize=583 ok=1
-Cmd: compileSnippet
-  error: 2 plat 0 at (72): 'CalcCol' : no matching overloaded function found\nCompiling Vertex program
-  error: 2 plat 0 at (79): 'CalcWireColVal' : no matching overloaded function found\nCompiling Vertex program
-  api=0 type=0 insize=3164 outsize=0 kw= ok=0
-Cmd: preprocess
-  insize=3457 outsize=583 ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=3175 outsize=5247 kw= ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=3175 outsize=6 kw= ok=1
