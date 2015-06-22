@@ -6,6 +6,7 @@ public class WireJunction : MonoBehaviour {
 	public GameObject parentWire;
 	public float propAlongWire = 0.5f;
 	public GameObject otherComponent;
+	public int otherComponentIndex;
 	
 	public void AddSelfToParent(){
 	
@@ -27,7 +28,13 @@ public class WireJunction : MonoBehaviour {
 		Wire wire = parentWire.GetComponent<Wire>();
 		Vector3 newPos;
 		int newDir;
-		wire.CalcInfoFromProp(propAlongWire, otherComponent.transform.position, out newPos, out newDir);
+		
+		// Calc the position of the thing we are tryig to attach on
+		Vector3 basePos = otherComponent.transform.position;
+		int otherWireDir = otherComponent.GetComponent<ElectricalComponent>().connectionData[otherComponentIndex].dir;
+		
+		
+		wire.CalcInfoFromProp(propAlongWire, basePos + Directions.GetDirVec(otherWireDir) * GameConfig.singleton.routingFirstStepDist, otherWireDir, out newPos, out newDir);
 		newPos.z = -3;
 		transform.position = newPos;
 		GetComponent<ElectricalComponent>().connectionData[0].dir = newDir;

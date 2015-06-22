@@ -47,41 +47,12 @@ public class Wire : MonoBehaviour {
 		}
 	}
 	
-//	public float CalcPropFromPos(Vector3 pos){
-//		float lengthSoFar = 0;
-//		for (int i = 0; i < paths[0].Count-1; ++i){
-//			Vector3 segment = paths[0][i] - paths[0][i+1];
-//			float thisSegLen = segment.magnitude;
-//			
-//			// Is this a horizontal path
-//			if (MathUtils.FP.Feq(paths[0][i].x, paths[0][1].x)){
-//				
-//			
-//			}
-//			// Is this a vertical path
-//			else (MathUtils.FP.Feq(paths[0][i].y, paths[0][1].y)){
-//			}
-//			else{
-//				DebugUtils.Assert(false, "not horizontal or vertical");
-//			}
-//			
-//			if (distTraveledSoFar + thisSegLen > remainingLengthToTarget){
-//				startIndex = i;
-//				propAlongFinalSegment = remainingLengthToTarget / thisSegLen;
-//				break;
-//			}
-//			else{
-//				remainingLengthToTarget -= thisSegLen;
-//				distTraveledSoFar += thisSegLen;
-//			}
-//		}
-//		
-//	}
+	
 	
 	// Given a proportion of the distance along the wire (from end0 to end1) and the 
 	// direction we would like to attach from, this returns the position and the direction we will attach from
 	// I.e. if we can attach from the right, we return 1
-	public void CalcInfoFromProp(float prop, Vector3 otherPos, out Vector3 pos, out int dir){
+	public void CalcInfoFromProp(float prop, Vector3 otherPos, int otherIndex, out Vector3 pos, out int dir){
 	
 		DebugUtils.Assert(prop >= 0 && prop <= 1, "Prop passed in not between 0 and 1");
 		float targetDist = prop * pathLength;
