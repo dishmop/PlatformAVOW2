@@ -57,6 +57,8 @@ public class UI : MonoBehaviour {
 		}
 		cursorJunction.GetComponent<WireJunction>().parentWire = wire;
 		cursorJunction.GetComponent<WireJunction>().propAlongWire = propAlong;	
+		cursorJunction.GetComponent<WireJunction>().otherComponent = attachedWire.GetComponent<Wire>().ends[0].component;
+		
 		
 		attachedWire.GetComponent<Wire>().ends[1].component = cursorJunction;
 		cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = null;
@@ -129,10 +131,20 @@ public class UI : MonoBehaviour {
 		
 		
 		if (Input.GetMouseButtonUp(0)){
-			if (attachedWire != null && selectedComponent != null){
+			if (attachedWire != null && (selectedComponent != null || cursorJunction != null)){
 				attachedWire.GetComponent<Wire>().currentWire.GetComponent<WireLine>().caseColor = Color.black;
 				Circuit.singleton.AddWire(attachedWire);
+				
+				if (cursorJunction != null){
+				
+					cursorJunction.GetComponent<WireJunction>().AddSelfToParent();
+					cursorJunction = null;
+				
+				}
+				
 				attachedWire = null;
+				
+
 			
 			}
 			UI.singleton.ReleaseConnector();
@@ -160,7 +172,9 @@ public class UI : MonoBehaviour {
 				wireLine.GetComponent<WireLine>().caseColor = GameConfig.singleton.selectedColor;
 			}
 		}
+		
 
+		
 	
 	}
 	

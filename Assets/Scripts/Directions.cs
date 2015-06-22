@@ -49,7 +49,11 @@ public class Directions{
 	}
 	
 	
+	// If we can, favour the opposite direction to the one we want to ignore
 	public static int GetDirectionTowards(Vector3 startPos, Vector3 endPos, int ignoreDir){
+		int favouredDir = CalcOppDir(ignoreDir);
+		if (IsInSameDirection(startPos, endPos,  favouredDir)) return favouredDir;
+		
 		for (int i = 0; i < kNumDirections; ++i){
 			int testDir = i;
 			if (testDir == ignoreDir) continue;

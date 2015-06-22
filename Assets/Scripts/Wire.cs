@@ -19,7 +19,7 @@ public class Wire : MonoBehaviour {
 	
 	public GameObject 	  	currentWire;
 	
-	public GameObject junction;
+	public List<GameObject> junctions;
 	
 	
 	List<Vector3>[] paths = new List<Vector3>[2];
@@ -81,7 +81,7 @@ public class Wire : MonoBehaviour {
 	// Given a proportion of the distance along the wire (from end0 to end1) and the 
 	// direction we would like to attach from, this returns the position and the direction we will attach from
 	// I.e. if we can attach from the right, we return 1
-	public void CalcInfoFromProp(float prop, Vector3 desAttachDir, out Vector3 pos, out int dir){
+	public void CalcInfoFromProp(float prop, Vector3 otherPos, out Vector3 pos, out int dir){
 	
 		DebugUtils.Assert(prop >= 0 && prop <= 1, "Prop passed in not between 0 and 1");
 		float targetDist = prop * pathLength;
@@ -114,8 +114,22 @@ public class Wire : MonoBehaviour {
 		
 		pos = transform.TransformPoint (localPos);
 		
-		dir = 1;
+		// Figure out Direction
+		Vector3 pathDir = paths[0][startIndex+1] - paths[0][startIndex];
 		
+		Vector3 desAttachDir = otherPos - pos;
+		
+		// If verical
+		if (MathUtils.FP.Feq(pathDir.x, 0)){
+			dir = (desAttachDir.x > 0) ? 1 : 3;
+		}
+		// If horizontal
+		else if (MathUtils.FP.Feq (pathDir.y, 0)){
+			dir = (desAttachDir.y > 0) ? 0 : 2;
+		}
+		else{
+			dir = 4;
+		}
 		
 	
 	}
@@ -142,18 +156,23 @@ public class Wire : MonoBehaviour {
 			paths[i].Add(ends[i].pos);
 		}
 
-		// If we need to move away from where we want to get to, move away by one unit and then
+		// We need to move away from where we want to get to, move away by one unit and then
 		// change direction so we are now moving towards where we want to go
 		for (int i = 0; i < 2; ++i){
 			Vector3 startPosLoc = paths[i][0];
-			Vector3 endPosLoc = paths[1-i][0];
 			
-			if (!Directions.IsInSameDirection(startPosLoc, endPosLoc, workingDirs[i])){
-				Vector3 newPos = startPosLoc + Directions.GetDirVec(workingDirs[i]) * GameConfig.singleton.routingFirstStepDist;
-				workingDirs[i] = Directions.GetDirectionTowards(startPosLoc, endPosLoc, Directions.CalcOppDir(workingDirs[i]));
-				paths[i].Add (newPos);
-
-			}
+			Vector3 newPos = startPosLoc + Directions.GetDirVec(workingDirs[i]) * GameConfig.singleton.routingFirstStepDist;
+			paths[i].Add (newPos);
+		}
+		
+		// Set up the directions
+		for (int i = 0; i < 2; ++i){
+			Vector3 startPosLoc = paths[i][paths[i].Count-1];
+			Vector3 endPosLoc = paths[1-i][paths[1-i].Count-1];
+			
+			workingDirs[i] = Directions.GetDirectionTowards(startPosLoc, endPosLoc, Directions.CalcOppDir(workingDirs[i]));
+			
+			//}
 		}
 		
 		// Test that we are now heading towards each other
@@ -167,7 +186,7 @@ public class Wire : MonoBehaviour {
 		Vector3 startPos = paths[0][paths[0].Count-1];
 		Vector3 endPos = paths[1][paths[1].Count-1];
 		
-		Vector3 centrePos = 0.5f * (startPos + endPos);
+ 		Vector3 centrePos = 0.5f * (startPos + endPos);
 
 		// We are now down to two cases - either the two directions are opposite to one another
 		// in which case we do an S shape
@@ -264,29 +283,7 @@ public class Wire : MonoBehaviour {
 	
 	}
 	
-	
-	void HandleMouseInput(){
-		// If this is the wire that is attaced to the cursor, then do nothing.
-		if (ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
-			return;
-		}
-		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
-		distAlong = 0;
-		if (IsPointInside(mouseWorldPos, out distAlong)){
-			if (junction == null){
-				junction = GameObject.Instantiate(Factory.singleton.wireJunctionPrefab);
-				junction.GetComponent<WireJunction>().parentWire = gameObject;
-				junction.transform.SetParent(transform);
-			}
-			DebugUtils.Assert (distAlong <= pathLength, "distAlong > path length!: " + distAlong + " : " + pathLength);
-			junction.GetComponent<WireJunction>().propAlongWire = distAlong / pathLength;
-			
-		}
-		else{
-			currentWire.GetComponent<WireLine>().wireIntensity = 1;
-		}
-		
-	}
+
 	
 	void HandleMouseInput2(){
 		// If this is the wire that is attaced to the cursor, then do nothing.
@@ -325,8 +322,8 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void OnGUI(){
-		if (pathLength > 1){
-			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "pathLength: " + pathLength + ", distAlong: " + distAlong);
-		}
+//		if (pathLength > 1){
+//			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "pathLength: " + pathLength + ", distAlong: " + distAlong);
+//		}
 	}
 }
