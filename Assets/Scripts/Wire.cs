@@ -47,6 +47,15 @@ public class Wire : MonoBehaviour {
 		}
 	}
 	
+	public void SwapEnds(){
+		EndData temp = ends[0];
+		ends[0] = ends[1];
+		ends[1] = temp;
+		foreach (GameObject junction in junctions){
+			junction.GetComponent<WireJunction>().propAlongWire = 1 - junction.GetComponent<WireJunction>().propAlongWire;
+		}
+	}
+	
 	
 	
 	// Given a proportion of the distance along the wire (from end0 to end1) and the 
@@ -256,11 +265,17 @@ public class Wire : MonoBehaviour {
 	
 
 	
-	void HandleMouseInput2(){
+	void HandleMouseInput(){
 		// If this is the wire that is attaced to the cursor, then do nothing.
-		if (ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
+		if (ends[1].component != null && ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
 			return;
 		}
+		// if this is the wire that is the parent of the junction at the cursor then do nothing
+//		if (UI.singleton.cursorJunction != null){
+//			if (UI.singleton.cursorJunction.GetComponent<WireJunction>().parentWire == gameObject){
+//				return;
+//			}
+//		}
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 		distAlong = 0;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
@@ -276,7 +291,7 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void Update(){
-		HandleMouseInput2();
+		HandleMouseInput();
 	}
 	
 	// Update is called once per frame

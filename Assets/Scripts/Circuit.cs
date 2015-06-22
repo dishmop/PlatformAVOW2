@@ -25,16 +25,16 @@ public class Circuit : MonoBehaviour {
 	public void RemoveWire(GameObject wire){
 		int index = wires.IndexOf(wire);
 		wires.RemoveAt(index);
-		ElectricalComponent component0 = wire.GetComponent<Wire>().ends[0].component.GetComponent<ElectricalComponent>();
-		ElectricalComponent component1 = wire.GetComponent<Wire>().ends[1].component.GetComponent<ElectricalComponent>();
-		
-		int index0 = component0.GetConnectionDataIndex(wire);
-		int index1 = component1.GetConnectionDataIndex(wire);
-		
-		component0.ClearConnectionData(index0);
-		component1.ClearConnectionData(index1);
-		
-		Destroy(wire);
+//		ElectricalComponent component0 = wire.GetComponent<Wire>().ends[0].component.GetComponent<ElectricalComponent>();
+//		ElectricalComponent component1 = wire.GetComponent<Wire>().ends[1].component.GetComponent<ElectricalComponent>();
+//		
+//		int index0 = component0.GetConnectionDataIndex(wire);
+//		int index1 = component1.GetConnectionDataIndex(wire);
+//		
+//		component0.ClearConnectionData(index0);
+//		component1.ClearConnectionData(index1);
+//		
+//		Destroy(wire);
 	}
 	
 	
@@ -49,6 +49,27 @@ public class Circuit : MonoBehaviour {
 		component1.GetComponent<ElectricalComponent>().connectionData[connector1].wire = newWire;
 		
 		
+	}
+	
+	
+	public void RemoveJunctionsJoining(GameObject wire){
+		List<GameObject> removalWires = new List<GameObject>();
+		List<int> removalIndices = new List<int>();
+		foreach (GameObject testWire in wires){
+			for (int i = 0; i < testWire.GetComponent<Wire>().junctions.Count; ++i){
+				GameObject junction = testWire.GetComponent<Wire>().junctions[i];
+				if (junction.GetComponent<ElectricalComponent>().connectionData[0].wire == wire){
+					//int index = testWire.GetComponent<Wire>().junctions.FindIndex(junction);
+					//testWire.GetComponent<Wire>().junctions.Remove(junction);
+					removalWires.Add (testWire);
+					removalIndices.Add (i);
+					Destroy (junction);
+				}
+			}
+		}
+		for (int i = 0; i < removalWires.Count; ++i){
+			removalWires[i].GetComponent<Wire>().junctions.RemoveAt(removalIndices[i]);
+		}
 	}
 	
 	//----------------------------------------------

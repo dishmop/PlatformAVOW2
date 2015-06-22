@@ -4,13 +4,14 @@ using System.Collections;
 public class UI : MonoBehaviour {
 	public static UI singleton = null;
 	
+	public GameObject cursorJunction;
+	
 	Vector3 mouseWorldPos;
 	Transform cursorTransform;
 	GameObject attachedWire;
 	GameObject selectedComponent = null;
 	int selectedConnectorIndex = -1;
-	
-	GameObject cursorJunction;
+
 	
 	public void RegisterSelected(GameObject electricalComponent, int index){
 	
@@ -111,8 +112,15 @@ public class UI : MonoBehaviour {
 	}
 	
 	public void ReleaseConnector(){
-		Destroy (attachedWire);
+		if (attachedWire != null){
+			Circuit.singleton.RemoveJunctionsJoining(attachedWire);
+			Destroy (attachedWire);
+		}
 		
+	}
+	
+	public void TransferWire(GameObject wire){
+		attachedWire = wire;
 	}
 
 	

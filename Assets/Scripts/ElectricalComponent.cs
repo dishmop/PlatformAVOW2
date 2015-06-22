@@ -56,15 +56,17 @@ public class ElectricalComponent : MonoBehaviour {
 		connectionData[index].wire = null;
 		connectionData[index].uiIsSelected = false;
 		connectionData[index].uiIsAttached = false;
-		connectionData[index].emptyConnector.SetActive(true);
-		
 	}
 	
 	
 	void SetupConnectorPositions(){
 		for (int i = 0; i < connectionData.Length; ++i){
-			Vector3 wirePos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
-			connectionData[i].emptyConnector.transform.localPosition = wirePos;
+		
+			if (connectionData[i].emptyConnector != null){
+				Vector3 connectorPos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
+				connectionData[i].emptyConnector.transform.localPosition = connectorPos;
+			}
+			/*
 			WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
 			
 			Vector3 goDir = Directions.GetDirVec(connectionData[i].dir);
@@ -75,6 +77,7 @@ public class ElectricalComponent : MonoBehaviour {
 			wireLine.SetNewPoints(newPoints);
 			wireLine.end0 = WireLine.EndType.kContinue;
 			wireLine.end1 = WireLine.EndType.kEnd;
+			*/
 			
 		}
 	}
@@ -85,11 +88,19 @@ public class ElectricalComponent : MonoBehaviour {
 
 		
 		// Set up the little bits of wire that are the conneciton points
-		for (int i = 0; i < connectionData.Length; ++i){
-			connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.wireLinePrefab);
-			connectionData[i].emptyConnector.transform.parent = transform;
+		if (type != Type.kCursor){
+			if (type != Type.kJunction){
+				for (int i = 0; i < connectionData.Length; ++i){
+					connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.socketPrefab);
+					connectionData[i].emptyConnector.transform.parent = transform;
+				}
+			}
+			else{
+				connectionData[0].emptyConnector = GameObject.Instantiate(Factory.singleton.socketTPrefab);
+				connectionData[0].emptyConnector.transform.parent = transform;
+			}
+			SetupConnectorPositions();
 		}
-		SetupConnectorPositions();
 		
 
 		
@@ -97,26 +108,13 @@ public class ElectricalComponent : MonoBehaviour {
 	
 	void Update(){
 
-		// Set the connectors to invisible if a wire is attached
-		foreach (ConnectionData data in connectionData){
-			data.emptyConnector.SetActive(data.wire == null);
-		}
-		if (type != Type.kCursor && type != Type.kJunction){
+
+		if (type != Type.kCursor){
 			HandleMouseInput();
 		}
 		for (int i = 0; i < connectionData.Length; ++i){
-			connectionData[i].emptyConnector.SetActive(ShouldRenderEmptyConnector(i));
 		}
 		SetupConnectorPositions();
-	}
-	
-	bool ShouldRenderEmptyConnector(int i){
-		
-		if (type == Type.kCursor || type == Type.kJunction) return false;
-		
-		if (connectionData[i].wire != null) return false;
-		
-		return true;
 	}
 	
 	
@@ -138,12 +136,13 @@ public class ElectricalComponent : MonoBehaviour {
 			
 			// Test if inside any of the connectors
 			for (int i = 0; i < connectionData.Length; ++i){
-				WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
-				float halfWidth =  wireLine.width * 0.501f;
-				Vector3 minPos = transform.TransformPoint(connectionData[i].pos) - new Vector3(halfWidth, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
-				Vector3 maxPos = transform.TransformPoint(connectionData[i].pos) + new Vector3(halfWidth, halfWidth, 0) + Directions.GetDirVec(connectionData[i].dir) * halfWidth;
-				
-				connectionData[i].uiIsSelected = (mouseWorldPos.x > minPos.x && mouseWorldPos.x < maxPos.x && mouseWorldPos.y > minPos.y && mouseWorldPos.y < maxPos.y);
+			
+				if (connectionData[i].emptyConnector != null){
+					Collider2D collider = connectionData[i].emptyConnector.GetComponent<Collider2D>();
+					connectionData[i].uiIsSelected = collider.OverlapPoint(new Vector2(mouseWorldPos.x, mouseWorldPos.y));
+				}
+			
+
 				if (connectionData[i].uiIsSelected){
 					UI.singleton.RegisterSelected(gameObject, i);
 				}
@@ -169,25 +168,47 @@ public class ElectricalComponent : MonoBehaviour {
 						
 						GameObject otherComp = null;
 						int otherIndex = -1;
+						int otherWireIndex = -1;
 						
 						if (comp0 == gameObject && index0 == i){
 							otherComp = comp1;
 							otherIndex = index1;
+							otherIndex = 1;
 							
 						}
 						else if (comp1 == gameObject && index1 == i){
 							otherComp = comp0;
 							otherIndex = index0;
+							otherIndex = 0;
 						}
 						else{
 							DebugUtils.Assert(false, "Removing a wire which is not attached as we thought.");
 						}
 						
+						// If we have grabbed the 0 end of the wire - swap it over
+						if (otherIndex == 1){
+							connectionData[i].wire.GetComponent<Wire>().SwapEnds();
+							
+						}
+						
 						Circuit.singleton.RemoveWire(connectionData[i].wire);
+						UI.singleton.TransferWire(connectionData[i].wire);
 						
 						connectionData[i].uiIsAttached = true;
-						UI.singleton.AttachConnector(otherComp, otherIndex);
+						//UI.singleton.AttachConnector(otherComp, otherIndex);
 						UI.singleton.RegisterSelected(gameObject, i);
+						
+
+						
+						
+						if (type == Type.kJunction){
+							GameObject parentWire = GetComponent<WireJunction>().parentWire;
+							parentWire.GetComponent<Wire>().junctions.Remove (gameObject);
+
+							
+							Destroy(gameObject);
+
+						}
 						
 						
 						
@@ -200,20 +221,9 @@ public class ElectricalComponent : MonoBehaviour {
 			}
 		}
 		
-		// Visualise UI stat
+		// Visualise UI state
 		foreach (ConnectionData data in connectionData){
-		
-			Color caseColor = Color.black;
-			if (data.uiIsAttached){
-				caseColor = GameConfig.singleton.attachedColor;
-			}
-			else if (data.uiIsSelected){
-				caseColor = GameConfig.singleton.selectedColor;
-			}
-			
-			
-			data.emptyConnector.GetComponent<WireLine>().caseColor = caseColor;
-
+			data.emptyConnector.transform.GetChild(0).gameObject.SetActive(data.uiIsSelected);
 		}
 		
 		

@@ -9,6 +9,8 @@ public class Factory : MonoBehaviour {
 //	public GameObject wireRectPrefab;
 	public GameObject wirePrefab;
 	public GameObject wireJunctionPrefab;
+	public GameObject socketPrefab;
+	public GameObject socketTPrefab;
 	
 
 
