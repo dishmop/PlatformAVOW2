@@ -1,26 +1,6 @@
 Base path: /Applications/Unity/Unity.app/Contents
-Pipe name: \\.\pipe\UnityShaderCompiler-64bit-4-749883392
+Pipe name: \\.\pipe\UnityShaderCompiler-64bit-4-741359616
 Cmd: getPlatforms
-Cmd: compileSnippet
-  api=0 type=0 insize=14306 outsize=2863 kw=DIRECTIONAL SHADOWS_SCREEN LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=14306 outsize=6 kw=DIRECTIONAL SHADOWS_SCREEN LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=7914 outsize=1776 kw=DIRECTIONAL_COOKIE ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=7914 outsize=2251 kw=SPOT PIXELSNAP_ON ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=7914 outsize=6 kw=POINT PIXELSNAP_ON ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=7914 outsize=6 kw=DIRECTIONAL_COOKIE PIXELSNAP_ON ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=12590 outsize=2780 kw=LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF UNITY_HDR_ON ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=12590 outsize=6 kw=LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF UNITY_HDR_ON ok=1
-Cmd: compileSnippet
-  api=0 type=0 insize=12780 outsize=2595 kw=LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF UNITY_HDR_ON ok=1
-Cmd: compileSnippet
-  api=0 type=1 insize=12780 outsize=6 kw=LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF PIXELSNAP_ON HDR_LIGHT_PREPASS_OFF ok=1
 End of pipe
 
 Quitting shader compiler process

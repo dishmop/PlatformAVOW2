@@ -265,7 +265,7 @@ public class Wire : MonoBehaviour {
 	
 
 	
-	void HandleMouseInput(){
+	public void HandleMouseInput(){
 		// If this is the wire that is attaced to the cursor, then do nothing.
 		if (ends[1].component != null && ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
 			return;

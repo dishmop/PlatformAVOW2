@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\ASDAudioSource.cs" />
      <Compile Include="Assets\Scripts\CamController.cs" />
      <Compile Include="Assets\Scripts\Circuit.cs" />
+     <Compile Include="Assets\Scripts\CircuitSimulator.cs" />
      <Compile Include="Assets\Scripts\DebugUtils.cs" />
      <Compile Include="Assets\Scripts\Directions.cs" />
      <Compile Include="Assets\Scripts\ElectricalComponent.cs" />
@@ -67,7 +68,22 @@
      <Compile Include="Assets\Scripts\WireJunction.cs" />
      <Compile Include="Assets\Scripts\WireLine.cs" />
      <Compile Include="Assets\Scripts\WireRect.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\alglibinternal.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\alglibmisc.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\ap.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\dataanalysis.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\diffequations.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\fasttransforms.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\integration.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\interpolation.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\linalg.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\optimization.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\solvers.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\specialfunctions.cs" />
+     <Compile Include="Assets\Scripts\alglib\src\statistics.cs" />
+     <None Include="Assets\Scripts\alglib\gpl2.txt" />
      <None Include="Assets\Shaders\GlowLine.shader" />
+     <None Include="Assets\Scripts\alglib\gpl3.txt" />
      <None Include="Assets\Shaders\GlowSquare.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

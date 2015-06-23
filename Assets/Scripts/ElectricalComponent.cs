@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class ElectricalComponent : MonoBehaviour {
@@ -204,6 +204,7 @@ public class ElectricalComponent : MonoBehaviour {
 						if (type == Type.kJunction){
 							GameObject parentWire = GetComponent<WireJunction>().parentWire;
 							parentWire.GetComponent<Wire>().junctions.Remove (gameObject);
+							parentWire.GetComponent<Wire>().HandleMouseInput();
 
 							
 							Destroy(gameObject);
