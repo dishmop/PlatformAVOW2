@@ -114,6 +114,8 @@ public class Wire : MonoBehaviour {
 	
 	}
 	
+
+	
 	
 	void SetupEnds(){
 		// if we are attached to a component then copy the various connection info from it
@@ -279,12 +281,12 @@ public class Wire : MonoBehaviour {
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 		distAlong = 0;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
-			currentWire.GetComponent<WireLine>().wireIntensity = 2;
+			//currentWire.GetComponent<WireLine>().wireIntensity = 2;
 			UI.singleton.RegisterWireSelect(gameObject, distAlong / pathLength);
 			
 		}
 		else{
-			currentWire.GetComponent<WireLine>().wireIntensity = 1;
+			//	currentWire.GetComponent<WireLine>().wireIntensity = 1;
 			UI.singleton.UnregisterWireSelect(gameObject);
 		}
 		
@@ -294,16 +296,28 @@ public class Wire : MonoBehaviour {
 		HandleMouseInput();
 	}
 	
+	// Get the voltage at one end of the wire and apply it to the colour
+	void SetupColors(){
+		
+		ElectricalComponent component = ends[0].component.GetComponent<ElectricalComponent>();
+		if (component.simNodeIndices != null){
+			int index = component.GetConnectionDataIndex(gameObject);
+			int simNodeIndex = component.simNodeIndices[index];
+			float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
+			Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
+			currentWire.GetComponent<WireLine>().wireColor = wireCol;
+		}
+		
+	}
+	
 	// Update is called once per frame
 	void FixedUpdate () {
 		SetupEnds();
 		SetupPath();
 		UpdateCentralWire();
 			
-//		if (autoUpdateWires){
-//			ClearMesh();
-//			ConstructMesh();
-//		}
+
+		SetupColors();
 	
 	}
 	

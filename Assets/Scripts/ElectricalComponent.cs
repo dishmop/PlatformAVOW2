@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class ElectricalComponent : MonoBehaviour {
 
 
+	
 	public enum Type{
 		kUnknown,
 		kVoltageSource,
@@ -27,6 +29,15 @@ public class ElectricalComponent : MonoBehaviour {
 	};
 	
 	public ConnectionData[] connectionData;
+	
+	// Indicies into the circuit simulator objects
+	// If we are a load or voltage source then we have two nodes
+	// If we are a junction, then we only have one
+	public int[] simNodeIndices;
+	public int simEdgeIndex = -1;
+	public float voltageRise = 0;
+	public float resistance = 0;
+	
 	
 	
 	public void GetConnectionData(GameObject wire, out int dir, out Vector3 pos){
@@ -58,6 +69,13 @@ public class ElectricalComponent : MonoBehaviour {
 		connectionData[index].uiIsAttached = false;
 	}
 	
+	public void ClearSimData(){
+		for (int i = 0; i < simNodeIndices.Count(); ++i){
+			simNodeIndices[i] = -1;
+		}
+		simEdgeIndex = -1;
+	}
+	
 	
 	void SetupConnectorPositions(){
 		for (int i = 0; i < connectionData.Length; ++i){
@@ -82,6 +100,30 @@ public class ElectricalComponent : MonoBehaviour {
 		}
 	}
 	
+	void SetupSimIndices(){
+		int numNodeIndices = 0;
+		switch (type){
+			case Type.kCursor:{
+				numNodeIndices = 1;
+				break;
+			}
+			case Type.kJunction:{
+				numNodeIndices = 1;
+				break;
+			}
+			case Type.kLoad:{
+				numNodeIndices = 2;
+				break;
+			}
+			case Type.kVoltageSource:{
+				numNodeIndices = 2;
+				break;
+			}
+		}
+		simNodeIndices = new int[numNodeIndices];
+	
+	}
+	
 	
 	void Start(){
 		Circuit.singleton.RegisterComponent(gameObject);
@@ -101,9 +143,11 @@ public class ElectricalComponent : MonoBehaviour {
 			}
 			SetupConnectorPositions();
 		}
-		
-
-		
+		SetupSimIndices();
+	}
+	
+	void OnDestroy(){
+		if (Circuit.singleton != null) Circuit.singleton.UnregisterComponent(gameObject);
 	}
 	
 	void Update(){
@@ -231,6 +275,8 @@ public class ElectricalComponent : MonoBehaviour {
 		// Set the cursor cubes position
 		mouseWorldPos.z = transform.position.z;
 	}
+	
+	
 	
 
 	

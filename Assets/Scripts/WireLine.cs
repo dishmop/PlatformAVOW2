@@ -20,7 +20,7 @@ public class WireLine : MonoBehaviour {
 	public float 	wireIntensity;
 	
 	
-	Vector3[] points;
+	public Vector3[] points;
 	
 	
 	// For internal storage of vertex data

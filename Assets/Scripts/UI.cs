@@ -5,10 +5,10 @@ public class UI : MonoBehaviour {
 	public static UI singleton = null;
 	
 	public GameObject cursorJunction;
+	public GameObject attachedWire;
 	
 	Vector3 mouseWorldPos;
 	Transform cursorTransform;
-	GameObject attachedWire;
 	GameObject selectedComponent = null;
 	int selectedConnectorIndex = -1;
 
@@ -53,13 +53,15 @@ public class UI : MonoBehaviour {
 		
 		if (cursorJunction == null){
 			cursorJunction = GameObject.Instantiate(Factory.singleton.wireJunctionPrefab);
-			cursorJunction.GetComponent<WireJunction>().parentWire = gameObject;
 			cursorJunction.transform.SetParent(transform);
+			cursorJunction.GetComponent<WireJunction>().parentWire = wire;
+			cursorJunction.GetComponent<WireJunction>().AddSelfToParent();
 		}
-		cursorJunction.GetComponent<WireJunction>().parentWire = wire;
+		
 		cursorJunction.GetComponent<WireJunction>().propAlongWire = propAlong;	
 		cursorJunction.GetComponent<WireJunction>().otherComponent = attachedWire.GetComponent<Wire>().ends[0].component;
 		cursorJunction.GetComponent<WireJunction>().otherComponentIndex = attachedWire.GetComponent<Wire>().ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire);
+		
 		
 		
 		attachedWire.GetComponent<Wire>().ends[1].component = cursorJunction;
@@ -73,6 +75,7 @@ public class UI : MonoBehaviour {
 		
 			attachedWire.GetComponent<Wire>().ends[1].component = cursorTransform.gameObject;
 			cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
+			cursorJunction.GetComponent<WireJunction>().RemoveSelfFromParent();
 			Destroy (cursorJunction);
 		}
 	
@@ -141,12 +144,12 @@ public class UI : MonoBehaviour {
 		
 		if (Input.GetMouseButtonUp(0)){
 			if (attachedWire != null && (selectedComponent != null || cursorJunction != null)){
-				attachedWire.GetComponent<Wire>().currentWire.GetComponent<WireLine>().caseColor = Color.black;
+//				attachedWire.GetComponent<Wire>().currentWire.GetComponent<WireLine>().caseColor = Color.black;
 				Circuit.singleton.AddWire(attachedWire);
 				
 				if (cursorJunction != null){
 				
-					cursorJunction.GetComponent<WireJunction>().AddSelfToParent();
+//					cursorJunction.GetComponent<WireJunction>().AddSelfToParent();
 					cursorJunction = null;
 				
 				}
@@ -175,12 +178,12 @@ public class UI : MonoBehaviour {
 			ReleaseConnector();
 		}
 		
-		if (attachedWire != null){
-			GameObject wireLine = attachedWire.GetComponent<Wire>().currentWire;
-			if (wireLine != null){
-				wireLine.GetComponent<WireLine>().caseColor = GameConfig.singleton.selectedColor;
-			}
-		}
+//		if (attachedWire != null){
+//			GameObject wireLine = attachedWire.GetComponent<Wire>().currentWire;
+//			if (wireLine != null){
+//				wireLine.GetComponent<WireLine>().caseColor = GameConfig.singleton.selectedColor;
+//			}
+//		}
 		
 
 		
@@ -198,6 +201,15 @@ public class UI : MonoBehaviour {
 	
 	void OnDestroy(){
 		singleton = null;
+	}
+	
+	void OnGUI(){
+//		if (attachedWire != null){
+//			Wire wire = attachedWire.GetComponent<Wire>();
+//			ElectricalComponent component = wire.ends[1].component.GetComponent<ElectricalComponent>();
+//			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "attachedWire.end[1].simNodeID = " + component.simNodeIndices[component.GetConnectionDataIndex(attachedWire)]);
+//			
+//		}
 	}
 
 	

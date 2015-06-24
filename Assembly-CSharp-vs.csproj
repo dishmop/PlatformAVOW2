@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\CamController.cs" />
      <Compile Include="Assets\Scripts\Circuit.cs" />
      <Compile Include="Assets\Scripts\CircuitSimulator.cs" />
+     <Compile Include="Assets\Scripts\DebugElectricText.cs" />
      <Compile Include="Assets\Scripts\DebugUtils.cs" />
      <Compile Include="Assets\Scripts\Directions.cs" />
      <Compile Include="Assets\Scripts\ElectricalComponent.cs" />

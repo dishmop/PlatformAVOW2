@@ -34,7 +34,7 @@ public class CircuitSimulator : MonoBehaviour {
 		public float resVoltage;
 		
 		// Debugging
-		string GetID(){return "N" + id;}
+		public string GetID(){return "N" + id;}
 		
 		
 		
@@ -64,7 +64,7 @@ public class CircuitSimulator : MonoBehaviour {
 		public float resFwCurrent;
 		
 		// Debugging
-		string GetID(){return "E" + id;}
+		public string GetID(){return "E" + id;}
 		
 		
 
@@ -81,8 +81,8 @@ public class CircuitSimulator : MonoBehaviour {
 	}
 	
 	// The Graph structures
-	List<Node> allNodes = new List<Node>();
-	List<Edge> allEdges = new List<Edge>();
+	public List<Node> allNodes = new List<Node>();
+	public List<Edge> allEdges = new List<Edge>();
 	
 	// Solver structures
 	public List<List<LoopElement>> loops;
@@ -90,13 +90,6 @@ public class CircuitSimulator : MonoBehaviour {
 	// Current solving	
 	double epsilon = 0.0001;
 	float[] loopCurrents;
-
-
-//	static readonly int kOut = 0;
-//	static readonly int kIn = 1;
-//	static readonly int kNumDirs = 2;
-//	
-//	static int ReverseDirection(int dir){ return 1-dir;}
 
 
 	public void ClearCircuit(){
@@ -115,10 +108,10 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	
 	
-	public int AddVoltageSourceEdge(int node0Id, int node1Id, float voltageDrop){
+	public int AddVoltageSourceEdge(int node0Id, int node1Id, float voltageRise){
 	
 		int edgeId = AddEdge(node0Id, node1Id);
-		allEdges[edgeId].voltageRise = voltageDrop;
+		allEdges[edgeId].voltageRise = voltageRise;
 		return edgeId;
 		
 	}
@@ -132,7 +125,17 @@ public class CircuitSimulator : MonoBehaviour {
 	}
 	
 	
+	// Creates a new edge whic is a perfect conductor and returns its Id
+	public int AddConductorEdge(int node0Id, int node1Id){
+		
+		int edgeId = AddEdge(node0Id, node1Id);
+		return edgeId;
+	}
+	
+	
 	public void Recalc(){
+	
+		Debug.Log ("numNodes = " + allNodes.Count() + ", numEdges = " + allEdges.Count());
 	
 		if (allEdges.Count == 0 || allNodes.Count == 0) return;
 		
@@ -140,6 +143,7 @@ public class CircuitSimulator : MonoBehaviour {
 		DebugUtils.Assert(ValidateGraph(), "The graph is invalid");
 
 		FindLoops();
+		
 		//DebugPrintLoops();
 		
 		RecordLoopsInComponents();
@@ -239,6 +243,37 @@ public class CircuitSimulator : MonoBehaviour {
 		}
 	}
 	
+	void SimpleTestCase(){
+		// Do some test cases
+		int node0Id = AddNode();
+		int node1Id = AddNode();
+		int node2Id = AddNode();
+		int cellId = AddVoltageSourceEdge(node0Id, node2Id, 1);
+		int resistor1Id = AddConductorEdge(node2Id, node1Id);
+		int resistor2Id = AddLoadEdge(node1Id, node0Id, 1);
+		int resistor3Id = AddLoadEdge(node1Id, node0Id, 1);
+//		int resistor4Id = AddLoadEdge(node2Id, node1Id, 0);
+		
+		Recalc();
+		
+		Debug.Log("Cell current = " + allEdges[cellId].resFwCurrent);
+		Debug.Log("Resistor 1 current = " + allEdges[resistor1Id].resFwCurrent);
+		Debug.Log("Resistor 2 current = " + allEdges[resistor2Id].resFwCurrent);
+		Debug.Log("Resistor 3 current = " + allEdges[resistor3Id].resFwCurrent);
+//		Debug.Log("Resistor 4 current = " + allEdges[resistor4Id].resFwCurrent);
+		
+		Debug.Log("Node 0 voltage = " + allNodes[node0Id].resVoltage);
+		Debug.Log("Node 1 voltage = " + allNodes[node1Id].resVoltage);
+		Debug.Log("Node 2 voltage = " + allNodes[node2Id].resVoltage);
+		
+	}
+	
+	
+	void Start(){
+//		SimpleTestCase();
+
+		
+	}
 	
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
@@ -252,7 +287,7 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	public void FixedUpdate(){
 		
-		Recalc();
+	//	Recalc();
 
 	}
 	
@@ -277,22 +312,23 @@ public class CircuitSimulator : MonoBehaviour {
 //		}
 //	}
 //	
-//	void DebugPrintLoops(){
-//		Debug.Log ("Printing loops");
-//		for (int i = 0; i < loops.Count; ++i){
-//			AVOWNode lastNode = loops[i][0].fromNode;
-//			string loopString = lastNode.GetID ();
-//			
-//			for (int j = 0; j < loops[i].Count; ++j){
-//				AVOWNode nextNode = loops[i][j].component.GetOtherNode(lastNode.gameObject).GetComponent<AVOWNode>();
-//				// print the connection and the final node
-//				loopString += "=" + loops[i][j].component.GetID () + "=>" + nextNode.GetID ();
-//				lastNode = nextNode;
-//			}
-//			Debug.Log ("Loop(" + i.ToString() + "): " + loopString );
-//			
-//		}
-//	}
+	void DebugPrintLoops(){
+		Debug.Log ("Printing loops");
+		for (int i = 0; i < loops.Count; ++i){
+			Node lastNode = loops[i][0].edge.nodes[loops[i][0].fromNodeIndex];
+			string loopString = lastNode.GetID ();
+			
+			for (int j = 0; j < loops[i].Count; ++j){
+				Node nextNode = loops[i][j].edge.nodes[1 - loops[i][j].fromNodeIndex];
+				
+				// print the connection and the final node
+				loopString += "=>" + loops[i][j].edge.GetID () + "=>" + nextNode.GetID ();
+				lastNode = nextNode;
+			}
+			Debug.Log ("Loop(" + i.ToString() + "): " + loopString );
+			
+		}
+	}
 //	
 //	void DebugPrintLoopCurrents(){
 //		Debug.Log("Printing loop currents");
@@ -310,7 +346,8 @@ public class CircuitSimulator : MonoBehaviour {
 		loops = new List<List<LoopElement>>();
 
 
-		// Get any node which is going to be our starting point for all traversals		
+		// Get any node which is going to be our starting point for all traversals	(this doesn't work if the first node is not part
+		// of the circuit - or if we have multiple disjoint circuits) - but ok for the moment as we insist that the cell is put in first. 
 		Node startNode = allNodes[0];
 		
 		
@@ -391,10 +428,12 @@ public class CircuitSimulator : MonoBehaviour {
 				Edge loopStartEdge = edgeStack.Peek();
 				
 				List<LoopElement> thisLoop = new List<LoopElement>();
-				thisLoop.Add (new LoopElement(edgeStack.Pop (), nodeStack.Pop ().id));
+				Edge addEdge = edgeStack.Pop ();
+				thisLoop.Add (new LoopElement(addEdge, (addEdge.nodes[0].id == nodeStack.Pop ().id) ? 0 : 1));
 				
 				while(nodeStack.Peek() != loopStartNode){
-					thisLoop.Add (new LoopElement(edgeStack.Pop (), nodeStack.Pop ().id));
+					addEdge = edgeStack.Pop ();
+					thisLoop.Add (new LoopElement(addEdge, (addEdge.nodes[0].id == nodeStack.Pop ().id) ? 0 : 1));
 				}
 				loops.Add (thisLoop);
 				
@@ -407,11 +446,12 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		// Quick check - we should have just traversed a spanning tree for the graph
 		// so everyone component should have been visited
-		foreach (Edge edge in allEdges){
-			
-			if (!edge.visited && !edge.disabled)
-				Debug.Log ("Error: Spanning tree does not visit very node");
-		}
+//		foreach (Edge edge in allEdges){
+//			
+//			if (!edge.visited && !edge.disabled)
+//				Debug.Log ("Error: Spanning tree does not visit very node");
+//		}
+//  	THIS IS NOT A VALID CHECK! AS YOU MAY HAVE NODES WHICH ARE NOT CONNECTED - WAS FINE FOR AVOW
 		
 	}
 	
@@ -454,7 +494,7 @@ public class CircuitSimulator : MonoBehaviour {
 					}
 				}
 				if (!MathUtils.FP.Feq(loopElement.edge.voltageRise, 0)){
-					V[i, 0] = (loopElement.fromNodeIndex == 0) ? loopElement.edge.voltageRise : - loopElement.edge.voltageRise;
+					V[i, 0] = (loopElement.fromNodeIndex == 0) ? loopElement.edge.voltageRise : -loopElement.edge.voltageRise;
 				}
 			}
 		}  

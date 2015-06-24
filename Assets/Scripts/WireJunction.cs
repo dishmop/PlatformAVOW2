@@ -15,6 +15,13 @@ public class WireJunction : MonoBehaviour {
 		
 		
 	}
+	
+	
+	public void RemoveSelfFromParent(){
+		
+		parentWire.GetComponent<Wire>().junctions.Remove(gameObject);
+		
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -63,6 +70,6 @@ public class WireJunction : MonoBehaviour {
 	}
 	
 	void OnGUI(){
-		GUI.Label(new Rect(0,0,Screen.width,Screen.height), "newDir: " + GetComponent<ElectricalComponent>().connectionData[0].dir);
+	//	GUI.Label(new Rect(0,0,Screen.width,Screen.height), "newDir: " + GetComponent<ElectricalComponent>().connectionData[0].dir);
 	}
 }

@@ -1,27 +1,26 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/CircuitSimulator.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Circuit.cs">
     <Files>
-      <File FileName="Assets/Scripts/Wire.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ElectricalComponent.cs" Line="72" Column="1" />
+      <File FileName="Assets/Scripts/Wire.cs" Line="117" Column="1" />
       <File FileName="Assets/Scripts/ASDAudioSource.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/CamController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/WireLine.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI.cs" Line="122" Column="30" />
       <File FileName="Assets/Scripts/Factory.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/PlayerController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/WireJunction.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/DebugUtils.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CircuitSimulator.cs" Line="460" Column="17" />
-      <File FileName="../AVOW/Assets/Scripts/AVOWSim.cs" Line="345" Column="37" />
-      <File FileName="../AVOW/Assets/Scripts/AVOWGraph.cs" Line="627" Column="31" />
-      <File FileName="../AVOW/Assets/Scripts/AVOWComponent.cs" Line="462" Column="23" />
+      <File FileName="Assets/Scripts/CircuitSimulator.cs" Line="129" Column="29" />
+      <File FileName="Assets/Scripts/Circuit.cs" Line="123" Column="61" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="43" />
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="199" />
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="213" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="48" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="205" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="215" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
