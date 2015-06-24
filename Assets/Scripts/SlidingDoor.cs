@@ -8,8 +8,9 @@ public class SlidingDoor : MonoBehaviour {
 	Transform slideDoorTransform;
 	Vector3 sliderDoorLocalPos = Vector3.zero;
 	float sliderHeight = 0;
-	float speed = 2;
-
+	float openSpeed = 0.25f;
+	float closeSpeed = 1f;
+	
 	// Use this for initialization
 	void Start () {
 		slideDoorTransform = transform.FindChild("SlideDoor");
@@ -31,12 +32,16 @@ public class SlidingDoor : MonoBehaviour {
 		
 		float oldOffset = offsetProp;
 		
+		float useSpeed = isOpen ? openSpeed : closeSpeed;
 		if (isOpen){
-			offsetProp = Mathf.Min (1, offsetProp + speed * Time.deltaTime);
+			offsetProp = Mathf.Min (1, offsetProp + useSpeed * Time.deltaTime);
 		}
 		else{
-			offsetProp = Mathf.Max (0, offsetProp - speed * Time.deltaTime);
+			offsetProp = Mathf.Max (0, offsetProp - useSpeed * Time.deltaTime);
 		}
+		
+		GetComponent<AudioSource>().pitch = useSpeed;
+		
 		
 		// if it has changes
 		if (oldOffset != offsetProp){
@@ -54,5 +59,20 @@ public class SlidingDoor : MonoBehaviour {
 		
 		HandleSliderVisibility();
 	
+	}
+	
+	void FixedUpdate(){
+		ElectricalComponent component = transform.FindChild("DoorElectrics").gameObject.GetComponent<ElectricalComponent>();
+		if (component.simEdgeIndex >= 0){
+			float current = CircuitSimulator.singleton.allEdges[component.simEdgeIndex].resFwCurrent;
+			openSpeed = current * current;
+			if (current > 0.25f){
+				isOpen = true;
+			}
+			else{
+				isOpen = false;
+				
+			}
+		}
 	}
 }

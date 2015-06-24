@@ -159,9 +159,12 @@ public class ElectricalComponent : MonoBehaviour {
 		for (int i = 0; i < connectionData.Length; ++i){
 		}
 		SetupConnectorPositions();
+		UI.singleton.ValidateAttachedWire();
 	}
 	
-	
+	void FixedUpdaste(){
+		UI.singleton.ValidateAttachedWire();
+	}
 	
 	
 	void HandleMouseInput(){
@@ -247,8 +250,14 @@ public class ElectricalComponent : MonoBehaviour {
 						
 						if (type == Type.kJunction){
 							GameObject parentWire = GetComponent<WireJunction>().parentWire;
+							
 							parentWire.GetComponent<Wire>().junctions.Remove (gameObject);
+							
+							/// Attach the UI wire to the cursor
+							UI.singleton.attachedWire.GetComponent<Wire>().ends[1].component = UI.singleton.cursorTransform.gameObject;
+							UI.singleton.cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = UI.singleton.attachedWire;
 							parentWire.GetComponent<Wire>().HandleMouseInput();
+							
 
 							
 							Destroy(gameObject);
@@ -274,6 +283,8 @@ public class ElectricalComponent : MonoBehaviour {
 		
 		// Set the cursor cubes position
 		mouseWorldPos.z = transform.position.z;
+		
+		UI.singleton.ValidateAttachedWire();
 	}
 	
 	

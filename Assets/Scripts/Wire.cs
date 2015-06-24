@@ -54,6 +54,7 @@ public class Wire : MonoBehaviour {
 		foreach (GameObject junction in junctions){
 			junction.GetComponent<WireJunction>().propAlongWire = 1 - junction.GetComponent<WireJunction>().propAlongWire;
 		}
+		UI.singleton.ValidateAttachedWire();
 	}
 	
 	
@@ -110,7 +111,7 @@ public class Wire : MonoBehaviour {
 		else{
 			dir = 4;
 		}
-		
+		UI.singleton.ValidateAttachedWire();
 	
 	}
 	
@@ -289,6 +290,7 @@ public class Wire : MonoBehaviour {
 			//	currentWire.GetComponent<WireLine>().wireIntensity = 1;
 			UI.singleton.UnregisterWireSelect(gameObject);
 		}
+		UI.singleton.ValidateAttachedWire();
 		
 	}
 	
@@ -318,6 +320,7 @@ public class Wire : MonoBehaviour {
 			
 
 		SetupColors();
+		UI.singleton.ValidateAttachedWire();
 	
 	}
 	

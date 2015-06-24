@@ -133,9 +133,9 @@ public class CircuitSimulator : MonoBehaviour {
 	}
 	
 	
-	public void Recalc(){
+	public void RunSimulation(){
 	
-		Debug.Log ("numNodes = " + allNodes.Count() + ", numEdges = " + allEdges.Count());
+	//	Debug.Log ("numNodes = " + allNodes.Count() + ", numEdges = " + allEdges.Count());
 	
 		if (allEdges.Count == 0 || allNodes.Count == 0) return;
 		
@@ -254,7 +254,7 @@ public class CircuitSimulator : MonoBehaviour {
 		int resistor3Id = AddLoadEdge(node1Id, node0Id, 1);
 //		int resistor4Id = AddLoadEdge(node2Id, node1Id, 0);
 		
-		Recalc();
+		RunSimulation();
 		
 		Debug.Log("Cell current = " + allEdges[cellId].resFwCurrent);
 		Debug.Log("Resistor 1 current = " + allEdges[resistor1Id].resFwCurrent);
@@ -631,6 +631,7 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		// We (arbitrarily) set this to be zero volts
 		cellEdge.nodes[0].resVoltage = 0;
+		cellEdge.nodes[1].resVoltage = cellEdge.voltageRise;
 
 		
 		// We have now visited this cell and the first node. 
@@ -689,6 +690,30 @@ public class CircuitSimulator : MonoBehaviour {
 				nodeStack.Pop ();
 			}
 		}
+//		
+//		// Now need to sort out voltages of nodes that have not ben visited (because they are not on a loop)
+//		// For this by finding edges which have a known voltasge at one end and not at the other 
+//		// do this iteratively until none are found
+//		bool maybeSomeLeft = true;
+//		while (maybeSomeLeft){
+//			// If we go through the whole thing and there are no changes, then there is no maybe some left
+//			maybeSomeLeft = false;
+//			foreach(Edge edge in allEdges){
+//				Node node0 = edge.nodes[0];
+//				Node node1 = edge.nodes[1];
+//				if (node0.visited && !node1.visited){
+//					maybeSomeLeft = true;
+//					node1.resVoltage = node0.resVoltage;
+//					node1.visited = true;
+//					
+//				}
+//				else if (!node0.visited && node1.visited){
+//					maybeSomeLeft = true;
+//					node0.resVoltage = node1.resVoltage;
+//					node0.visited = true;
+//				}
+//			}
+//		}
 	}
 	
 //	void DebugPrintVoltages(){

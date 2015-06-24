@@ -80,13 +80,12 @@ public class Circuit : MonoBehaviour {
 	}
 	
 	public void AddWireToSim(GameObject wireGO){
+	
+		UI.singleton.ValidateAttachedWire();
 		
 	
 		Wire wire = wireGO.GetComponent<Wire>();
 		
-		if (wire.junctions.Count() > 0){
-			Debug.Log ("Stop!");
-		}
 		
 		// Get an ordered list of the junctions in the wire
 		List<GameObject> thisJunctions = wire.junctions.OrderBy(obj => obj.GetComponent<WireJunction>().propAlongWire).ToList();
@@ -105,6 +104,11 @@ public class Circuit : MonoBehaviour {
 			lastComponent = nextComponent;
 			lastIndex = nextIndex;
 			
+		}
+		UI.singleton.ValidateAttachedWire();
+		
+		if (wire.ends[1].component == null){
+			Debug.Log("!!!");
 		}
 		ElectricalComponent endComponent = wire.ends[1].component.GetComponent<ElectricalComponent>();
 		int endIndex = endComponent.GetConnectionDataIndex(wireGO);
@@ -130,6 +134,7 @@ public class Circuit : MonoBehaviour {
 	
 	// Initialise the circuit simulator and run it
 	public void Simulate(){
+		UI.singleton.ValidateAttachedWire();
 		ClearCircuitSimData();
 		
 		
@@ -172,7 +177,7 @@ public class Circuit : MonoBehaviour {
 		
 
 		
-		sim.Recalc();
+		sim.RunSimulation();
 		
 
 		

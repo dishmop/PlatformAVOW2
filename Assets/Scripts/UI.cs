@@ -6,34 +6,39 @@ public class UI : MonoBehaviour {
 	
 	public GameObject cursorJunction;
 	public GameObject attachedWire;
+	public Transform cursorTransform;
 	
 	Vector3 mouseWorldPos;
-	Transform cursorTransform;
 	GameObject selectedComponent = null;
 	int selectedConnectorIndex = -1;
 
 	
-	public void RegisterSelected(GameObject electricalComponent, int index){
+	public void RegisterSelected(GameObject electricalComponentGO, int index){
+		ValidateAttachedWire();
 	
 		if (attachedWire != null){
 			// If we are already attached to this, then ignore
-			if (electricalComponent.GetComponent<ElectricalComponent>().connectionData[index].wire == attachedWire && 
-			    attachedWire.GetComponent<Wire>().ends[0].component == electricalComponent){
+			ElectricalComponent component = electricalComponentGO.GetComponent<ElectricalComponent>();
+			Wire wire = attachedWire.GetComponent<Wire>();
+			if (component.connectionData[index].wire == attachedWire && 
+			    wire.ends[0].component == electricalComponentGO){
 				selectedComponent = null;
 				selectedConnectorIndex = -1;
+				ValidateAttachedWire();
 				
 				return;
 			}
 			// If there is already another wire attached to this then ignore
-			if (electricalComponent.GetComponent<ElectricalComponent>().connectionData[index].wire != null && 
-			electricalComponent.GetComponent<ElectricalComponent>().connectionData[index].wire != attachedWire){
+			if (electricalComponentGO.GetComponent<ElectricalComponent>().connectionData[index].wire != null && 
+			electricalComponentGO.GetComponent<ElectricalComponent>().connectionData[index].wire != attachedWire){
 				selectedComponent = null;
 				selectedConnectorIndex = -1;
+				ValidateAttachedWire();
 				return;
 			}
 		}
 		
-		selectedComponent = electricalComponent;
+		selectedComponent = electricalComponentGO;
 		selectedConnectorIndex = index;
 		
 		// Check if we have selected another connector, and if so snap the wire to it
@@ -44,9 +49,13 @@ public class UI : MonoBehaviour {
 			selectedComponent.GetComponent<ElectricalComponent>().connectionData[selectedConnectorIndex].wire = attachedWire;
 			
 		}
+		ValidateAttachedWire();
 	}
 	
 	public void RegisterWireSelect(GameObject wire, float propAlong){
+//		Debug.Log(Time.fixedTime + ": RegisterWireSelect()");
+		ValidateAttachedWire();
+
 		if ( attachedWire == null) return;
 		
 		if (attachedWire == wire) return;
@@ -67,17 +76,22 @@ public class UI : MonoBehaviour {
 		attachedWire.GetComponent<Wire>().ends[1].component = cursorJunction;
 		cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = null;
 		cursorJunction.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
+		ValidateAttachedWire();
 	}
 
 	
 	public void UnregisterWireSelect(GameObject wire){
-		if (attachedWire != null && cursorJunction != null && cursorJunction.GetComponent<WireJunction>().parentWire == wire){
+//		Debug.Log(Time.fixedTime + ": UnregisterWireSelect()");
+		WireJunction junction = (cursorJunction != null) ? cursorJunction.GetComponent<WireJunction>() : null;
+		if (attachedWire != null && cursorJunction != null && junction.parentWire == wire){
 		
 			attachedWire.GetComponent<Wire>().ends[1].component = cursorTransform.gameObject;
 			cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
 			cursorJunction.GetComponent<WireJunction>().RemoveSelfFromParent();
 			Destroy (cursorJunction);
 		}
+		
+		ValidateAttachedWire();
 	
 	}
 
@@ -96,9 +110,8 @@ public class UI : MonoBehaviour {
 			
 			selectedComponent = null;
 			selectedConnectorIndex = -1;
-			
-			
 		}
+		ValidateAttachedWire();
 	}
 	
 
@@ -112,6 +125,7 @@ public class UI : MonoBehaviour {
 		
 		electricalComponent.GetComponent<ElectricalComponent>().connectionData[connectionIndex].wire = attachedWire;
 		cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
+		ValidateAttachedWire();
 	}
 	
 	public void ReleaseConnector(){
@@ -119,11 +133,26 @@ public class UI : MonoBehaviour {
 			Circuit.singleton.RemoveJunctionsJoining(attachedWire);
 			Destroy (attachedWire);
 		}
+		ValidateAttachedWire();
 		
 	}
 	
 	public void TransferWire(GameObject wire){
 		attachedWire = wire;
+		ValidateAttachedWire();
+	}
+	
+	public void ValidateAttachedWire(){
+		if (attachedWire != null){
+			Wire thisWire = attachedWire.GetComponent<Wire>();
+			DebugUtils.Assert (thisWire.ends[0].component != null, "thisWire.ends[0].component != null");
+			DebugUtils.Assert (thisWire.ends[1].component != null, "thisWire.ends[1].component != null");
+			
+			DebugUtils.Assert (thisWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1, "thisWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1");
+			DebugUtils.Assert (thisWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1, "thisWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1");;
+			
+		}
+		
 	}
 
 	
@@ -135,6 +164,9 @@ public class UI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+	
+//		Debug.Log(Time.fixedTime + ": Update()");
+		
 	
 		// Calc the mouse posiiton on world space
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
@@ -186,7 +218,7 @@ public class UI : MonoBehaviour {
 //		}
 		
 
-		
+		ValidateAttachedWire();
 	
 	}
 	

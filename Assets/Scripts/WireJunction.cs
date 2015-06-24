@@ -12,6 +12,7 @@ public class WireJunction : MonoBehaviour {
 	
 		parentWire.GetComponent<Wire>().junctions.Add(gameObject);
 		transform.SetParent(parentWire.transform);
+		UI.singleton.ValidateAttachedWire();
 		
 		
 	}
@@ -20,6 +21,7 @@ public class WireJunction : MonoBehaviour {
 	public void RemoveSelfFromParent(){
 		
 		parentWire.GetComponent<Wire>().junctions.Remove(gameObject);
+		UI.singleton.ValidateAttachedWire();
 		
 	}
 
@@ -66,6 +68,7 @@ public class WireJunction : MonoBehaviour {
 				break;
 			}
 		}
+		UI.singleton.ValidateAttachedWire();
 		
 	}
 	

@@ -1,26 +1,29 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Circuit.cs">
     <Files>
-      <File FileName="Assets/Scripts/ElectricalComponent.cs" Line="72" Column="1" />
-      <File FileName="Assets/Scripts/Wire.cs" Line="117" Column="1" />
+      <File FileName="Assets/Scripts/ElectricalComponent.cs" Line="209" Column="6" />
       <File FileName="Assets/Scripts/ASDAudioSource.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/CamController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/WireLine.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI.cs" Line="122" Column="30" />
+      <File FileName="Assets/Scripts/WireLine.cs" Line="23" Column="9" />
+      <File FileName="Assets/Scripts/UI.cs" Line="152" Column="3" />
       <File FileName="Assets/Scripts/Factory.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/PlayerController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/WireJunction.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/PlayerController.cs" Line="164" Column="12" />
+      <File FileName="Assets/Scripts/WireJunction.cs" Line="9" Column="33" />
       <File FileName="Assets/Scripts/DebugUtils.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CircuitSimulator.cs" Line="129" Column="29" />
-      <File FileName="Assets/Scripts/Circuit.cs" Line="123" Column="61" />
+      <File FileName="Assets/Scripts/CircuitSimulator.cs" Line="138" Column="2" />
+      <File FileName="Assets/Scripts/Circuit.cs" Line="104" Column="23" />
+      <File FileName="Assets/Scripts/DebugElectricText.cs" Line="4" Column="49" />
+      <File FileName="Assets/Scripts/GameConfig.cs" Line="7" Column="46" />
+      <File FileName="Assets/Scripts/Wire.cs" Line="308" Column="60" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="48" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="50" />
       <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="205" />
       <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="215" />
+      <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/ElectricalComponent.cs" line="229" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
