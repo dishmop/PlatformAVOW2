@@ -54,6 +54,7 @@
      <Compile Include="Assets\Scripts\DebugUtils.cs" />
      <Compile Include="Assets\Scripts\Directions.cs" />
      <Compile Include="Assets\Scripts\ElectricalComponent.cs" />
+     <Compile Include="Assets\Scripts\ExitDoor.cs" />
      <Compile Include="Assets\Scripts\Factory.cs" />
      <Compile Include="Assets\Scripts\GameConfig.cs" />
      <Compile Include="Assets\Scripts\GameMode.cs" />

@@ -5,7 +5,11 @@ public class GameMode : MonoBehaviour {
 
 	public static GameMode singleton = null;
 	
+	public GameObject endOfLevelPanel;
+	
 	public bool isEditingCircuit = false;
+	public bool isEndOfLevel = true;
+	public string nextLevelName;
 	
 	bool tempDebugFlag = true;
 
@@ -16,6 +20,13 @@ public class GameMode : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+	
+		endOfLevelPanel.SetActive(isEndOfLevel);
+		if (isEndOfLevel){
+			if (Input.GetMouseButtonDown(0)){
+			 	Application.LoadLevel(nextLevelName);
+			}
+		}
 	
 		if (isEditingCircuit && !tempDebugFlag){
 			tempDebugFlag = true;

@@ -38,7 +38,12 @@ public class ElectricalComponent : MonoBehaviour {
 	public float voltageRise = 0;
 	public float resistance = 0;
 	
-	
+	public float GetSimFwCurrent(){
+		if (simEdgeIndex >= 0){
+			return CircuitSimulator.singleton.allEdges[simEdgeIndex].resFwCurrent;
+		}
+		return 0;
+	}
 	
 	public void GetConnectionData(GameObject wire, out int dir, out Vector3 pos){
 		foreach (ConnectionData data in connectionData){
@@ -121,6 +126,7 @@ public class ElectricalComponent : MonoBehaviour {
 			}
 		}
 		simNodeIndices = new int[numNodeIndices];
+		ClearSimData();
 	
 	}
 	

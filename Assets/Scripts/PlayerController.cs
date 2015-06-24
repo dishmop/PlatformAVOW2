@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (GameMode.singleton.isEndOfLevel) return;	
 		horizontalSpeed = walkSpeed * Input.GetAxis("Horizontal");
 		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit){
 			if (horizontalSpeed > 0){
@@ -234,4 +235,10 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 	}
+	
+//	void OnTriggerEnter2D(Collider collider){
+//		if (collider.gameObject.tag == "Player"){
+//			Debug.Log ("Exit Level");
+//		}
+//	}
 }
