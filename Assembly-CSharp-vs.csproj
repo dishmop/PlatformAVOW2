@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\ASDAudioSource.cs" />
      <Compile Include="Assets\Scripts\CamController.cs" />
+     <Compile Include="Assets\Scripts\Cell.cs" />
      <Compile Include="Assets\Scripts\Circuit.cs" />
      <Compile Include="Assets\Scripts\CircuitSimulator.cs" />
      <Compile Include="Assets\Scripts\DebugElectricText.cs" />

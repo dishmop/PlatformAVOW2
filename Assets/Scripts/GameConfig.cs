@@ -8,6 +8,11 @@ public class GameConfig : MonoBehaviour {
 	public Color interactionNormal = new Color(0, 0.75f, 0, 1);
 	public Color interactionReady = new Color(0.25f, 1, 0.25f, 1);
 	
+	public Color indicatorOK = new Color(0, 1, 0, 1);
+	public Color indicatorSemi = new Color(1, 1, 0, 1);
+	public Color indicatorError = new Color(1, 0, 0, 1);
+	public Color indicatorUnpowered = new Color(0, 0, 0, 1);
+	
 	public float routingFirstStepDist = 0.25f;
 	public bool showDebug = false;
 	

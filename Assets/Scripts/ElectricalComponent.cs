@@ -145,6 +145,8 @@ public class ElectricalComponent : MonoBehaviour {
 			}
 		}
 		simNodeIndices = new int[numNodeIndices];
+		
+		
 		ClearSimData();
 	
 	}
