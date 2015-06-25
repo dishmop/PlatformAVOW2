@@ -42,7 +42,11 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (GameMode.singleton.isEndOfLevel) return;	
+		if (GameMode.singleton.isEndOfLevel){
+			horizontalSpeed = 0;
+			
+			return;	
+		}
 		horizontalSpeed = walkSpeed * Input.GetAxis("Horizontal");
 		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit){
 			if (horizontalSpeed > 0){

@@ -14,6 +14,8 @@ public class ElectricalComponent : MonoBehaviour {
 		kInternal
 	};
 	
+	int rotDirAdd = 0;
+	
 	public Type type = Type.kUnknown;
 	
 	[System.Serializable]
@@ -97,7 +99,8 @@ public class ElectricalComponent : MonoBehaviour {
 				Vector3 connectorPos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
 				connectionData[i].emptyConnector.transform.localPosition = connectorPos;
 				if (type != Type.kJunction){
-					connectionData[i].emptyConnector.transform.localRotation = Quaternion.Euler(0, 0, connectionData[i].dir * 90);
+					int useDir = (connectionData[i].dir + Directions.kNumDirections - rotDirAdd) % Directions.kNumDirections;
+					connectionData[i].emptyConnector.transform.localRotation = Quaternion.Euler(0, 0, useDir * 90);
 				}
 			}
 			/*
@@ -153,6 +156,25 @@ public class ElectricalComponent : MonoBehaviour {
 	
 	
 	void Start(){
+	
+		float angle = transform.rotation.eulerAngles.z;
+		if (MathUtils.FP.Feq(angle, 0)){
+			rotDirAdd = 0;
+		}
+		else if (MathUtils.FP.Feq(angle, 270)){
+			rotDirAdd = 1;
+		}
+		else if (MathUtils.FP.Feq(angle, 180)){
+			rotDirAdd = 2;
+		}
+		else if (MathUtils.FP.Feq(angle, 90)){
+			rotDirAdd = 3;
+		}
+		
+		for (int i = 0; i < connectionData.Length; ++i){
+			connectionData[i].dir = (connectionData[i].dir + rotDirAdd) % Directions.kNumDirections;
+		}
+		
 		if (type != Type.kInternal){
 			Circuit.singleton.RegisterComponent(gameObject);
 		}

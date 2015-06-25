@@ -5,7 +5,8 @@ public class GameMode : MonoBehaviour {
 
 	public static GameMode singleton = null;
 	
-	public GameObject endOfLevelPanel;
+	public GameObject endOfLevelPanelGO;
+	public GameObject canvasGO;
 	
 	public bool isEditingCircuit = false;
 	public bool isEndOfLevel = true;
@@ -15,13 +16,16 @@ public class GameMode : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+
+		
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
-		endOfLevelPanel.SetActive(isEndOfLevel);
+		canvasGO.SetActive(true);
+		
+		endOfLevelPanelGO.SetActive(isEndOfLevel);
 		if (isEndOfLevel){
 			if (Input.GetMouseButtonDown(0)){
 			 	Application.LoadLevel(nextLevelName);

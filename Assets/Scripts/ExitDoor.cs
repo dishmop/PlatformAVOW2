@@ -50,7 +50,7 @@ public class ExitDoor : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter2D(Collider2D collider){
-		if (collider.gameObject.tag == "Player"){
+		if (isOpen && collider.gameObject.tag == "Player"){
 			GameMode.singleton.isEndOfLevel = true;
 			GameMode.singleton.nextLevelName = nextLevelName;
 		}

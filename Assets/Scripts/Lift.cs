@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Global : MonoBehaviour {
+public class Lift : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		//Time.timeScale = 0.1f;
-
 	
 	}
 	
