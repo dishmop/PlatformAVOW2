@@ -25,6 +25,8 @@ public class Lift : MonoBehaviour {
 	
 		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() ;
 		
+		float oldHeight = liftHeight;
+		
 		if (current > 0.25f){
 			liftHeight = Mathf.Min (liftHeight + speed * Time.deltaTime, liftMax);
 			
@@ -35,6 +37,16 @@ public class Lift : MonoBehaviour {
 		Vector3 newPos = platformInitPos + new Vector3(0, liftHeight, 0);
 		liftPlatformGO.transform.position = newPos;
 		
+		if (!MathUtils.FP.Feq(liftHeight, oldHeight)){
+			if (!GetComponent<ASDAudioSource>().IsPlaying()){
+				GetComponent<ASDAudioSource>().Play();
+			}
+		}
+		else{
+			if (GetComponent<ASDAudioSource>().IsPlaying()){
+				GetComponent<ASDAudioSource>().Stop();
+			}
+		}
 		
 	
 	}
