@@ -187,6 +187,14 @@ public class ElectricalComponent : MonoBehaviour {
 					connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.socketPrefab);
 					connectionData[i].emptyConnector.transform.parent = transform;
 				}
+				if (type == Type.kLoad){
+					connectionData[0].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kPlus;
+					connectionData[1].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kMinus;
+				}
+				if (type == Type.kVoltageSource){
+					connectionData[0].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kMinus;
+					connectionData[1].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kPlus;
+				}
 			}
 			else{
 				connectionData[0].emptyConnector = GameObject.Instantiate(Factory.singleton.socketTPrefab);
