@@ -5,6 +5,8 @@ public class SlidingDoor : MonoBehaviour {
 
 	public bool isOpen;
 	public float offsetProp = 0;
+	public GameObject indicatorGO;
+	
 	Transform slideDoorTransform;
 	Vector3 sliderDoorLocalPos = Vector3.zero;
 	float sliderHeight = 0;
@@ -57,6 +59,8 @@ public class SlidingDoor : MonoBehaviour {
 			
 		}
 		
+
+		
 		HandleSliderVisibility();
 	
 	}
@@ -72,6 +76,19 @@ public class SlidingDoor : MonoBehaviour {
 			else{
 				isOpen = false;
 				
+			}
+			
+			if (current < -0.1){
+				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorError;
+			}
+			else if (current < 0.25f){
+				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorUnpowered;
+			}
+			else if (current < 0.75f){
+				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorSemi;
+			}
+			else {
+				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorOK;
 			}
 		}
 	}

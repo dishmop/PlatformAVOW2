@@ -9,6 +9,7 @@ public class ExitDoor : MonoBehaviour {
 	public GameObject shutDoorGO;
 	public AudioSource doorOpen;
 	public AudioSource doorClose;
+	public GameObject indicatorGO;
 	
 	public string nextLevelName;
 	
@@ -22,13 +23,24 @@ public class ExitDoor : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate(){
 		bool wasOpen = isOpen;
-		isOpen = (electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() > 0.75f);
+		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() ;
+		isOpen = (current> 0.75f);
 		// If closing
 		if (wasOpen && !isOpen){
 			doorClose.Play ();
 		}
 		if (!wasOpen && isOpen){	
 			doorOpen.Play ();
+		}
+		
+		if (current < -0.1){
+			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorError;
+		}
+		else if (current < 0.75f){
+			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorUnpowered;
+		}
+		else {
+			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorOK;
 		}
 	}
 	
