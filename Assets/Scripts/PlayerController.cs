@@ -29,10 +29,8 @@ public class PlayerController : MonoBehaviour {
 	
 	GameObject model;
 	public bool isGrounded = false;
-	public bool isAtTerminal  = false;
 	
 	bool tryJump = false;
-	bool tryAction = false;
 	
 	float horizontalSpeed;
 
@@ -57,12 +55,6 @@ public class PlayerController : MonoBehaviour {
 		
 		tryJump = Input.GetMouseButton(0);
 		
-		if (!isAtTerminal){
-			tryAction = false;
-		}
-		if (Input.GetKeyDown(KeyCode.Space)){
-			tryAction = !tryAction;
-		}
 		
 		ProcessFootsteps();
 		
@@ -86,15 +78,12 @@ public class PlayerController : MonoBehaviour {
 			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 2.5f), ForceMode2D.Impulse);
 		}
 		
-		
-		GameMode.singleton.isEditingCircuit = (tryAction && isAtTerminal);
-		
+			
 		model.GetComponent<Animator>().SetBool("isActioning", GameMode.singleton.isEditingCircuit);
 
 		
 		// Reset (so it can be set asgain by any collision messages)
 		isGrounded = false;
-		isAtTerminal = false;
 	}
 	
 	bool TestForGround(Collision2D collision){
@@ -145,9 +134,6 @@ public class PlayerController : MonoBehaviour {
 			isGrounded = true;
 			thud1.Play ();
 		}
-		if (TestForTerminal(collision)){
-			isAtTerminal = true;
-		}
 		
 	}
 	
@@ -157,9 +143,6 @@ public class PlayerController : MonoBehaviour {
 			isGrounded = true;
 		}
 		
-		if (TestForTerminal(collision)){
-			isAtTerminal = true;
-		}
 	}
 	
 	void OnGUI2(){

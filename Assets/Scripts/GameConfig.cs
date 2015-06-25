@@ -5,6 +5,8 @@ public class GameConfig : MonoBehaviour {
 	public static GameConfig singleton = null;
 	public Color highVolt = new Color(127f/255f, 10f/255f, 0f/255f, 1);
 	public Color lowVolt = new Color(0f/255f, 10f/255f, 127f/255f, 1);
+	public Color interactionNormal = new Color(0, 0.75f, 0, 1);
+	public Color interactionReady = new Color(0.25f, 1, 0.25f, 1);
 	
 	public float routingFirstStepDist = 0.25f;
 	public bool showDebug = false;

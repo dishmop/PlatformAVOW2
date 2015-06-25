@@ -4,17 +4,25 @@ using System.Linq;
 
 public class ElectricalComponent : MonoBehaviour {
 
-
-	
 	public enum Type{
 		kUnknown,
 		kVoltageSource,
 		kLoad,
 		kCursor,
-		kJunction
+		kSwitch,
+		kJunction,
+		kInternal
 	};
 	
 	public Type type = Type.kUnknown;
+	
+	[System.Serializable]
+	public class InternalRoute{
+		public int connectionIndex0;
+		public int connectionIndex1;
+		public float resistance;
+	}
+	public InternalRoute[] internalRouting;
 	
 
 	[System.Serializable]
@@ -88,6 +96,9 @@ public class ElectricalComponent : MonoBehaviour {
 			if (connectionData[i].emptyConnector != null){
 				Vector3 connectorPos = new Vector3(connectionData[i].pos.x, connectionData[i].pos.y, -2);
 				connectionData[i].emptyConnector.transform.localPosition = connectorPos;
+				if (type != Type.kJunction){
+					connectionData[i].emptyConnector.transform.localRotation = Quaternion.Euler(0, 0, connectionData[i].dir * 90);
+				}
 			}
 			/*
 			WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
@@ -124,6 +135,14 @@ public class ElectricalComponent : MonoBehaviour {
 				numNodeIndices = 2;
 				break;
 			}
+			case Type.kSwitch:{
+				numNodeIndices = 3;
+				break;
+			}
+			case Type.kInternal:{
+				numNodeIndices = 1;
+				break;
+			}
 		}
 		simNodeIndices = new int[numNodeIndices];
 		ClearSimData();
@@ -132,11 +151,13 @@ public class ElectricalComponent : MonoBehaviour {
 	
 	
 	void Start(){
-		Circuit.singleton.RegisterComponent(gameObject);
+		if (type != Type.kInternal){
+			Circuit.singleton.RegisterComponent(gameObject);
+		}
 
 		
 		// Set up the little bits of wire that are the conneciton points
-		if (type != Type.kCursor){
+		if (type != Type.kCursor && type != Type.kInternal){
 			if (type != Type.kJunction){
 				for (int i = 0; i < connectionData.Length; ++i){
 					connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.socketPrefab);
@@ -159,7 +180,7 @@ public class ElectricalComponent : MonoBehaviour {
 	void Update(){
 
 
-		if (type != Type.kCursor){
+		if (type != Type.kCursor && type != Type.kInternal){
 			HandleMouseInput();
 		}
 		for (int i = 0; i < connectionData.Length; ++i){

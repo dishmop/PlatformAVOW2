@@ -11,6 +11,7 @@ public class Factory : MonoBehaviour {
 	public GameObject wireJunctionPrefab;
 	public GameObject socketPrefab;
 	public GameObject socketTPrefab;
+	public GameObject emptyConnectorPrefab;
 	
 
 

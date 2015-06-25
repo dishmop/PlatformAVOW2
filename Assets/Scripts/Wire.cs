@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Wire : MonoBehaviour {
 
@@ -302,12 +303,14 @@ public class Wire : MonoBehaviour {
 	void SetupColors(){
 		
 		ElectricalComponent component = ends[0].component.GetComponent<ElectricalComponent>();
-		if (component.simNodeIndices != null){
+		if (component.simNodeIndices != null && component.simNodeIndices.Count() != 0){
 			int index = component.GetConnectionDataIndex(gameObject);
 			int simNodeIndex = component.simNodeIndices[index];
-			float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
-			Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
-			currentWire.GetComponent<WireLine>().wireColor = wireCol;
+			if (simNodeIndex >= 0){
+				float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
+				Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
+				currentWire.GetComponent<WireLine>().wireColor = wireCol;
+			}
 		}
 		
 	}

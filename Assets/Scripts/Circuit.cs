@@ -130,6 +130,11 @@ public class Circuit : MonoBehaviour {
 		if (component.type == ElectricalComponent.Type.kVoltageSource){
 			component.simEdgeIndex = sim.AddVoltageSourceEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.voltageRise);
 		}
+		
+		// Do any internal routing
+		foreach (ElectricalComponent.InternalRoute route in component.internalRouting){
+			sim.AddLoadEdge(component.simNodeIndices[route.connectionIndex0], component.simNodeIndices[route.connectionIndex1], route.resistance);
+		}
 	}
 	
 	// Initialise the circuit simulator and run it
