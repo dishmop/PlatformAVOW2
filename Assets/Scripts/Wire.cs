@@ -13,6 +13,7 @@ public class Wire : MonoBehaviour {
 		
 	};
 	
+	public bool markedForDeletion = false;
 	public bool autoUpdateWires = true;
 	
 	public EndData[] ends = new EndData[2];

@@ -17,6 +17,9 @@ public class WireJunction : MonoBehaviour {
 		
 	}
 	
+	public GameObject GetOtherWire(){
+		return otherComponent.GetComponent<ElectricalComponent>().connectionData[otherComponentIndex].wire;
+	}
 	
 	public void RemoveSelfFromParent(){
 		

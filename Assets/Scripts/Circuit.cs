@@ -60,23 +60,38 @@ public class Circuit : MonoBehaviour {
 	
 	
 	public void RemoveJunctionsJoining(GameObject wire){
-		List<GameObject> removalWires = new List<GameObject>();
-		List<int> removalIndices = new List<int>();
+
+		// Find wires that contain a child junction matching the end of this wire.	
 		foreach (GameObject testWire in wireGOs){
 			for (int i = 0; i < testWire.GetComponent<Wire>().junctions.Count; ++i){
 				GameObject junction = testWire.GetComponent<Wire>().junctions[i];
 				if (junction.GetComponent<ElectricalComponent>().connectionData[0].wire == wire){
 					//int index = testWire.GetComponent<Wire>().junctions.FindIndex(junction);
 					//testWire.GetComponent<Wire>().junctions.Remove(junction);
-					removalWires.Add (testWire);
-					removalIndices.Add (i);
+					testWire.GetComponent<Wire>().junctions.RemoveAt(i);
 					Destroy (junction);
+					break;
 				}
 			}
 		}
-		for (int i = 0; i < removalWires.Count; ++i){
-			removalWires[i].GetComponent<Wire>().junctions.RemoveAt(removalIndices[i]);
+		
+		// We also need to remove any wires which are connected to child junctions on THIS wire. 
+		List<GameObject> removalWires = new List<GameObject>();
+		foreach (GameObject junctionGO in wire.GetComponent<Wire>().junctions){
+			WireJunction junction = junctionGO.GetComponent<WireJunction>();
+			removalWires.Add (junction.GetOtherWire());
+			// First remove them from the circuit (so we don't try and remove them again
+			wireGOs.Remove(junction.GetOtherWire());
 		}
+		
+		// Now we can go about actually deleting them (and recursively deleting their junctions too
+		foreach (GameObject wireGO in removalWires){
+			RemoveJunctionsJoining(wireGO);
+			Destroy (wireGO);
+			
+		}
+		
+		
 	}
 	
 	public void AddWireToSim(GameObject wireGO){
