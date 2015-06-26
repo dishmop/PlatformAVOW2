@@ -1,38 +1,36 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Lift.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameConfig.cs">
     <Files>
       <File FileName="Assets/Scripts/ElectricalComponent.cs" Line="196" Column="94" />
       <File FileName="Assets/Scripts/ASDAudioSource.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/CamController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/WireLine.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Factory.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/PlayerController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/WireJunction.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/DebugUtils.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/CircuitSimulator.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/PlayerController.cs" Line="144" Column="25" />
+      <File FileName="Assets/Scripts/CircuitSimulator.cs" Line="508" Column="55" />
       <File FileName="Assets/Scripts/DebugElectricText.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GameConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/GameConfig.cs" Line="16" Column="41" />
       <File FileName="Assets/Scripts/SlidingDoor.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ExitDoor.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Terminal.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GameMode.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Wire.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/LeverSwitch.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Cell.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Terminal.cs" Line="23" Column="36" />
+      <File FileName="Assets/Scripts/GameMode.cs" Line="34" Column="1" />
+      <File FileName="Assets/Scripts/Wire.cs" Line="16" Column="40" />
+      <File FileName="Assets/Scripts/LeverSwitch.cs" Line="15" Column="20" />
+      <File FileName="Assets/Scripts/Cell.cs" Line="57" Column="72" />
       <File FileName="Assets/Scripts/LevelWires.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Global.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Circuit.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Circuit.cs" Line="25" Column="22" />
       <File FileName="Assets/Scripts/Lift.cs" Line="46" Column="8" />
-      <File FileName="Assets/Scripts/PipeSocket.cs" Line="5" Column="1" />
+      <File FileName="Assets/Scripts/PipeSocket.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/WireJunction.cs" Line="21" Column="10" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="50" />
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="207" />
-      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="217" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Circuit.cs" line="67" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="208" />
+      <Breakpoint enabled="false" file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/Wire.cs" line="218" />
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/DebugUtils.cs" line="6" />
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/DebugUtils.cs" line="13" />
       <Breakpoint file="/Users/dac70/ownCloud/CUED_IWTSE/Game prototyping/Unity Demos/Platform/Assets/Scripts/DebugUtils.cs" line="25" />

@@ -19,6 +19,10 @@ public class Terminal : MonoBehaviour {
 			GameMode.singleton.isEditingCircuit = !GameMode.singleton.isEditingCircuit;
 			
 		}
+		if (GameMode.singleton.isEditingCircuit && Input.GetKeyDown(KeyCode.C)){
+			Circuit.singleton.RemoveAllWires();
+		}
+		
 		
 	}
 	

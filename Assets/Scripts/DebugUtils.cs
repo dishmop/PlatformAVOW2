@@ -16,7 +16,7 @@ public class DebugUtils{
 
 	public static void Assert(bool condition, string msg){
 		if (!condition){
-			 Debug.LogError(msg);
+//			 Debug.LogError(msg);
 			}
 	}
 

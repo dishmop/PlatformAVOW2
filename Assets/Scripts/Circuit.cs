@@ -19,6 +19,23 @@ public class Circuit : MonoBehaviour {
 		electricalComponentGOs.Remove(electricalComponent);
 	}
 	
+	public void RemoveAllWires(){
+		for (int i = 0 ; i < wireGOs.Count(); ++i){
+			RemoveJunctionsJoining(wireGOs[i]);
+			Destroy (wireGOs[i]);
+		}
+		wireGOs = new List<GameObject>();
+		
+		// Ensure all compoents have no connections
+		foreach (GameObject componentGOs in electricalComponentGOs){
+			ElectricalComponent component = componentGOs.GetComponent<ElectricalComponent>();
+			for (int i = 0; i < component.connectionData.Count(); ++i){
+				
+				component.connectionData[i].wire = null;
+			}
+		}
+	}
+	
 	
 	public GameObject GetElectricalComponent(int index){
 		return electricalComponentGOs[index];
@@ -143,7 +160,7 @@ public class Circuit : MonoBehaviour {
 			component.simEdgeIndex = sim.AddLoadEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.resistance);
 		}
 		if (component.type == ElectricalComponent.Type.kVoltageSource){
-			component.simEdgeIndex = sim.AddVoltageSourceEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.voltageRise);
+			component.simEdgeIndex = sim.AddVoltageSourceEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.voltageRise, component.resistance);
 		}
 		
 		// Do any internal routing

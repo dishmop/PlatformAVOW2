@@ -17,6 +17,8 @@ public class CircuitSimulator : MonoBehaviour {
 		public int fromNodeIndex;		// 0 or 1
 	};
 	
+	public bool voltageError;
+	
 	
 	// Circuir graph is made from nodes and edges
 	public class Node{
@@ -116,6 +118,15 @@ public class CircuitSimulator : MonoBehaviour {
 		
 	}
 	
+	public int AddVoltageSourceEdge(int node0Id, int node1Id, float voltageRise, float resistance){
+		
+		int edgeId = AddEdge(node0Id, node1Id);
+		allEdges[edgeId].voltageRise = voltageRise;
+		allEdges[edgeId].resistance = resistance;
+		return edgeId;
+		
+	}
+	
 	// Creates a new load edge and returns its Id
 	public int AddLoadEdge(int node0Id, int node1Id, float resistance){
 		
@@ -134,6 +145,7 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	
 	public void RunSimulation(){
+		voltageError = false;
 	
 	//	Debug.Log ("numNodes = " + allNodes.Count() + ", numEdges = " + allEdges.Count());
 	
@@ -679,9 +691,7 @@ public class CircuitSimulator : MonoBehaviour {
 				}
 				// Otherwise, assert that the voltage is the same as what we just caluclated
 				else{
-					if (!MathUtils.FP.Feq(nextNode.resVoltage, nextNodeVoltage)){
-						Debug.LogError ("Voltages accross components are not consitent");
-					}
+					voltageError = true;
 				}
 			}
 			// If we failed to find an unvisited component, then pop this node off the stack (as there is

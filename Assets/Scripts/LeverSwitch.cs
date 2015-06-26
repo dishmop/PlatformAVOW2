@@ -12,7 +12,7 @@ public class LeverSwitch : MonoBehaviour {
 	public GameObject connectionGO1;
 	
 	public bool isOn = false;
-	float angle = 45;
+	float angle = -45;
 	float angleSpeed = 360f;
 	
 	// Use this for initialization

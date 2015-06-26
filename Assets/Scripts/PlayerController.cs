@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour {
 	bool leftTriggered = false;
 	bool rightTriggered = false;
 	
+	bool firstFallHit = true;
+	
 
 	
 	GameObject model;
@@ -136,7 +138,10 @@ public class PlayerController : MonoBehaviour {
 		//Debug.Log("OnCollisionEnter2D: " + col.collider.gameObject.name);
 		if (TestForGround(collision)){
 			isGrounded = true;
-			thud1.Play ();
+			if (!firstFallHit){
+				thud1.Play ();
+			}
+			firstFallHit = false;
 		}
 		
 	}

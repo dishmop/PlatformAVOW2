@@ -12,7 +12,7 @@ public class GameMode : MonoBehaviour {
 	public bool isEndOfLevel = true;
 	public string nextLevelName;
 	
-	bool tempDebugFlag = true;
+
 
 	// Use this for initialization
 	void Start () {
@@ -27,16 +27,11 @@ public class GameMode : MonoBehaviour {
 		
 		endOfLevelPanelGO.SetActive(isEndOfLevel);
 		if (isEndOfLevel){
-			if (Input.GetMouseButtonDown(0)){
+			if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)){
 			 	Application.LoadLevel(nextLevelName);
 			}
 		}
-	
-		if (isEditingCircuit && !tempDebugFlag){
-			tempDebugFlag = true;
-			Circuit.singleton.AddConnection(Circuit.singleton.GetElectricalComponent(0), 0, Circuit.singleton.GetElectricalComponent(1), 0);
-			Circuit.singleton.AddConnection(Circuit.singleton.GetElectricalComponent(0), 1, Circuit.singleton.GetElectricalComponent(1), 1);
-		}
+		
 		
 		Cursor.visible = isEditingCircuit;
 	

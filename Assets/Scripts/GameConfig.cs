@@ -13,7 +13,7 @@ public class GameConfig : MonoBehaviour {
 	public Color indicatorError = new Color(1, 0, 0, 1);
 	public Color indicatorUnpowered = new Color(0, 0, 0, 1);
 	
-	public float routingFirstStepDist = 0.25f;
+	public float routingFirstStepDist = 0.35f;
 	public bool showDebug = false;
 	
 	void Awake(){

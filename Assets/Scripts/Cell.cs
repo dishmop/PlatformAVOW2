@@ -51,6 +51,14 @@ public class Cell : MonoBehaviour {
 				tripTime = Time.fixedTime;
 			}
 		}
+		
+		// Check if we have a short circuit
+		if (CircuitSimulator.singleton.voltageError){
+			cellElectrics.GetComponent<ElectricalComponent>().resistance = 0.01f;
+		}
+		else{
+			cellElectrics.GetComponent<ElectricalComponent>().resistance = 0;
+		}
 
 
 	
