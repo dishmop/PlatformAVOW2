@@ -59,6 +59,8 @@ public class SlidingDoor : MonoBehaviour {
 			
 		}
 		
+		
+		slideDoorTransform.GetComponent<BoxCollider2D>().enabled = !isOpen;
 
 		
 		HandleSliderVisibility();

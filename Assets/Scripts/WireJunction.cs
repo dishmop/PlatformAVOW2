@@ -42,6 +42,10 @@ public class WireJunction : MonoBehaviour {
 		int newDir;
 		
 		// Calc the position of the thing we are tryig to attach on
+		if (otherComponent == null){
+			return;
+		}
+		
 		Vector3 basePos = otherComponent.transform.position;
 		int otherWireDir = otherComponent.GetComponent<ElectricalComponent>().connectionData[otherComponentIndex].dir;
 		

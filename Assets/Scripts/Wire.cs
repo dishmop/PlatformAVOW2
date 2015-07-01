@@ -15,6 +15,7 @@ public class Wire : MonoBehaviour {
 	
 	public bool markedForDeletion = false;
 	public bool autoUpdateWires = true;
+	public bool enableHandleInput = true;
 	
 	public EndData[] ends = new EndData[2];
 	
@@ -24,11 +25,63 @@ public class Wire : MonoBehaviour {
 	public List<GameObject> junctions;
 	
 	
-	List<Vector3>[] paths = new List<Vector3>[2];
+	List<Vector3>[] rawPaths = new List<Vector3>[2];
+	
+	// These split up the path into sections (with a different section between each junction
+	List<List<Vector3>> usePaths = new List<List<Vector3>>();
+	
 	float			pathLength;
 	
 	// Debug (should be local)
 	float distAlong;
+	
+	
+	
+	void ReconstructUsePaths(){
+		// How meny sections should we have
+		int desNumSections = junctions.Count() + 1;
+		if (desNumSections != usePaths.Count()){
+			usePaths = new List<List<Vector3>>();
+			for (int i = 0; i < desNumSections; ++i){
+				usePaths.Add (new List<Vector3>());
+			}
+		}
+		
+		// Get an ordered list of the junctions in the wire
+		List<GameObject> orderedJunctions = junctions.OrderBy(obj => obj.GetComponent<WireJunction>().propAlongWire).ToList();
+		
+		int segmentIndex = 0;
+		int lastIndex = 0;
+		float distTravelled = 0;
+		Vector3 lastPos = rawPaths[0][lastIndex];
+		
+		// We need at least one path and the first point must go in it
+		usePaths[segmentIndex] = new List<Vector3>();
+		usePaths[segmentIndex].Add (lastPos);
+		
+		// If there are junctions, then do each segment at a time
+		for  (int i = 0; i < orderedJunctions.Count(); ++i){
+		
+			// Distance that the junction is along the wire
+			float juncDist = pathLength * orderedJunctions[i].GetComponent<WireJunction>().propAlongWire;
+
+			// position of next point in the line path			
+			Vector3 nextPos = rawPaths[0][lastIndex + 1];
+			Vector3 pathSegment= nextPos - lastPos;
+			float pathSegLength = pathSegment.magnitude;
+			
+			// If the junction is between this path segment then make a new path point and close off this usePath
+			if (distTravelled + pathSegLength > juncDist){
+				float distDownThisPathSegment = juncDist - distTravelled;
+				float propDownThisPathSegment = distDownThisPathSegment / pathSegLength;
+				Vector3 newPoint = Vector3.Lerp (lastPos, nextPos, propDownThisPathSegment);
+				usePaths[segmentIndex].Add (newPoint);
+				distTravelled = juncDist;
+			}
+			
+		}
+		
+	}
 	
 	
 	void ConstructMesh(){
@@ -76,8 +129,8 @@ public class Wire : MonoBehaviour {
 		
 		float propAlongFinalSegment = -1;
 		
-		for (int i = 0; i < paths[0].Count-1; ++i){
-			Vector3 segment = paths[0][i] - paths[0][i+1];
+		for (int i = 0; i < rawPaths[0].Count-1; ++i){
+			Vector3 segment = rawPaths[0][i] - rawPaths[0][i+1];
 			float thisSegLen = segment.magnitude;
 			if (thisSegLen > remainingLengthToTarget){
 				startIndex = i;
@@ -90,15 +143,15 @@ public class Wire : MonoBehaviour {
 			}
 		}
 		
-		DebugUtils.Assert (startIndex >=0 && startIndex < paths[0].Count, "Trying to access wire segment outside of bounds");
+		DebugUtils.Assert (startIndex >=0 && startIndex < rawPaths[0].Count, "Trying to access wire segment outside of bounds");
 		
 		
-		Vector3 localPos = Vector3.Lerp(paths[0][startIndex], paths[0][startIndex+1], propAlongFinalSegment);
+		Vector3 localPos = Vector3.Lerp(rawPaths[0][startIndex], rawPaths[0][startIndex+1], propAlongFinalSegment);
 		
 		pos = transform.TransformPoint (localPos);
 		
 		// Figure out Direction
-		Vector3 pathDir = paths[0][startIndex+1] - paths[0][startIndex];
+		Vector3 pathDir = rawPaths[0][startIndex+1] - rawPaths[0][startIndex];
 		
 		Vector3 desAttachDir = otherPos - pos;
 		
@@ -137,23 +190,23 @@ public class Wire : MonoBehaviour {
 		
 		for (int i = 0; i < 2; ++i){
 			workingDirs[i] = ends[i].dir;
-			paths[i] = new List<Vector3>();
-			paths[i].Add(ends[i].pos);
+			rawPaths[i] = new List<Vector3>();
+			rawPaths[i].Add(ends[i].pos);
 		}
 
 		// We need to move away from where we want to get to, move away by one unit and then
 		// change direction so we are now moving towards where we want to go
 		for (int i = 0; i < 2; ++i){
-			Vector3 startPosLoc = paths[i][0];
+			Vector3 startPosLoc = rawPaths[i][0];
 			
 			Vector3 newPos = startPosLoc + Directions.GetDirVec(workingDirs[i]) * GameConfig.singleton.routingFirstStepDist;
-			paths[i].Add (newPos);
+			rawPaths[i].Add (newPos);
 		}
 		
 		// Set up the directions
 		for (int i = 0; i < 2; ++i){
-			Vector3 startPosLoc = paths[i][paths[i].Count-1];
-			Vector3 endPosLoc = paths[1-i][paths[1-i].Count-1];
+			Vector3 startPosLoc = rawPaths[i][rawPaths[i].Count-1];
+			Vector3 endPosLoc = rawPaths[1-i][rawPaths[1-i].Count-1];
 			
 			workingDirs[i] = Directions.GetDirectionTowards(startPosLoc, endPosLoc, Directions.CalcOppDir(workingDirs[i]));
 			
@@ -168,8 +221,8 @@ public class Wire : MonoBehaviour {
 //			DebugUtils.Assert(Directions.IsInSameDirection(startPosLoc, endPosLoc, workingDirs[i]), "Path ends not heading towards eachother");
 //		}
 //		
-		Vector3 startPos = paths[0][paths[0].Count-1];
-		Vector3 endPos = paths[1][paths[1].Count-1];
+		Vector3 startPos = rawPaths[0][rawPaths[0].Count-1];
+		Vector3 endPos = rawPaths[1][rawPaths[1].Count-1];
 		
  		Vector3 centrePos = 0.5f * (startPos + endPos);
 
@@ -181,13 +234,13 @@ public class Wire : MonoBehaviour {
 			
 			// If vertical
 			if (workingDirs[0] == Directions.kUp || workingDirs[0] == Directions.kDown){
-				paths[0].Add(new Vector3(startPos.x, centrePos.y, 0));
-				paths[0].Add(new Vector3(endPos.x, centrePos.y, 0));
+				rawPaths[0].Add(new Vector3(startPos.x, centrePos.y, 0));
+				rawPaths[0].Add(new Vector3(endPos.x, centrePos.y, 0));
 			}
 			// If horizontal
 			else{
-				paths[0].Add(new Vector3(centrePos.x, startPos.y, 0));
-				paths[0].Add(new Vector3(centrePos.x, endPos.y, 0));
+				rawPaths[0].Add(new Vector3(centrePos.x, startPos.y, 0));
+				rawPaths[0].Add(new Vector3(centrePos.x, endPos.y, 0));
 			}
 			
 		}
@@ -196,26 +249,26 @@ public class Wire : MonoBehaviour {
 			
 			// If vertical
 			if (workingDirs[0] == Directions.kUp || workingDirs[0] == Directions.kDown){
-				paths[0].Add(new Vector3(startPos.x, endPos.y, 0));
+				rawPaths[0].Add(new Vector3(startPos.x, endPos.y, 0));
 			}
 			// If horizontal
 			else{
-				paths[0].Add(new Vector3(endPos.x, startPos.y, 0));
+				rawPaths[0].Add(new Vector3(endPos.x, startPos.y, 0));
 			}			
 		}
 		
 		// Add in the points from path[1] to path[0]
-		for (int i = paths[1].Count - 1; i >=0 ; --i){
-			paths[0].Add (paths[1][i]);
+		for (int i = rawPaths[1].Count - 1; i >=0 ; --i){
+			rawPaths[0].Add (rawPaths[1][i]);
 		}
 		
 		// No use for the info in paths[1] anymore
-		paths[1].Clear();
+		rawPaths[1].Clear();
 		
 		// Make the z value 0
-		for (int i = 0; i < paths[0].Count; ++i){
-			Vector3 newPos = new Vector3(paths[0][i].x, paths[0][i].y, 0);
-			paths[0][i] = newPos;
+		for (int i = 0; i < rawPaths[0].Count; ++i){
+			Vector3 newPos = new Vector3(rawPaths[0][i].x, rawPaths[0][i].y, 0);
+			rawPaths[0][i] = newPos;
 		}
 		//centrePos.z = 0;
 		
@@ -223,14 +276,14 @@ public class Wire : MonoBehaviour {
 		transform.position = new Vector3(centrePos.x, centrePos.y, -2);
 		
 		// Offset the path so the object can be positioned at its centre
-		for (int i = 0; i < paths[0].Count; ++i){
-			paths[0][i] -= centrePos;
+		for (int i = 0; i < rawPaths[0].Count; ++i){
+			rawPaths[0][i] -= centrePos;
 		}
 		
 		// Figure out the length of the path
 		pathLength = 0;
-		for (int i = 0; i < paths[0].Count-1; ++i){
-			Vector3 segment = paths[0][i] - paths[0][i+1];
+		for (int i = 0; i < rawPaths[0].Count-1; ++i){
+			Vector3 segment = rawPaths[0][i] - rawPaths[0][i+1];
 			pathLength += segment.magnitude;
 		}
 		
@@ -249,7 +302,7 @@ public class Wire : MonoBehaviour {
 		
 		WireLine line = wireLine.GetComponent<WireLine>();
 		
-		line.SetNewPoints(paths[0].ToArray());
+		line.SetNewPoints(rawPaths[0].ToArray());
 		line.end0 = WireLine.EndType.kContinue;
 		line.end1 = WireLine.EndType.kContinue;
 //		line.ConstructMesh();
@@ -257,7 +310,7 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void UpdateCentralWire(){
-		currentWire.GetComponent<WireLine>().SetNewPoints(paths[0].ToArray());
+		currentWire.GetComponent<WireLine>().SetNewPoints(rawPaths[0].ToArray());
 	
 	}
 	
@@ -271,6 +324,8 @@ public class Wire : MonoBehaviour {
 
 	
 	public void HandleMouseInput(){
+		if (!enableHandleInput) return;
+		
 		// If this is the wire that is attaced to the cursor, then do nothing.
 		if (ends[1].component != null && ends[1].component.GetComponent<ElectricalComponent>().type == ElectricalComponent.Type.kCursor){
 			return;
@@ -306,6 +361,10 @@ public class Wire : MonoBehaviour {
 		ElectricalComponent component = ends[0].component.GetComponent<ElectricalComponent>();
 		if (component.simNodeIndices != null && component.simNodeIndices.Count() != 0){
 			int index = component.GetConnectionDataIndex(gameObject);
+			if (index == -1){
+				// Something's gone wrong 
+				return;
+			}
 			int simNodeIndex = component.simNodeIndices[index];
 			if (simNodeIndex >= 0){
 				float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;

@@ -33,6 +33,7 @@ public class LeverSwitch : MonoBehaviour {
 		wireGO.transform.SetParent(transform);
 		wireGO.GetComponent<Wire>().ends[0].component = connectionGO0;
 		wireGO.GetComponent<Wire>().ends[1].component = connectionGO1;
+		wireGO.GetComponent<Wire>().enableHandleInput = false;
 		
 		connectionGO0.GetComponent<ElectricalComponent>().connectionData[0].wire = wireGO;
 		connectionGO1.GetComponent<ElectricalComponent>().connectionData[0].wire = wireGO;

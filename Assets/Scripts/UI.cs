@@ -13,8 +13,13 @@ public class UI : MonoBehaviour {
 	int selectedConnectorIndex = -1;
 
 	
-	public void RegisterSelected(GameObject electricalComponentGO, int index){
+	public bool RegisterSelected(GameObject electricalComponentGO, int index){
 		ValidateAttachedWire();
+		
+		// f we already have an attached component, then can't attach another
+		if (selectedComponent != null && (electricalComponentGO != selectedComponent || selectedConnectorIndex != index)){
+			return false;
+		}
 	
 		if (attachedWire != null){
 			// If we are already attached to this, then ignore
@@ -26,7 +31,7 @@ public class UI : MonoBehaviour {
 				selectedConnectorIndex = -1;
 				ValidateAttachedWire();
 				
-				return;
+				return false;
 			}
 			// If there is already another wire attached to this then ignore
 			if (electricalComponentGO.GetComponent<ElectricalComponent>().connectionData[index].wire != null && 
@@ -34,7 +39,7 @@ public class UI : MonoBehaviour {
 				selectedComponent = null;
 				selectedConnectorIndex = -1;
 				ValidateAttachedWire();
-				return;
+				return false;
 			}
 		}
 		
@@ -50,6 +55,7 @@ public class UI : MonoBehaviour {
 			
 		}
 		ValidateAttachedWire();
+		return true;
 	}
 	
 	public void RegisterWireSelect(GameObject wire, float propAlong){
@@ -144,12 +150,12 @@ public class UI : MonoBehaviour {
 	
 	public void ValidateAttachedWire(){
 		if (attachedWire != null){
-			Wire thisWire = attachedWire.GetComponent<Wire>();
-			DebugUtils.Assert (thisWire.ends[0].component != null, "thisWire.ends[0].component != null");
-			DebugUtils.Assert (thisWire.ends[1].component != null, "thisWire.ends[1].component != null");
-			
-			DebugUtils.Assert (thisWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1, "thisWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1");
-			DebugUtils.Assert (thisWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1, "thisWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1");;
+//			Wire thisWire = attachedWire.GetComponent<Wire>();
+//			DebugUtils.Assert (thisWire.ends[0].component != null, "thisWire.ends[0].component != null");
+//			DebugUtils.Assert (thisWire.ends[1].component != null, "thisWire.ends[1].component != null");
+//			
+//			DebugUtils.Assert (thisWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1, "thisWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1");
+//			DebugUtils.Assert (thisWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1, "thisWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire) != -1");;
 			
 		}
 		

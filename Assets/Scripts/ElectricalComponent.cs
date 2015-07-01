@@ -250,7 +250,11 @@ public class ElectricalComponent : MonoBehaviour {
 			
 
 				if (connectionData[i].uiIsSelected){
-					UI.singleton.RegisterSelected(gameObject, i);
+					bool ok = UI.singleton.RegisterSelected(gameObject, i);
+					if (!ok){
+						connectionData[i].uiIsSelected = false;
+						return;
+					}
 				}
 				else{
 					UI.singleton.UnregisterSelected(gameObject, i);
@@ -302,7 +306,12 @@ public class ElectricalComponent : MonoBehaviour {
 						
 						connectionData[i].uiIsAttached = true;
 						//UI.singleton.AttachConnector(otherComp, otherIndex);
-						UI.singleton.RegisterSelected(gameObject, i);
+						bool ok = UI.singleton.RegisterSelected(gameObject, i);
+						if (!ok){
+							connectionData[i].uiIsSelected = false;
+							return;
+						}
+						
 						
 
 						

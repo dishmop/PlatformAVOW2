@@ -124,6 +124,10 @@ public class Circuit : MonoBehaviour {
 		
 		ElectricalComponent lastComponent = wire.ends[0].component.GetComponent<ElectricalComponent>();
 		int lastIndex = lastComponent.GetConnectionDataIndex(wireGO);
+		if (lastIndex == -1){
+			// something's gone  a bit wrong
+			return;
+		}
 		
 		for (int i = 0; i < thisJunctions.Count(); ++i){
 			ElectricalComponent nextComponent = thisJunctions[i].GetComponent<ElectricalComponent>();
@@ -141,11 +145,14 @@ public class Circuit : MonoBehaviour {
 		
 		if (wire.ends[1].component == null){
 			Debug.Log("!!!");
+			return;
 		}
+		
 		ElectricalComponent endComponent = wire.ends[1].component.GetComponent<ElectricalComponent>();
 		int endIndex = endComponent.GetConnectionDataIndex(wireGO);
 		
 		// Add the final segment in
+//		Debug.Log("lastIndex = " + lastIndex + ", endIndex = " + endIndex);
 		sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex]);
 	}
 	

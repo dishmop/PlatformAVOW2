@@ -54,7 +54,7 @@ public class WireLine : MonoBehaviour {
 			ConstructMesh();
 		}
 	
-		// Ever set of 4 vertices is an axis aligned quad
+		// Every set of 4 vertices is an axis aligned quad
 		// I.e. mega trivial to determin if we are inside
 		distAlong = 0;
 		
