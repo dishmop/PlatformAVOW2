@@ -6,6 +6,7 @@ public class Lift : MonoBehaviour {
 	public GameObject liftPlatformGO;
 	public GameObject liftSideGO;
 	public GameObject electricsGO;
+	public GameObject playerGO;
 	
 	float speed = 0.25f;
 	
@@ -47,6 +48,10 @@ public class Lift : MonoBehaviour {
 				GetComponent<ASDAudioSource>().Stop();
 			}
 		}
+		
+		bool haveMissedLift = liftHeight > 0.7 && playerGO.transform.position.y < transform.position.y + 0.2f;
+		
+		transform.FindChild("LiftPlatform").FindChild("Text").gameObject.SetActive(haveMissedLift);
 		
 	
 	}

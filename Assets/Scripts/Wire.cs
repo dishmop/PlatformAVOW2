@@ -340,7 +340,8 @@ public class Wire : MonoBehaviour {
 		distAlong = 0;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
 			//currentWire.GetComponent<WireLine>().wireIntensity = 2;
-			UI.singleton.RegisterWireSelect(gameObject, distAlong / pathLength);
+			float distUse = Mathf.Min (Mathf.Max (distAlong, 0.5f), pathLength-0.5f);
+			UI.singleton.RegisterWireSelect(gameObject, distUse / pathLength);
 			
 		}
 		else{

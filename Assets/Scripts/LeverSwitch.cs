@@ -74,13 +74,15 @@ public class LeverSwitch : MonoBehaviour {
 		leverGO.transform.FindChild ("SwitchLever").GetComponent<SpriteRenderer>().color = isInTrigger ? GameConfig.singleton.interactionReady : GameConfig.singleton.interactionNormal;
 		
 		
-		if (isInTrigger && Input.GetKeyDown(KeyCode.Space)){
+		if (isInTrigger && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
 			isOn = !isOn;
 			
 		}
 		UpdateEmptyConnectors();
 		
 		switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[0].connectionIndex1 = isOn ? 1 : 2;
+		
+		transform.FindChild("Text").gameObject.SetActive(isInTrigger);
 	
 	}
 	

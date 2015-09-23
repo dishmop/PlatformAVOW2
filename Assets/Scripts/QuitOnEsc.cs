@@ -1,35 +1,42 @@
 using UnityEngine;
-using System.Collections;
 
 public class QuitOnEsc : MonoBehaviour {
 
 	public string OnQuitLevelName;
-
-
-	// Use this for initialization
-	void Start () {
-//		Cursor.visible = false;
-		
-
+	public string finalQuitURL = "http://google.com";
 	
-	}
+	
 	
 	// Update is called once per frame
 	void Update () {
 
 		
 		// Test for exit
-		if (Input.GetKeyDown (KeyCode.Escape)) {
+		if (UnityEngine.Input.GetKeyDown (KeyCode.Escape)) {
 			if (OnQuitLevelName != null && OnQuitLevelName != ""){
 				Application.LoadLevel(OnQuitLevelName);
 			}
 			else{
-				AppHelper.Quit();
+				Quit();
 			}
 		}
-		
-
-			
-		
+	}
+	
+	//#if UNITY_WEBPLAYER
+	//#endif
+	public void Quit()
+	{
+		#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+		#elif UNITY_WEBPLAYER
+		if (finalQuitURL != ""){
+			Application.OpenURL(finalQuitURL);
+		}
+		#else
+		if (finalQuitURL != ""){
+			Application.OpenURL(finalQuitURL);
+		}
+		Application.Quit();
+		#endif
 	}
 }

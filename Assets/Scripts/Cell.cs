@@ -49,6 +49,7 @@ public class Cell : MonoBehaviour {
 				powerLevel2GO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorError;
 				cellElectrics.GetComponent<ElectricalComponent>().voltageRise = 0.1f;
 				tripTime = Time.fixedTime;
+				transform.FindChild("Warning").gameObject.SetActive(true);
 			}
 		}
 		

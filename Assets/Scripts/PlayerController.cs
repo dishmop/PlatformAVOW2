@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		
-		tryJump = Input.GetMouseButton(0);
+		tryJump = Input.GetKey(KeyCode.Space);
 		
 		
 		ProcessFootsteps();

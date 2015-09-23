@@ -32,6 +32,9 @@ public class GameMode : MonoBehaviour {
 			}
 		}
 		
+		if (Input.GetKeyDown(KeyCode.R)){
+			Application.LoadLevel (Application.loadedLevelName);
+		}
 		
 		Cursor.visible = isEditingCircuit;
 	
