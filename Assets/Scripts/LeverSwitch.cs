@@ -51,8 +51,6 @@ public class LeverSwitch : MonoBehaviour {
 		connectionGO1.transform.position =  transform.TransformPoint(switchElectricsGO.GetComponent<ElectricalComponent>().connectionData[index].pos);
 		connectionGO1.GetComponent<ElectricalComponent>().connectionData[0].dir = Directions.CalcOppDir(switchElectricsGO.GetComponent<ElectricalComponent>().connectionData[index].dir);
 		
-		ElectricalComponent switchElec = switchElectricsGO.GetComponent<ElectricalComponent>();
-		ElectricalComponent connection1 = connectionGO1.GetComponent<ElectricalComponent>();
 		
 		if (switchElectricsGO.GetComponent<ElectricalComponent>().simNodeIndices != null && switchElectricsGO.GetComponent<ElectricalComponent>().simNodeIndices.Count() != 0){
 			connectionGO0.GetComponent<ElectricalComponent>().simNodeIndices [0] = switchElectricsGO.GetComponent<ElectricalComponent>().simNodeIndices[0];

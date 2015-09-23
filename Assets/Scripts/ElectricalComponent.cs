@@ -276,18 +276,14 @@ public class ElectricalComponent : MonoBehaviour {
 						GameObject comp1 = connectionData[i].wire.GetComponent<Wire>().ends[1].component;
 						int index1 = comp1.GetComponent<ElectricalComponent>().GetConnectionDataIndex(connectionData[i].wire);
 						
-						GameObject otherComp = null;
 						int otherIndex = -1;
-						int otherWireIndex = -1;
 						
 						if (comp0 == gameObject && index0 == i){
-							otherComp = comp1;
 							otherIndex = index1;
 							otherIndex = 1;
 							
 						}
 						else if (comp1 == gameObject && index1 == i){
-							otherComp = comp0;
 							otherIndex = index0;
 							otherIndex = 0;
 						}
