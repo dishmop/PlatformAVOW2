@@ -57,6 +57,7 @@ public class LeverSwitch : MonoBehaviour {
 			connectionGO1.GetComponent<ElectricalComponent>().simNodeIndices [0] = switchElectricsGO.GetComponent<ElectricalComponent>().simNodeIndices[index];
 		}
 		
+		
 	}
 	
 	
