@@ -5,15 +5,22 @@ public class ExitDoor : MonoBehaviour {
 
 	public GameObject electricsGO;
 	
-	public GameObject openDoorGO;
-	public GameObject shutDoorGO;
+	public GameObject doorPanelGO;
 	public AudioSource doorOpen;
 	public AudioSource doorClose;
 	public GameObject indicatorGO;
 	
 	public string nextLevelName;
 	
-	bool isOpen = false;
+	public enum Dir{
+		kGoLeft,
+		kGoRight,
+	}
+	public Dir panelDir = Dir.kGoRight;
+	float panelPos = 0;
+	float speed = 1;
+	
+	public bool isOpen = false;
 	
 	// Use this for initialization
 	void Start () {
@@ -42,11 +49,23 @@ public class ExitDoor : MonoBehaviour {
 		else {
 			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorOK;
 		}
+		doorPanelGO.transform.localPosition = new Vector3((panelDir == Dir.kGoRight) ? panelPos : -panelPos, 0, 0);
+		
+		if (isOpen){
+			if (panelPos < 1){
+				panelPos += speed * Time.fixedDeltaTime;
+				if (panelPos > 1) panelPos = 1; 
+			}
+		}
+		else{
+			if (panelPos > 0){
+				panelPos -= speed * Time.fixedDeltaTime;
+				if (panelPos < 0) panelPos = 0; 
+			}
+		}
 	}
 	
 	void Update(){
-		openDoorGO.SetActive(isOpen);
-		shutDoorGO.SetActive(!isOpen);
 	}
 	
 	void OnTriggerEnter2D(Collider2D collider){
