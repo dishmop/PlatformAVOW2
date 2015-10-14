@@ -3,7 +3,6 @@ using UnityEngine;
 public class QuitOnEsc : MonoBehaviour {
 
 	public string OnQuitLevelName;
-	public string finalQuitURL = "http://google.com";
 	
 	
 	
@@ -22,20 +21,16 @@ public class QuitOnEsc : MonoBehaviour {
 		}
 	}
 	
-	//#if UNITY_WEBPLAYER
-	//#endif
-	public void Quit()
+	public static string webplayerQuitURL = "http://i-want-to-study-engineering.org/game/rating/wired/";
+	
+	public static void Quit()
 	{
 		#if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 		#elif UNITY_WEBPLAYER
-		if (finalQuitURL != ""){
-			Application.OpenURL(finalQuitURL);
-		}
+		Application.OpenURL(webplayerQuitURL);
 		#else
-		if (finalQuitURL != ""){
-			Application.OpenURL(finalQuitURL);
-		}
+		Application.OpenURL(webplayerQuitURL);
 		Application.Quit();
 		#endif
 	}
