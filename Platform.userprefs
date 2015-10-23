@@ -1,21 +1,22 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/QuitOnEsc.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/SetupResolution.cs">
     <Files>
       <File FileName="../8-bit/Assets/Scripts/ConnectorComponent.cs" Line="1" Column="1" />
       <File FileName="../8-bit/Assets/Scripts/GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/AppHelper.cs" Line="20" Column="2" />
-      <File FileName="../../BuildServer/Code/AVOW/Assets/Scripts/AppHelper.cs" Line="18" Column="1" />
+      <File FileName="Assets/Scripts/AppHelper.cs" Line="1" Column="1" />
+      <File FileName="../../BuildServer/Code/AVOW/Assets/Scripts/AppHelper.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ExitDoor.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/LeverSwitch.cs" Line="56" Column="1" />
-      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="4" Column="1" />
+      <File FileName="Assets/Scripts/LeverSwitch.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/QuitOnEsc.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/SetupResolution.cs" Line="9" Column="29" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Scripts" expanded="True">
-              <Node name="QuitOnEsc.cs" selected="True" />
+              <Node name="SetupResolution.cs" selected="True" />
             </Node>
           </Node>
         </State>
