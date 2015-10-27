@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.Analytics;
 
 public class ExitDoor : MonoBehaviour {
 
@@ -16,6 +18,9 @@ public class ExitDoor : MonoBehaviour {
 		kGoLeft,
 		kGoRight,
 	}
+	
+	bool hasTriggered = false;
+	
 	public Dir panelDir = Dir.kGoRight;
 	float panelPos = 0;
 	float speed = 1;
@@ -69,9 +74,18 @@ public class ExitDoor : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter2D(Collider2D collider){
-		if (isOpen && collider.gameObject.tag == "Player"){
+		if (isOpen && collider.gameObject.tag == "Player" && !hasTriggered){
 			GameMode.singleton.isEndOfLevel = true;
 			GameMode.singleton.nextLevelName = nextLevelName;
+			hasTriggered = true;
+//			Debug.Log ("levelComplete - levelTime: " + Time.timeSinceLevelLoad + ", gameTime: " + (Time.time - GameMode.gameStartTime));
+			
+			Analytics.CustomEvent("levelComplete", new Dictionary<string, object>
+			                      {
+				{ "levelName", Application.loadedLevelName },
+				{ "levelTime",Time.timeSinceLevelLoad },
+				{ "gameTime", (Time.time - GameMode.gameStartTime)},
+			});			
 		}
 	}
 	

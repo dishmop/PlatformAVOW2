@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.Analytics;
 
 public class EndOfGame : MonoBehaviour {
 
@@ -9,7 +11,9 @@ public class EndOfGame : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	Cursor.visible = true;
+		Cursor.visible = true;
+//		Debug.Log ("gameComplete - gameTime: " + (Time.time - GameMode.gameStartTime));
+		Analytics.CustomEvent("gameComplete", new Dictionary<string, object>{ { "gameTime", (Time.time - GameMode.gameStartTime) }	});		
 	
 	}
 	
