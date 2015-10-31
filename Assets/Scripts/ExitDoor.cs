@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.Analytics;
+//using System.Collections.Generic;
+//using UnityEngine.Analytics;
 
 public class ExitDoor : MonoBehaviour {
 
@@ -80,12 +80,16 @@ public class ExitDoor : MonoBehaviour {
 			hasTriggered = true;
 //			Debug.Log ("levelComplete - levelTime: " + Time.timeSinceLevelLoad + ", gameTime: " + (Time.time - GameMode.gameStartTime));
 			
-			Analytics.CustomEvent("levelComplete", new Dictionary<string, object>
-			                      {
-				{ "levelName", Application.loadedLevelName },
-				{ "levelTime",Time.timeSinceLevelLoad },
-				{ "gameTime", (Time.time - GameMode.gameStartTime)},
-			});			
+			GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "levelComplete", Application.loadedLevelName, Time.timeSinceLevelLoad);
+			GoogleAnalytics.Client.SendScreenHit("levelComplete_" + Application.loadedLevelName);		
+			
+//
+//			Analytics.CustomEvent("levelComplete", new Dictionary<string, object>
+//			                      {
+//				{ "levelName", Application.loadedLevelName },
+//				{ "levelTime",Time.timeSinceLevelLoad },
+//				{ "gameTime", (Time.time - GameMode.gameStartTime)},
+//			});			
 		}
 	}
 	
