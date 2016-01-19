@@ -205,6 +205,20 @@ public class AVOWGrid : MonoBehaviour {
 		float boxRadius = 0.015f;
 		float intAxisRadius = 0.015f;
 		
+		
+		// Outer box
+		float boarderSizeBA = borderSize / vAToRealSize;
+		
+		Vector2 blQuad = new Vector2(-boarderSizeBA, -boarderSizeBA);
+		Vector2 brQuad = new Vector2(maxCurrent + boarderSizeBA, -boarderSizeBA);
+		Vector2 trQuad = new Vector2(maxCurrent + boarderSizeBA, maxVoltage + boarderSizeBA);
+		Vector2 tlQuad = new Vector2(-boarderSizeBA, maxVoltage + boarderSizeBA);
+				
+		DrawSquareVA(blQuad, brQuad, trQuad, tlQuad, boxRadius, false);
+		
+		
+		
+		// VA box
 		Vector2 bl = new Vector2(0f, 0f);
 		Vector2 br = new Vector2(maxCurrent, 0f);
 		Vector2 tr = new Vector2(maxCurrent, maxVoltage);
