@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Linq;
+using System.Text;
+using System.IO;
 
 public class AVOWGrid : MonoBehaviour {
 	public GameObject background;
@@ -11,6 +13,9 @@ public class AVOWGrid : MonoBehaviour {
 	public float borderSize = 0.1f;		// Size of border in real world 
 	public float gradScale = -10f;
 	public float minVoltage = 0.5f;
+	
+	string savePath = "/Resources/Grids/";
+	string loadPath = "Grids/";
 	
 	
 	float checkSum = 0;
@@ -94,10 +99,8 @@ public class AVOWGrid : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
-		CreateTextures();
-		AssignTexturesToMaterial();
+		LoadOrCreateTextures();
 		
-		Recalc ();
 		checkSum = CalcCheckSum();
 		
 
@@ -113,7 +116,77 @@ public class AVOWGrid : MonoBehaviour {
 			   gradScale +
 			   minVoltage;
 	}
+	
+	string ConstructRawFilename(){
+		StringBuilder sb = new StringBuilder();
+		sb.Append("resistance" + resistance.ToString() + "_");
+		sb.Append("maxVoltage" + maxVoltage.ToString() + "_");
+		sb.Append("vAToRealSize" + vAToRealSize.ToString() + "_");
+		sb.Append("borderSize" + borderSize.ToString() + "_");
+		sb.Append("gradScale" + gradScale.ToString() + "_");
+		sb.Append("minVoltage" + minVoltage.ToString() + "_");
+		return sb.ToString();
+	}
+	
+	string ConstructDiffuseName(){
+		return ConstructRawFilename() + "Diffuse.png";
+	}
+	
+	string ConstructNormalName(){
+		return ConstructRawFilename() + "Normal.png";
+	}
+	
+	
+	void LoadOrCreateTextures(){
+		CalcTextureDimensions();
+		ReconfigureMesh();
+		CreateTextures();
 		
+		
+		string diffusePath = loadPath + ConstructDiffuseName();
+		string normalPath = loadPath + ConstructNormalName();
+		// Debug.Log("LoadLevel: " + path);
+		TextAsset diffuseAsset = Resources.Load(diffusePath) as TextAsset;
+		if (diffuseAsset != null){
+			Debug.Log ("Loading texture: " + ConstructDiffuseName());
+			gridDifffuse.LoadImage(diffuseAsset.bytes);
+			TextAsset normalAsset = Resources.Load(normalPath) as TextAsset;
+			gridNormal.LoadImage(normalAsset.bytes);
+		}	
+		else{
+			Debug.Log ("Failed to load texture: " + ConstructDiffuseName());
+			Debug.Log ("Constructing texture...");
+			ConstructTextures ();
+#if UNITY_EDITOR		
+			Debug.Log ("Saving texture..." + ConstructDiffuseName());
+			FileStream diffuseFile = File.Create(Application.dataPath + savePath + ConstructDiffuseName() + ".bytes");
+			byte[] diffuseBytes = gridDifffuse.EncodeToPNG();
+			diffuseFile.Write(diffuseBytes, 0, diffuseBytes.Length);
+			diffuseFile.Close();
+			
+			FileStream normalFile = File.Create(Application.dataPath + savePath + ConstructNormalName() + ".bytes");
+			byte[] normalBytes = gridNormal.EncodeToPNG();
+			normalFile.Write(normalBytes, 0, normalBytes.Length);
+			normalFile.Close();
+			
+			
+			
+			// Ensure the assets are all realoaded and the cache cleared.
+			UnityEditor.AssetDatabase.Refresh();
+#endif
+			
+		}
+		
+		AssignTexturesToMaterial();
+		
+		
+	}
+	
+	public void SaveLevel(string filename){
+
+	}	
+	
+	
 		
 	
 	void CalcTextureDimensions(){
@@ -190,17 +263,17 @@ public class AVOWGrid : MonoBehaviour {
 	void FixedUpdate () {
 		float newCheckSum = CalcCheckSum();
 		if (newCheckSum != checkSum){
-			Recalc();
+			//ConstructTextures();
 			checkSum = newCheckSum;
 		}
 	
 	}
 	
-	void Recalc(){
+	
+	void ConstructTextures(){
 		Compute2ndOrderSobel();
-		CalcTextureDimensions();
-		ReconfigureMesh();
 		
+		CreateTextureData();
 		FillTextures();
 		float boxRadius = 0.015f;
 		float intAxisRadius = 0.015f;
@@ -289,6 +362,10 @@ public class AVOWGrid : MonoBehaviour {
 	void CreateTextures(){
 		gridDifffuse  = new Texture2D(textSize, textSize, TextureFormat.ARGB32, true);
 		gridNormal = new Texture2D(textSize, textSize, TextureFormat.ARGB32, true);
+		
+	}
+	
+	void CreateTextureData(){
 		
 		diffuseCols = new Color[textSize * textSize];
 		normalCols = new Color[textSize * textSize];
