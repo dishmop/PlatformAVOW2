@@ -23,6 +23,7 @@ public class CircuitSimulator : MonoBehaviour {
 	// Circuir graph is made from nodes and edges
 	public class Node{
 		public int id;
+		public string debugName;
 		
 		// These two lists are kept in sync - edges[i].nodes[edgeIndices[i] = this
 		public List<Edge> edges = new List<Edge>();
@@ -100,10 +101,11 @@ public class CircuitSimulator : MonoBehaviour {
 	}
 	
 	// Create a new node and returns its ID
-	public int AddNode(){
+	public int AddNode(string name){
 		int id = allNodes.Count();
 		Node newNode = new Node();
 		newNode.id = id;
+		newNode.debugName = name;
 		allNodes.Add (newNode);
 		return id;
 	}
@@ -168,6 +170,11 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		CalcVoltages();
 		//DebugPrintVoltages();
+		
+//		Debug.Log ("-----");
+//		foreach (var node in allNodes){
+//			Debug.Log("   [" + node.GetID() + " - " + node.debugName + "] = " + node.resVoltage + ", visited = " + node.visited);
+//		}
 
 	}
 	
@@ -257,9 +264,9 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	void SimpleTestCase(){
 		// Do some test cases
-		int node0Id = AddNode();
-		int node1Id = AddNode();
-		int node2Id = AddNode();
+		int node0Id = AddNode("test0");
+		int node1Id = AddNode("test1");
+		int node2Id = AddNode("test2");
 		int cellId = AddVoltageSourceEdge(node0Id, node2Id, 1);
 		int resistor1Id = AddConductorEdge(node2Id, node1Id);
 		int resistor2Id = AddLoadEdge(node1Id, node0Id, 1);
@@ -298,6 +305,7 @@ public class CircuitSimulator : MonoBehaviour {
 
 	
 	public void FixedUpdate(){
+
 		
 	//	Recalc();
 
@@ -643,11 +651,6 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		// We (arbitrarily) set this to be zero volts
 		cellEdge.nodes[0].resVoltage = 0;
-		cellEdge.nodes[1].resVoltage = cellEdge.voltageRise;
-
-		
-		// We have now visited this cell and the first node. 
-		cellEdge.visited = true;
 		cellEdge.nodes[0].visited = true;		
 		Stack<Node> nodeStack = new Stack<Node>();
 		
@@ -675,7 +678,7 @@ public class CircuitSimulator : MonoBehaviour {
 				thisEdge.visited = true;
 				
 				// Calc the voltage at the other end of this component
-				float voltageChange = thisEdge.resFwCurrent * thisEdge.resistance * (thisEdgeIndex == 0 ? 1 : -1);
+				float voltageChange = (-thisEdge.voltageRise + thisEdge.resFwCurrent * thisEdge.resistance) * (thisEdgeIndex == 0 ? 1 : -1);
 				
 				// Get the node at the other end
 				Node nextNode = thisEdge.nodes[1 - thisEdgeIndex];
@@ -691,7 +694,10 @@ public class CircuitSimulator : MonoBehaviour {
 				}
 				// Otherwise, assert that the voltage is the same as what we just caluclated
 				else{
-					voltageError = true;
+					if (!MathUtils.FP.Feq (nextNode.resVoltage, nextNodeVoltage)){
+						voltageError = true;
+						Debug.Log("Voltage error!");
+					}
 				}
 			}
 			// If we failed to find an unvisited component, then pop this node off the stack (as there is

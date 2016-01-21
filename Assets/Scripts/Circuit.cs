@@ -161,7 +161,7 @@ public class Circuit : MonoBehaviour {
 		ElectricalComponent component = componentGO.GetComponent<ElectricalComponent>();
 				
 		for (int i = 0; i < component.simNodeIndices.Count (); ++i){
-			component.simNodeIndices[i] = sim.AddNode();
+			component.simNodeIndices[i] = sim.AddNode(component.name + "_" + i);
 		}
 		if (component.type == ElectricalComponent.Type.kLoad){
 			component.simEdgeIndex = sim.AddLoadEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.resistance);

@@ -6,6 +6,7 @@ using System.IO;
 
 public class AVOWGrid : MonoBehaviour {
 	public GameObject background;
+	public GameObject bubble;
 	
 	public float resistance = 1;
 	public float maxVoltage = 1;
@@ -50,7 +51,7 @@ public class AVOWGrid : MonoBehaviour {
 	float[,] sobel2H = new float[3, 3];
 	float[,] sobel2V = new float[3, 3];
 	float[,] guassian = new float[3, 3]{ {0.0625f, 0.125f, 0.0625f}, {0.125f, 0.25f, 0.125f}, {0.0625f, 0.125f, 0.0625f} };
-	float[,] unit = new float[3, 3]{ {0, 0f, 0f}, {0f, 1f, 0f}, {0f, 0f, 0f} };
+//	float[,] unit = new float[3, 3]{ {0, 0f, 0f}, {0f, 1f, 0f}, {0f, 0f, 0f} };
 	
 	
 	class LineV{
@@ -94,6 +95,14 @@ public class AVOWGrid : MonoBehaviour {
 			return retVal;
 			
 		}
+	}
+	
+	public void SetBubble(float minV, float maxV){
+		float voltageDiff = maxV - minV;
+		float current = voltageDiff / resistance;
+		bubble.transform.localScale = new Vector3(current, voltageDiff);
+		bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
+		bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
 	}
 	
 	// Use this for initialization
@@ -312,21 +321,24 @@ public class AVOWGrid : MonoBehaviour {
 		DrawGridLines(0.125f, maxProp*0.125f, intAxisRadius * 0.25f);
 		
 		// Do minimum voltage - if we have one
-		Vector2 blMin = new Vector2(0f, 0f);
-		Vector2 brMin = new Vector2(minCurrent, 0f);
-		Vector2 trMin = new Vector2(minCurrent, minVoltage);
-		Vector2 tlMin = new Vector2(0f, minVoltage);
-		
-		Vector2 centre = new Vector2((maxCurrent - minCurrent) * 0.5f, (maxVoltage - minVoltage) * 0.5f);
-		
-		
-		DrawFilledSquareVA(centre + blMin, 
-		             centre + brMin, 
-		             centre + trMin, 
-		             centre + tlMin, 
-		             boxRadius, 
-		             false);
-		
+		if (!MathUtils.FP.Feq(minVoltage, 0)){
+			
+			Vector2 blMin = new Vector2(0f, 0f);
+			Vector2 brMin = new Vector2(minCurrent, 0f);
+			Vector2 trMin = new Vector2(minCurrent, minVoltage);
+			Vector2 tlMin = new Vector2(0f, minVoltage);
+			
+			Vector2 centre = new Vector2((maxCurrent - minCurrent) * 0.5f, (maxVoltage - minVoltage) * 0.5f);
+			
+			
+			DrawFilledSquareVA(centre + blMin, 
+			             centre + brMin, 
+			             centre + trMin, 
+			             centre + tlMin, 
+			             boxRadius, 
+			             false);
+		}
+			
 		
 		ConvertHeightToNormal();
 		UploadTextureData();

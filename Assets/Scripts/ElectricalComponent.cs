@@ -55,6 +55,20 @@ public class ElectricalComponent : MonoBehaviour {
 		return 0;
 	}
 	
+	public float GetVoltageMin(){
+		if (simEdgeIndex >= 0){
+			return CircuitSimulator.singleton.allEdges[simEdgeIndex].nodes[1].resVoltage;
+		}
+		return 0;
+	}
+	
+	public float GetVoltageMax(){
+		if (simEdgeIndex >= 0){
+			return CircuitSimulator.singleton.allEdges[simEdgeIndex].nodes[0].resVoltage;
+		}
+		return 0;
+	}
+	
 	public void GetConnectionData(GameObject wire, out int dir, out Vector3 pos){
 		foreach (ConnectionData data in connectionData){
 			if (data.wire == wire){

@@ -11,6 +11,7 @@ public class ExitDoor : MonoBehaviour {
 	public AudioSource doorOpen;
 	public AudioSource doorClose;
 	public GameObject indicatorGO;
+	public GameObject avowGridGO;
 	
 	public string nextLevelName;
 	
@@ -71,6 +72,13 @@ public class ExitDoor : MonoBehaviour {
 	}
 	
 	void Update(){
+	
+		if (avowGridGO != null){
+			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax());
+		}
+		
 	}
 	
 	void OnTriggerEnter2D(Collider2D collider){

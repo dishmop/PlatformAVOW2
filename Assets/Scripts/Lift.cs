@@ -7,6 +7,7 @@ public class Lift : MonoBehaviour {
 	public GameObject liftSideGO;
 	public GameObject electricsGO;
 	public GameObject playerGO;
+	public GameObject avowGridGO;
 	
 	float speed = 0.25f;
 	
@@ -21,6 +22,14 @@ public class Lift : MonoBehaviour {
 	
 	}
 	
+	void Update(){
+		if (avowGridGO != null){
+			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax());
+		}
+	}
+	
 	// Update is called once per frame
 	void FixedUpdate () {
 	
@@ -28,11 +37,11 @@ public class Lift : MonoBehaviour {
 		
 		float oldHeight = liftHeight;
 		
-		if (current > 0.25f){
+		if (current > 0.5f){
 			liftHeight = Mathf.Min (liftHeight + speed * Time.deltaTime, liftMax);
 			
 		}
-		else if (current < -0.25f){
+		else if (current < -0.5f){
 			liftHeight = Mathf.Max (liftHeight - speed * Time.deltaTime, 0);
 		}
 		Vector3 newPos = platformInitPos + new Vector3(0, liftHeight, 0);

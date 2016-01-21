@@ -6,6 +6,8 @@ public class SlidingDoor : MonoBehaviour {
 	public bool isOpen;
 	public float offsetProp = 0;
 	public GameObject indicatorGO;
+	public GameObject avowGridGO;
+	public GameObject electricsGO;
 	
 	Transform slideDoorTransform;
 	Vector3 sliderDoorLocalPos = Vector3.zero;
@@ -64,15 +66,27 @@ public class SlidingDoor : MonoBehaviour {
 
 		
 		HandleSliderVisibility();
+		if (avowGridGO != null){
+			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax());
+		}
 	
 	}
 	
+
+	
 	void FixedUpdate(){
+	
+		float minVoltage = 0.5f;
+		if (avowGridGO != null){
+			minVoltage = avowGridGO.GetComponent<AVOWGrid>().minVoltage;
+		}
 		ElectricalComponent component = transform.FindChild("DoorElectrics").gameObject.GetComponent<ElectricalComponent>();
 		if (component.simEdgeIndex >= 0){
 			float current = CircuitSimulator.singleton.allEdges[component.simEdgeIndex].resFwCurrent;
 			openSpeed = current * current;
-			if (current > 0.25f){
+			if (MathUtils.FP.Fgeq(current, minVoltage)){
 				isOpen = true;
 			}
 			else{
@@ -83,10 +97,10 @@ public class SlidingDoor : MonoBehaviour {
 			if (current < -0.1){
 				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorError;
 			}
-			else if (current < 0.25f){
+			else if (MathUtils.FP.Fgeq(current, minVoltage)){
 				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorUnpowered;
 			}
-			else if (current < 0.75f){
+			else if (current < 0.85f){
 				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorSemi;
 			}
 			else {
