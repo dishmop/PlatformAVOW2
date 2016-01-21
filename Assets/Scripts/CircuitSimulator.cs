@@ -134,18 +134,7 @@ public class CircuitSimulator : MonoBehaviour {
 	// Also mark any eges and nodes which are in the same clique as the battery.
 	public void SetupAVOWMembers(){
 	
-		// In/Out nodes
-		foreach(Edge edge in allEdges){
-			edge.hWidth = Mathf.Abs(edge.resFwCurrent);
-			if (edge.resFwCurrent > 0){
-				edge.inNode = edge.nodes[0];
-				edge.outNode = edge.nodes[1];
-			}
-			else{
-				edge.inNode = edge.nodes[1];
-				edge.outNode = edge.nodes[0];
-			}
-		}
+
 		
 		// Battery Clique
 		batteryEdge = null;
@@ -155,6 +144,40 @@ public class CircuitSimulator : MonoBehaviour {
 				batteryEdge = edge;
 			}
 		}
+		
+		
+		foreach(Node node in allNodes){
+			node.isInBatteryClique = false;
+		}
+		if (batteryEdge != null){
+			// Start at the battery edge and add any nodes
+			Stack<Edge> edgeStack = new Stack<Edge>();
+			edgeStack.Push(batteryEdge);
+			while (edgeStack.Count != 0){
+				Edge thisEdge = edgeStack.Pop();
+				
+				thisEdge.isInBatteryClique = true;
+				
+				Node node0 = thisEdge.nodes[0];
+				Node node1 = thisEdge.nodes[1];
+				
+				// Ensure the nodes at either end are also in the clique
+				node0.isInBatteryClique = true;
+				node1.isInBatteryClique = true;
+				
+				foreach (Edge edge in thisEdge.nodes[0].edges){
+					if (!edge.isInBatteryClique){
+						edgeStack.Push(edge);
+					}
+				}
+				foreach (Edge edge in thisEdge.nodes[1].edges){
+					if (!edge.isInBatteryClique){
+						edgeStack.Push(edge);
+					}
+				}
+			}
+		}
+		
 		
 		// RepNodes
 		foreach(Node node in allNodes){
@@ -180,7 +203,7 @@ public class CircuitSimulator : MonoBehaviour {
 					minNode = thisNode;
 				}
 				foreach (Edge edge in thisNode.edges){
-					if (MathUtils.FP.Feq(edge.resistance, 0)){
+					if (MathUtils.FP.Feq(edge.resistance, 0) && MathUtils.FP.Feq(edge.voltageRise, 0)){
 						Node otherNode = edge.GetOtherNode(thisNode);
 						if (otherNode.repNode == null){
 							nodeStack.Push (otherNode);
@@ -189,45 +212,43 @@ public class CircuitSimulator : MonoBehaviour {
 						
 					}
 				}
-				// Now we have out list of nodes which can all be represented by a single node
-				foreach (Node groupNode in nodeGroup){
-					groupNode.repNode = minNode;
-				}
+
 			}
-			
-			
-			
-			
-		}		
-		
-		
-		
-		foreach(Node node in allNodes){
-			node.isInBatteryClique = false;
+			// Now we have out list of nodes which can all be represented by a single node
+			foreach (Node groupNode in nodeGroup){
+				groupNode.repNode = minNode;
+
+			}
 		}
-		if (batteryEdge != null){
-			// Start at the battery edge and add any nodes
-			Stack<Edge> edgeStack = new Stack<Edge>();
-			edgeStack.Push(batteryEdge);
-			while (edgeStack.Count != 0){
-				Edge thisEdge = edgeStack.Pop();
-				thisEdge.isInBatteryClique = true;
-				// Ensure the nodes at either end are also in the clique
-				thisEdge.nodes[0].isInBatteryClique = true;
-				thisEdge.nodes[1].isInBatteryClique = true;
-				foreach (Edge edge in thisEdge.nodes[0].edges){
-					if (!edge.isInBatteryClique){
-						edgeStack.Push(edge);
-					}
-				}
-				foreach (Edge edge in thisEdge.nodes[1].edges){
-					if (!edge.isInBatteryClique){
-						edgeStack.Push(edge);
-					}
-				}
+		// If we are no a "representative node" then we should not be part of the clique	
+		foreach(Node node in allNodes){	
+			// We should not have duplicates as part of the battery clique
+			if (node != node.repNode){
+				node.isInBatteryClique = false;
+			}	
+		}	
+		
+		// If we are subsumed by a rep group, then we should not be part of ther clique
+		foreach (Edge edge in allEdges){
+			if (edge.nodes[0].repNode == edge.nodes[1].repNode){
+				edge.isInBatteryClique = false;
 			}
 		}
 		
+		
+		// In/Out nodes
+		foreach(Edge edge in allEdges){
+			edge.hWidth = Mathf.Abs(edge.resFwCurrent);
+			if (edge.resFwCurrent > 0){
+				edge.inNode = edge.nodes[0];
+				edge.outNode = edge.nodes[1];
+			}
+			else{
+				edge.inNode = edge.nodes[1];
+				edge.outNode = edge.nodes[0];
+			}
+		}
+	
 		
 		
 	}
@@ -312,10 +333,10 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		SetupAVOWMembers();
 		
-		Debug.Log ("-----");
-		foreach (var node in allNodes){
-			Debug.Log("   [" + node.GetID() + " - " + node.debugName + "] = " + node.resVoltage + ", clique = " + node.isInBatteryClique);
-		}
+//		Debug.Log ("-----");
+//		foreach (var node in allNodes){
+//			Debug.Log("   [" + node.GetID() + " - " + node.debugName + "] = " + node.resVoltage + ", clique = " + node.isInBatteryClique);
+//		}
 
 	}
 	

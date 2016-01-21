@@ -47,7 +47,7 @@ public class AVOWSim : MonoBehaviour {
 		public float h0 = -1;
 		public float hWidth = -1;
 		public float hOrder = -1;
-		public List<CircuitSimulator.Edge> eges = new List<CircuitSimulator.Edge>();
+		public List<CircuitSimulator.Edge> edges = new List<CircuitSimulator.Edge>();
 	};
 	
 	SimNode[] allSimNodes;
@@ -514,7 +514,13 @@ public class AVOWSim : MonoBehaviour {
 		
 		
 		// Make a copy of the nodes in the tree
-		allSimNodes = new SimNode[sim.allNodes.Count];
+		int numCliquedNodes = 0;
+		foreach (CircuitSimulator.Node node in sim.allNodes){
+			if (node.isInBatteryClique) {
+				numCliquedNodes++;
+			}
+		}
+		allSimNodes = new SimNode[numCliquedNodes];
 		int nodeIndex = 0;
 		foreach (CircuitSimulator.Node node in sim.allNodes){
 			if (!node.isInBatteryClique) continue;
@@ -553,18 +559,18 @@ public class AVOWSim : MonoBehaviour {
 		foreach (CircuitSimulator.Edge edge in sim.allEdges){
 			if (!edge.isInBatteryClique) continue;
 			// Get list of components going in and out of the nodes at either end of this component (this won't include this one...yet)			
-			List<CircuitSimulator.Edge> inEdges = edge.inNode.inEdges;
-			List<CircuitSimulator.Edge> outEdges = edge.outNode.outEdges;
+			List<CircuitSimulator.Edge> inEdges = edge.inNode.repNode.inEdges;
+			List<CircuitSimulator.Edge> outEdges = edge.outNode.repNode.outEdges;
 			
 			// Check this first before making a normal key
-			Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node> tallyKey = new Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node>(edge.inNode, edge.outNode);
+			Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node> tallyKey = new Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node>(edge.inNode.repNode, edge.outNode.repNode);
 			
 			int tally = 0;
 			if (blockTally.ContainsKey(tallyKey)){
 				tally = blockTally[tallyKey];
 			}
 			
-			Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int> key = new Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int>(edge.inNode, edge.outNode, tally);
+			Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int> key = new Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int>(edge.inNode.repNode, edge.outNode.repNode, tally);
 			
 			if (edges.ContainsKey(key)){
 				// Check if the last component added to these  in/out node list is the most recent one added to this dicionary entry. If it is, we can add this one
@@ -586,7 +592,7 @@ public class AVOWSim : MonoBehaviour {
 					
 					tally++;
 					
-					Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int> newKey = new Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int>(edge.inNode, edge.outNode, tally);
+					Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int> newKey = new Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int>(edge.inNode.repNode, edge.outNode.repNode, tally);
 					edges.Add(newKey, new List<CircuitSimulator.Edge>{});
 					edges[newKey].Add (edge);
 					blockTally[tallyKey] = tally;	
@@ -623,11 +629,11 @@ public class AVOWSim : MonoBehaviour {
 		int blockIndex = 0;
 		foreach(KeyValuePair<Eppy.Tuple<CircuitSimulator.Node, CircuitSimulator.Node, int>, List<CircuitSimulator.Edge>> item in edges){
 			SimBlock newBlock = new SimBlock();
-			newBlock.eges = item.Value;
+			newBlock.edges = item.Value;
 			// order the components so the lowest hOrder value is at the beginning
-			newBlock.eges.Sort((obj1, obj2) => obj1.hOrder.CompareTo(obj2.hOrder));
+			newBlock.edges.Sort((obj1, obj2) => obj1.hOrder.CompareTo(obj2.hOrder));
 			
-			newBlock.hOrder = newBlock.eges[0].hOrder;
+			newBlock.hOrder = newBlock.edges[0].hOrder;
 			newBlock.nodes[kIn] = allSimNodes[idToIndexLookup[item.Key.Item1.id]];
 			newBlock.nodes[kOut] = allSimNodes[idToIndexLookup[item.Key.Item2.id]];
 			newBlock.ordinals[kIn] = -1;
@@ -635,7 +641,7 @@ public class AVOWSim : MonoBehaviour {
 			
 			// Determine the overall width									
 			newBlock.hWidth = 0;
-			foreach (CircuitSimulator.Edge edge in newBlock.eges){
+			foreach (CircuitSimulator.Edge edge in newBlock.edges){
 				newBlock.hWidth  += edge.hWidth;
 			}
 			
@@ -891,10 +897,10 @@ public class AVOWSim : MonoBehaviour {
 		SetupPermutation(bestI);
 		foreach(SimBlock block in allSimBlocks){
 			float width = block.h0;
-			for (int i = 0; i < block.eges.Count; ++i){
-				block.eges[i].h0 = width;
-				width += block.eges[i].hWidth;
-				block.eges[i].hasBeenLayedOut = true;
+			for (int i = 0; i < block.edges.Count; ++i){
+				block.edges[i].h0 = width;
+				width += block.edges[i].hWidth;
+				block.edges[i].hasBeenLayedOut = true;
 				
 			}
 		}
@@ -912,7 +918,6 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	bool TestForCurrent(){
-		return false;
 		return !MathUtils.FP.Feq(CircuitSimulator.singleton.batteryEdge.resFwCurrent, 0);
 	}
 	
