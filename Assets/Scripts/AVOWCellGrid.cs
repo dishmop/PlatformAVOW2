@@ -4,16 +4,15 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-public class AVOWGrid : MonoBehaviour {
+public class AVOWCellGrid : MonoBehaviour {
 	public GameObject background;
-	public GameObject bubble;
+	public GameObject bubblePrefab;
 	
-	public float resistance = 1;
-	public float maxVoltage = 1;
+	public float voltage = 1;
+	public float current = 1;
 	public float vAToRealSize = 1f;		// Size of 1v or 1A in real space
 	public float borderSize = 0.1f;		// Size of border in real world 
 	float gradScale = -10f;
-	public float minVoltage = 0.5f;
 	
 	string savePath = "/Resources/Grids/";
 	string loadPath = "Grids/";
@@ -24,8 +23,6 @@ public class AVOWGrid : MonoBehaviour {
 	
 	// Derived measurementes
 	float realSize;				// Width or height of full texture in world units
-	float maxCurrent;
-	float minCurrent;
 	float vaRectWidth;
 	float vaRectHeight;
 	float quadWidth;
@@ -97,13 +94,13 @@ public class AVOWGrid : MonoBehaviour {
 		}
 	}
 	
-	public void SetBubble(float minV, float maxV){
-		float voltageDiff = maxV - minV;
-		float current = voltageDiff / resistance;
-		bubble.transform.localScale = new Vector3(current, voltageDiff);
-		bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
-		bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
-	}
+//	public void SetBubble(float minV, float maxV){
+//		float voltageDiff = maxV - minV;
+//		float current = voltageDiff / resistance;
+//		bubble.transform.localScale = new Vector3(current, voltageDiff);
+//		bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
+//		bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
+//	}
 	
 	// Use this for initialization
 	void Start () {
@@ -118,23 +115,21 @@ public class AVOWGrid : MonoBehaviour {
 	}
 	
 	float CalcCheckSum(){
-		return resistance + 
-			   maxVoltage + 
+		return voltage + 
+			   current + 
 			   vAToRealSize + 
 			   borderSize + 
-			   gradScale +
-			   minVoltage;
+			   gradScale;
 	}
 	
 	string ConstructRawFilename(){
 		StringBuilder sb = new StringBuilder();
-		sb.Append("load_");
-		sb.Append("resistance" + resistance.ToString() + "_");
-		sb.Append("maxVoltage" + maxVoltage.ToString() + "_");
+		sb.Append("cell_");
+		sb.Append("voltage" + voltage.ToString() + "_");
+		sb.Append("current" + current.ToString() + "_");
 		sb.Append("vAToRealSize" + vAToRealSize.ToString() + "_");
 		sb.Append("borderSize" + borderSize.ToString() + "_");
 		sb.Append("gradScale" + gradScale.ToString() + "_");
-		sb.Append("minVoltage" + minVoltage.ToString() + "_");
 		return sb.ToString();
 	}
 	
@@ -202,11 +197,9 @@ public class AVOWGrid : MonoBehaviour {
 	void CalcTextureDimensions(){
 
 		// Derived measurementes
-		maxCurrent = maxVoltage / resistance;
-		minCurrent = minVoltage / resistance;
 		
-		vaRectWidth = maxCurrent * vAToRealSize;
-		vaRectHeight = maxVoltage * vAToRealSize;
+		vaRectWidth = current * vAToRealSize;
+		vaRectHeight = voltage * vAToRealSize;
 		
 		quadWidth = vaRectWidth + 2 * borderSize;
 		quadHeight = vaRectHeight + 2 * borderSize;
@@ -286,16 +279,15 @@ public class AVOWGrid : MonoBehaviour {
 		CreateTextureData();
 		FillTextures();
 		float boxRadius = 0.015f;
-		float intAxisRadius = 0.015f;
 		
 		
 		// Outer box
 		float boarderSizeBA = borderSize / vAToRealSize;
 		
 		Vector2 blQuad = new Vector2(-boarderSizeBA, -boarderSizeBA);
-		Vector2 brQuad = new Vector2(maxCurrent + boarderSizeBA, -boarderSizeBA);
-		Vector2 trQuad = new Vector2(maxCurrent + boarderSizeBA, maxVoltage + boarderSizeBA);
-		Vector2 tlQuad = new Vector2(-boarderSizeBA, maxVoltage + boarderSizeBA);
+		Vector2 brQuad = new Vector2(current + boarderSizeBA, -boarderSizeBA);
+		Vector2 trQuad = new Vector2(current + boarderSizeBA, voltage + boarderSizeBA);
+		Vector2 tlQuad = new Vector2(-boarderSizeBA, voltage + boarderSizeBA);
 				
 		DrawSquareVA(blQuad, brQuad, trQuad, tlQuad, boxRadius, false);
 		
@@ -303,9 +295,9 @@ public class AVOWGrid : MonoBehaviour {
 		
 		// VA box
 		Vector2 bl = new Vector2(0f, 0f);
-		Vector2 br = new Vector2(maxCurrent, 0f);
-		Vector2 tr = new Vector2(maxCurrent, maxVoltage);
-		Vector2 tl = new Vector2(0f, maxVoltage);
+		Vector2 br = new Vector2(current, 0f);
+		Vector2 tr = new Vector2(current, voltage);
+		Vector2 tl = new Vector2(0f, voltage);
 		
 		
 		DrawSquareVA(bl, br, tr, tl, boxRadius, false);
@@ -315,61 +307,12 @@ public class AVOWGrid : MonoBehaviour {
 
 
 		
-		float maxProp = 0f;
-		DrawGridLines(1, maxProp, boxRadius);
-		DrawGridLines(0.5f, maxProp*0.5f, intAxisRadius);
-		DrawGridLines(0.25f, maxProp*0.25f, intAxisRadius * 0.5f);
-		DrawGridLines(0.125f, maxProp*0.125f, intAxisRadius * 0.25f);
-		
-		// Do minimum voltage - if we have one
-		if (!MathUtils.FP.Feq(minVoltage, 0)){
-			
-			Vector2 blMin = new Vector2(0f, 0f);
-			Vector2 brMin = new Vector2(minCurrent, 0f);
-			Vector2 trMin = new Vector2(minCurrent, minVoltage);
-			Vector2 tlMin = new Vector2(0f, minVoltage);
-			
-			Vector2 centre = new Vector2((maxCurrent - minCurrent) * 0.5f, (maxVoltage - minVoltage) * 0.5f);
-			
-			
-			DrawFilledSquareVA(centre + blMin, 
-			             centre + brMin, 
-			             centre + trMin, 
-			             centre + tlMin, 
-			             boxRadius, 
-			             false);
-		}
-			
-		
 		ConvertHeightToNormal();
 		UploadTextureData();
 		
 	}
 	
 	
-	void DrawGridLines(float step, float protrudePropBoarder, float radius){
-	
-		float vaProtrude = protrudePropBoarder * borderSize / vAToRealSize;
-		Vector2 centre = new Vector2(maxCurrent * 0.5f, maxVoltage * 0.5f);
-		// Vertical centre line
-		DrawLineVA( new Vector2(centre.x, -vaProtrude), new Vector2(centre.x, maxVoltage + vaProtrude), radius, false);
-		// Horizontal central line
-		DrawLineVA( new Vector2(-vaProtrude, centre.y), new Vector2(maxCurrent+ vaProtrude, centre.y), radius, false);
-		
-		int numVLines = Mathf.FloorToInt(maxCurrent * 0.5f / step);
-		for (int i = 0; i < numVLines; ++i){
-			DrawLineVA( new Vector2(centre.x + (i + 1) * step, -vaProtrude), new Vector2(centre.x + (i + 1) * step, maxVoltage + vaProtrude), radius, false);
-			DrawLineVA( new Vector2(centre.x - (i + 1) * step, -vaProtrude), new Vector2(centre.x - (i + 1) * step, maxVoltage + vaProtrude), radius, false);
-			
-		}
-		
-		int numHLines = Mathf.FloorToInt(maxVoltage * 0.5f / step);
-		for (int i = 0; i < numHLines; ++i){
-			DrawLineVA( new Vector2(-vaProtrude, centre.y + (i + 1) * step), new Vector2(maxCurrent+ vaProtrude, centre.y + (i + 1) * step), radius, false);
-			DrawLineVA( new Vector2(-vaProtrude, centre.y - (i + 1) * step), new Vector2(maxCurrent+ vaProtrude, centre.y - (i + 1) * step), radius, false);
-			
-		}
-	}
 	
 	
 	void CreateTextures(){

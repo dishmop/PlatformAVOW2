@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class SlidingDoor : MonoBehaviour {
@@ -83,8 +83,8 @@ public class SlidingDoor : MonoBehaviour {
 			minVoltage = avowGridGO.GetComponent<AVOWGrid>().minVoltage;
 		}
 		ElectricalComponent component = transform.FindChild("DoorElectrics").gameObject.GetComponent<ElectricalComponent>();
-		if (component.simEdgeIndex >= 0){
-			float current = CircuitSimulator.singleton.allEdges[component.simEdgeIndex].resFwCurrent;
+		if (component.simEdgeId >= 0){
+			float current = CircuitSimulator.singleton.allEdges[component.simEdgeId].resFwCurrent;
 			openSpeed = current * current;
 			if (MathUtils.FP.Fgeq(current, minVoltage)){
 				isOpen = true;

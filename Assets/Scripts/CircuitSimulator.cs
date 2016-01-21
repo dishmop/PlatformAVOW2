@@ -18,6 +18,7 @@ public class CircuitSimulator : MonoBehaviour {
 	};
 	
 	public bool voltageError;
+	public Edge batteryEdge;
 	
 	
 	// Circuir graph is made from nodes and edges
@@ -39,8 +40,16 @@ public class CircuitSimulator : MonoBehaviour {
 		// Debugging
 		public string GetID(){return "N" + id;}
 		
+		// Members for AVOW representation
+		public List<Edge> inEdges = new List<Edge>();
+		public List<Edge> outEdges = new List<Edge>();
+		public float h0;
+		public float hWidth;
+		public bool hasBeenLayedOut;
+		public bool isInBatteryClique;
+		public Node repNode;		// All nodes which are connected by zero resistance edges for a group who will all have the same repnode (the node with the lowest ID).
 		
-		
+
 	};
 	
 	public class Edge{
@@ -69,7 +78,28 @@ public class CircuitSimulator : MonoBehaviour {
 		// Debugging
 		public string GetID(){return "E" + id;}
 		
+		// Members for AVOW representation
+		public float hOrder = -1;
+		public float h0;
+		public float hWidth;
+		public Node inNode;
+		public Node outNode;
+		public bool hasBeenLayedOut;	// False at first and then true after it has been laid out at least once
+		public bool isInBatteryClique;
 		
+		public Node GetOtherNode(Node thisNode){
+			if (nodes[0] != thisNode && nodes[1] != thisNode){
+				Debug.LogError("Mismatched node");
+				return null;
+			}
+			if (nodes[0] == thisNode){
+				return nodes[1];
+			}
+			else{
+				return nodes[0];
+			}
+			
+		}
 
 	};
 
@@ -98,6 +128,108 @@ public class CircuitSimulator : MonoBehaviour {
 	public void ClearCircuit(){
 		allNodes.Clear();
 		allEdges.Clear();
+	}
+	
+	// Setup in and out nodes on each edge.
+	// Also mark any eges and nodes which are in the same clique as the battery.
+	public void SetupAVOWMembers(){
+	
+		// In/Out nodes
+		foreach(Edge edge in allEdges){
+			edge.hWidth = Mathf.Abs(edge.resFwCurrent);
+			if (edge.resFwCurrent > 0){
+				edge.inNode = edge.nodes[0];
+				edge.outNode = edge.nodes[1];
+			}
+			else{
+				edge.inNode = edge.nodes[1];
+				edge.outNode = edge.nodes[0];
+			}
+		}
+		
+		// Battery Clique
+		batteryEdge = null;
+		foreach(Edge edge in allEdges){
+			edge.isInBatteryClique = false;
+			if (edge.voltageRise > 0){
+				batteryEdge = edge;
+			}
+		}
+		
+		// RepNodes
+		foreach(Node node in allNodes){
+			node.repNode = null;
+		}		
+		foreach(Node node in allNodes){
+			List<Node> nodeGroup = new List<Node>();
+			Stack<Node> nodeStack = new Stack<Node>();
+			if (node.repNode != null) continue;
+			
+			nodeStack.Push (node);
+			
+			// Mark it as added to the stack
+			node.repNode = node;
+			
+			// We keep track of the node we encounter with the minimal id as this will be our representative one
+			Node minNode = node;
+			
+			while (nodeStack.Count != 0){
+				Node thisNode = nodeStack.Pop ();
+				nodeGroup.Add(thisNode);
+				if (thisNode.id < minNode.id){
+					minNode = thisNode;
+				}
+				foreach (Edge edge in thisNode.edges){
+					if (MathUtils.FP.Feq(edge.resistance, 0)){
+						Node otherNode = edge.GetOtherNode(thisNode);
+						if (otherNode.repNode == null){
+							nodeStack.Push (otherNode);
+							otherNode.repNode = otherNode;
+						}
+						
+					}
+				}
+				// Now we have out list of nodes which can all be represented by a single node
+				foreach (Node groupNode in nodeGroup){
+					groupNode.repNode = minNode;
+				}
+			}
+			
+			
+			
+			
+		}		
+		
+		
+		
+		foreach(Node node in allNodes){
+			node.isInBatteryClique = false;
+		}
+		if (batteryEdge != null){
+			// Start at the battery edge and add any nodes
+			Stack<Edge> edgeStack = new Stack<Edge>();
+			edgeStack.Push(batteryEdge);
+			while (edgeStack.Count != 0){
+				Edge thisEdge = edgeStack.Pop();
+				thisEdge.isInBatteryClique = true;
+				// Ensure the nodes at either end are also in the clique
+				thisEdge.nodes[0].isInBatteryClique = true;
+				thisEdge.nodes[1].isInBatteryClique = true;
+				foreach (Edge edge in thisEdge.nodes[0].edges){
+					if (!edge.isInBatteryClique){
+						edgeStack.Push(edge);
+					}
+				}
+				foreach (Edge edge in thisEdge.nodes[1].edges){
+					if (!edge.isInBatteryClique){
+						edgeStack.Push(edge);
+					}
+				}
+			}
+		}
+		
+		
+		
 	}
 	
 	// Create a new node and returns its ID
@@ -130,9 +262,9 @@ public class CircuitSimulator : MonoBehaviour {
 	}
 	
 	// Creates a new load edge and returns its Id
-	public int AddLoadEdge(int node0Id, int node1Id, float resistance){
+	public int AddLoadEdge(int node0Id, int node1Id, float resistance, float hOrder){
 		
-		int edgeId = AddEdge(node0Id, node1Id);
+		int edgeId = AddEdge(node0Id, node1Id,  hOrder);
 		allEdges[edgeId].resistance = resistance;
 		return edgeId;
 	}
@@ -143,6 +275,11 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		int edgeId = AddEdge(node0Id, node1Id);
 		return edgeId;
+	}
+	
+	
+	public CircuitSimulator.Edge GetEdge(int id){
+		return allEdges.Find(obj=>obj.id == id);
 	}
 	
 	
@@ -171,11 +308,20 @@ public class CircuitSimulator : MonoBehaviour {
 		CalcVoltages();
 		//DebugPrintVoltages();
 		
-//		Debug.Log ("-----");
-//		foreach (var node in allNodes){
-//			Debug.Log("   [" + node.GetID() + " - " + node.debugName + "] = " + node.resVoltage + ", visited = " + node.visited);
-//		}
+		OrderEdgesByHOrder();
+		
+		SetupAVOWMembers();
+		
+		Debug.Log ("-----");
+		foreach (var node in allNodes){
+			Debug.Log("   [" + node.GetID() + " - " + node.debugName + "] = " + node.resVoltage + ", clique = " + node.isInBatteryClique);
+		}
 
+	}
+	
+	void OrderEdgesByHOrder(){
+		// Ensure all components are sorted by horder (makes things easier to find
+		allEdges.Sort((obj1, obj2) => obj1.hOrder.CompareTo(obj2.hOrder));
 	}
 	
 	// return true if the graph is self-consistent
@@ -220,10 +366,11 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	
 	// Creates a new voltage source edge and returns its Id
-	int AddEdge(int node0Id, int node1Id){
+	int AddEdge(int node0Id, int node1Id, float hOrder = -1){
 		int id = allEdges.Count();
 		
 		Edge newEdge = new Edge();
+		newEdge.hOrder = hOrder;
 		newEdge.id = id;
 		newEdge.nodes[0] = allNodes[node0Id];
 		newEdge.nodes[1] = allNodes[node1Id];
@@ -269,8 +416,8 @@ public class CircuitSimulator : MonoBehaviour {
 		int node2Id = AddNode("test2");
 		int cellId = AddVoltageSourceEdge(node0Id, node2Id, 1);
 		int resistor1Id = AddConductorEdge(node2Id, node1Id);
-		int resistor2Id = AddLoadEdge(node1Id, node0Id, 1);
-		int resistor3Id = AddLoadEdge(node1Id, node0Id, 1);
+		int resistor2Id = AddLoadEdge(node1Id, node0Id, 1, 0);
+		int resistor3Id = AddLoadEdge(node1Id, node0Id, 1, 1);
 //		int resistor4Id = AddLoadEdge(node2Id, node1Id, 0);
 		
 		RunSimulation();

@@ -164,15 +164,15 @@ public class Circuit : MonoBehaviour {
 			component.simNodeIndices[i] = sim.AddNode(component.name + "_" + i);
 		}
 		if (component.type == ElectricalComponent.Type.kLoad){
-			component.simEdgeIndex = sim.AddLoadEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.resistance);
+			component.simEdgeId = sim.AddLoadEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.resistance, component.gameObject.transform.position.x);
 		}
 		if (component.type == ElectricalComponent.Type.kVoltageSource){
-			component.simEdgeIndex = sim.AddVoltageSourceEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.voltageRise, component.resistance);
+			component.simEdgeId = sim.AddVoltageSourceEdge(component.simNodeIndices[0], component.simNodeIndices[1], component.voltageRise, component.resistance);
 		}
 		
 		// Do any internal routing
 		foreach (ElectricalComponent.InternalRoute route in component.internalRouting){
-			sim.AddLoadEdge(component.simNodeIndices[route.connectionIndex0], component.simNodeIndices[route.connectionIndex1], route.resistance);
+			sim.AddLoadEdge(component.simNodeIndices[route.connectionIndex0], component.simNodeIndices[route.connectionIndex1], route.resistance, component.gameObject.transform.position.x);
 		}
 	}
 	
@@ -222,6 +222,9 @@ public class Circuit : MonoBehaviour {
 
 		
 		sim.RunSimulation();
+		if (AVOWSim.singleton){
+			AVOWSim.singleton.Recalc();
+		}
 		
 
 		

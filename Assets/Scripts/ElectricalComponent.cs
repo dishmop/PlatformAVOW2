@@ -44,27 +44,27 @@ public class ElectricalComponent : MonoBehaviour {
 	// If we are a load or voltage source then we have two nodes
 	// If we are a junction, then we only have one
 	public int[] simNodeIndices;
-	public int simEdgeIndex = -1;
+	public int simEdgeId = -1;
 	public float voltageRise = 0;
 	public float resistance = 0;
 	
 	public float GetSimFwCurrent(){
-		if (simEdgeIndex >= 0){
-			return CircuitSimulator.singleton.allEdges[simEdgeIndex].resFwCurrent;
+		if (simEdgeId >= 0){
+			return CircuitSimulator.singleton.GetEdge(simEdgeId).resFwCurrent;
 		}
 		return 0;
 	}
 	
 	public float GetVoltageMin(){
-		if (simEdgeIndex >= 0){
-			return CircuitSimulator.singleton.allEdges[simEdgeIndex].nodes[1].resVoltage;
+		if (simEdgeId >= 0){
+			return CircuitSimulator.singleton.GetEdge(simEdgeId).nodes[1].resVoltage;
 		}
 		return 0;
 	}
 	
 	public float GetVoltageMax(){
-		if (simEdgeIndex >= 0){
-			return CircuitSimulator.singleton.allEdges[simEdgeIndex].nodes[0].resVoltage;
+		if (simEdgeId >= 0){
+			return CircuitSimulator.singleton.GetEdge(simEdgeId).nodes[0].resVoltage;
 		}
 		return 0;
 	}
@@ -102,7 +102,7 @@ public class ElectricalComponent : MonoBehaviour {
 		for (int i = 0; i < simNodeIndices.Count(); ++i){
 			simNodeIndices[i] = -1;
 		}
-		simEdgeIndex = -1;
+		simEdgeId = -1;
 	}
 	
 	
