@@ -918,7 +918,8 @@ public class AVOWSim : MonoBehaviour {
 	}
 	
 	bool TestForCurrent(){
-		return !MathUtils.FP.Feq(CircuitSimulator.singleton.batteryEdge.resFwCurrent, 0);
+	return true;
+	//	return !MathUtils.FP.Feq(CircuitSimulator.singleton.batteryEdge.resFwCurrent, 0);
 	}
 	
 	void LayoutHOrder(){	

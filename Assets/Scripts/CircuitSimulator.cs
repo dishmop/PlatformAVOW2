@@ -333,11 +333,15 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		SetupAVOWMembers();
 		
-//		Debug.Log ("-----");
+		Debug.Log ("-----");
 //		foreach (var node in allNodes){
 //			Debug.Log("   [" + node.GetID() + " - " + node.debugName + "] = " + node.resVoltage + ", clique = " + node.isInBatteryClique);
 //		}
 
+		foreach (var edge in allEdges){
+			if (!edge.isInBatteryClique) continue;
+			Debug.Log("   [" + edge.GetID() + " - (" + edge.nodes[0].debugName + ", " + edge.nodes[1].debugName + ") ]: h0 = " + edge.h0 + ", hWidth = " + edge.hWidth + ", v0 = " + edge.nodes[0].resVoltage + ", v1 = " + edge.nodes[1].resVoltage);
+		}
 	}
 	
 	void OrderEdgesByHOrder(){

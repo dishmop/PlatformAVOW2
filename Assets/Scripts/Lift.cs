@@ -33,7 +33,7 @@ public class Lift : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 	
-		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() ;
+		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent();
 		
 		float oldHeight = liftHeight;
 		

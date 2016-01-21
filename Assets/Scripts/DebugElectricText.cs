@@ -20,7 +20,7 @@ public class DebugElectricText : MonoBehaviour {
 		ElectricalComponent component = electricsGO.GetComponent<ElectricalComponent>();
 		CircuitSimulator sim = CircuitSimulator.singleton;
 		if (component.simEdgeId >= 0 && GameConfig.singleton.showDebug){
-			float current = sim.allEdges[component.simEdgeId].resFwCurrent;
+			float current = component.GetComponent<ElectricalComponent>().GetSimFwCurrent();
 			
 			float volt0 = sim.allNodes[component.simNodeIndices[0]].resVoltage;
 			float volt1 = sim.allNodes[component.simNodeIndices[1]].resVoltage;

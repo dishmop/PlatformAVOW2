@@ -82,9 +82,9 @@ public class SlidingDoor : MonoBehaviour {
 		if (avowGridGO != null){
 			minVoltage = avowGridGO.GetComponent<AVOWGrid>().minVoltage;
 		}
-		ElectricalComponent component = transform.FindChild("DoorElectrics").gameObject.GetComponent<ElectricalComponent>();
+		ElectricalComponent component = electricsGO.GetComponent<ElectricalComponent>();
 		if (component.simEdgeId >= 0){
-			float current = CircuitSimulator.singleton.allEdges[component.simEdgeId].resFwCurrent;
+			float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent();
 			openSpeed = current * current;
 			if (MathUtils.FP.Fgeq(current, minVoltage)){
 				isOpen = true;
