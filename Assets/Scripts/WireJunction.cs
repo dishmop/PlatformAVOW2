@@ -42,7 +42,7 @@ public class WireJunction : MonoBehaviour {
 		int newDir;
 		
 		// Calc the position of the thing we are tryig to attach on
-		if (otherComponent == null){
+		if (otherComponent == null || otherComponentIndex == -1){
 			return;
 		}
 		

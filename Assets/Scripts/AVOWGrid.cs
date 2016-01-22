@@ -7,6 +7,10 @@ using System.IO;
 public class AVOWGrid : MonoBehaviour {
 	public GameObject background;
 	public GameObject bubble;
+	Color lightCol = new Color (0.85f, 0.85f, 0.85f);
+	Color mainCol = new Color (0.35f, 0.35f, 0.35f);
+	
+	Color darkCol = new Color (0f, 0f, 0f);
 	
 	public float resistance = 1;
 	public float maxVoltage = 1;
@@ -19,7 +23,6 @@ public class AVOWGrid : MonoBehaviour {
 	string loadPath = "Grids/";
 	
 	
-	float checkSum = 0;
 	
 	
 	// Derived measurementes
@@ -97,10 +100,9 @@ public class AVOWGrid : MonoBehaviour {
 		}
 	}
 	
-	public void SetBubble(float minV, float maxV){
+	public void SetBubble(float minV, float maxV, float current){
 		float voltageDiff = maxV - minV;
-		float current = voltageDiff / resistance;
-		bubble.transform.localScale = new Vector3(current, voltageDiff);
+		bubble.transform.localScale = new Vector3(current, voltageDiff, 1);
 		bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
 		bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
 	}
@@ -110,9 +112,6 @@ public class AVOWGrid : MonoBehaviour {
 	
 		LoadOrCreateTextures();
 		
-		checkSum = CalcCheckSum();
-		
-
 		
 	
 	}
@@ -271,11 +270,8 @@ public class AVOWGrid : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		float newCheckSum = CalcCheckSum();
-		if (newCheckSum != checkSum){
-			//ConstructTextures();
-			checkSum = newCheckSum;
-		}
+
+		
 	
 	}
 	
@@ -532,10 +528,17 @@ public class AVOWGrid : MonoBehaviour {
 				
 				grad2Mags[i] = gradScale * grad2Mags[i];
 				
-				diffuseCols[i] = new Color(0.5f + grad2Mags[i] * 0.5f, 
-				                           0.5f + grad2Mags[i] * 0.5f, 
-				                           0.5f + grad2Mags[i] * 0.5f, 
-				                           1);
+				if (grad2Mags[i] < 0){
+					diffuseCols[i] = Color.Lerp(mainCol, darkCol, -grad2Mags[i]);
+				}
+				else{
+					diffuseCols[i] = Color.Lerp(mainCol, lightCol, grad2Mags[i]);
+				}
+//				
+//				diffuseCols[i] = new Color(0.5f + grad2Mags[i] * 0.5f, 
+//				                           0.5f + grad2Mags[i] * 0.5f, 
+//				                           0.5f + grad2Mags[i] * 0.5f, 
+//				                           1);
 				
 				
 				++i;

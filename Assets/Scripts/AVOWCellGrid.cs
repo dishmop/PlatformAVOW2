@@ -3,10 +3,14 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Collections.Generic;
 
 public class AVOWCellGrid : MonoBehaviour {
 	public GameObject background;
 	public GameObject bubblePrefab;
+	Color lightCol = new Color (0.85f, 0.85f, 0.85f);
+	Color mainCol = new Color (0.35f, 0.35f, 0.35f);
+	Color darkCol = new Color (0f, 0f, 0f);
 	
 	public float voltage = 1;
 	public float current = 1;
@@ -16,9 +20,9 @@ public class AVOWCellGrid : MonoBehaviour {
 	
 	string savePath = "/Resources/Grids/";
 	string loadPath = "Grids/";
+	List<GameObject>	bubbleList = new List<GameObject>();
 	
 	
-	float checkSum = 0;
 	
 	
 	// Derived measurementes
@@ -94,24 +98,13 @@ public class AVOWCellGrid : MonoBehaviour {
 		}
 	}
 	
-//	public void SetBubble(float minV, float maxV){
-//		float voltageDiff = maxV - minV;
-//		float current = voltageDiff / resistance;
-//		bubble.transform.localScale = new Vector3(current, voltageDiff);
-//		bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
-//		bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
-//	}
+
 	
 	// Use this for initialization
 	void Start () {
 	
 		LoadOrCreateTextures();
-		
-		checkSum = CalcCheckSum();
-		
-
-		
-	
+				
 	}
 	
 	float CalcCheckSum(){
@@ -264,11 +257,55 @@ public class AVOWCellGrid : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		float newCheckSum = CalcCheckSum();
-		if (newCheckSum != checkSum){
-			//ConstructTextures();
-			checkSum = newCheckSum;
+	
+		// Count how many blocks there are to make
+		int count = 0;
+		foreach (var edge in CircuitSimulator.singleton.allEdges){
+			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) ) continue;
+			++count;
 		}
+		while (bubbleList.Count < count){
+			GameObject newBubble = GameObject.Instantiate(bubblePrefab);
+			newBubble.transform.SetParent(transform);
+			newBubble.transform.localPosition = Vector3.zero;
+			bubbleList.Add (newBubble);
+		}
+		while (bubbleList.Count > count){
+			GameObject.Destroy(bubbleList[0]);
+			bubbleList.RemoveAt(0);
+		}
+		
+		foreach (var edge in CircuitSimulator.singleton.allEdges){
+			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) ) continue;
+			++count;
+		}
+		
+		// Get the battery edge to work out our offset on the grid (we want to centre the AVOW diagram)
+		var batteryEdge = CircuitSimulator.singleton.batteryEdge;
+		Vector2 vaOffset = new Vector2(batteryEdge.hWidth * 0.5f, Mathf.Abs(batteryEdge.nodes[0].resVoltage - batteryEdge.nodes[1].resVoltage)* 0.5f);
+		Vector2 realOffset = TransformVAToReal(vaOffset);
+		
+		//		float voltageDiff = maxV - minV;
+		//		float current = voltageDiff / resistance;
+		//		bubble.transform.localScale = new Vector3(current, voltageDiff);
+		int index = 0;
+		for (int i = 0; i < CircuitSimulator.singleton.allEdges.Count; ++i){
+			CircuitSimulator.Edge edge = CircuitSimulator.singleton.allEdges[i];
+			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) ) continue;
+			GameObject bubble = bubbleList[index++];
+			float v0 = edge.outNode.resVoltage;
+			float v1 = edge.inNode.resVoltage;
+			bubble.GetComponent<Renderer>().material.SetFloat("_v0", v0);
+			bubble.GetComponent<Renderer>().material.SetFloat("_v1", v1);
+			bubble.transform.localScale = new Vector3(edge.resFwCurrent, v1 - v0, 1);
+			Vector2 vaPos = new Vector2(edge.h0 + 0.5f * edge.hWidth, 0.5f * (v0 + v1));
+			Vector2 realPos = TransformVAToReal(vaPos)- realOffset;
+			bubble.transform.localPosition = new Vector3(realPos.x, realPos.y, 0);
+			
+			
+		}
+		
+
 	
 	}
 	
@@ -475,10 +512,17 @@ public class AVOWCellGrid : MonoBehaviour {
 				
 				grad2Mags[i] = gradScale * grad2Mags[i];
 				
-				diffuseCols[i] = new Color(0.5f + grad2Mags[i] * 0.5f, 
-				                           0.5f + grad2Mags[i] * 0.5f, 
-				                           0.5f + grad2Mags[i] * 0.5f, 
-				                           1);
+				if (grad2Mags[i] < 0){
+					diffuseCols[i] = Color.Lerp(mainCol, darkCol, -grad2Mags[i]);
+				}
+				else{
+					diffuseCols[i] = Color.Lerp(mainCol, lightCol, grad2Mags[i]);
+				}
+				//				
+				//				diffuseCols[i] = new Color(0.5f + grad2Mags[i] * 0.5f, 
+				//				                           0.5f + grad2Mags[i] * 0.5f, 
+				//				                           0.5f + grad2Mags[i] * 0.5f, 
+				//				                           1);
 				
 				
 				++i;

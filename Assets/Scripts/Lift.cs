@@ -26,7 +26,8 @@ public class Lift : MonoBehaviour {
 		if (avowGridGO != null){
 			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
-				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax());
+				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
+				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent());
 		}
 	}
 	

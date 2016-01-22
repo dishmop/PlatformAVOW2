@@ -177,7 +177,7 @@ public class Circuit : MonoBehaviour {
 	}
 	
 	// Initialise the circuit simulator and run it
-	public void Simulate(){
+	public void GameUpdate(){
 		UI.singleton.ValidateAttachedWire();
 		ClearCircuitSimData();
 		
@@ -221,12 +221,6 @@ public class Circuit : MonoBehaviour {
 		
 
 		
-		sim.RunSimulation();
-		if (AVOWSim.singleton){
-			AVOWSim.singleton.Recalc();
-		}
-		
-
 		
 	}
 	
@@ -236,11 +230,7 @@ public class Circuit : MonoBehaviour {
 		}
 	}
 	
-	
-	void FixedUpdate(){
-		Simulate();
-	}
-	
+		
 	void Start(){
 		sim = CircuitSimulator.singleton;
 		

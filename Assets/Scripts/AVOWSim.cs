@@ -61,7 +61,7 @@ public class AVOWSim : MonoBehaviour {
 	
 	
 	
-	public void Recalc(){
+	public void GameUpdate(){
 		
 		if (CircuitSimulator.singleton.allNodes.Count == 0){
 			return;

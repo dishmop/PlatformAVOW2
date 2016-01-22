@@ -57,14 +57,14 @@ public class ElectricalComponent : MonoBehaviour {
 	
 	public float GetVoltageMin(){
 		if (simEdgeId >= 0){
-			return CircuitSimulator.singleton.GetEdge(simEdgeId).nodes[1].resVoltage;
+			return CircuitSimulator.singleton.GetEdge(simEdgeId).outNode.resVoltage;
 		}
 		return 0;
 	}
 	
 	public float GetVoltageMax(){
 		if (simEdgeId >= 0){
-			return CircuitSimulator.singleton.GetEdge(simEdgeId).nodes[0].resVoltage;
+			return CircuitSimulator.singleton.GetEdge(simEdgeId).inNode.resVoltage;
 		}
 		return 0;
 	}

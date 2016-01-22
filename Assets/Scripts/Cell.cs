@@ -23,10 +23,10 @@ public class Cell : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 	
+		/*
 		if (Time.fixedTime > tripTime + tripDuration){
 			cellElectrics.GetComponent<ElectricalComponent>().voltageRise =oldVoltageRise;
 	
-		
 			float current = cellElectrics.GetComponent<ElectricalComponent>().GetSimFwCurrent();
 			if (MathUtils.FP.Feq (current, 0)){
 				powerLevel0GO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorUnpowered;
@@ -52,6 +52,7 @@ public class Cell : MonoBehaviour {
 				transform.FindChild("Warning").gameObject.SetActive(true);
 			}
 		}
+		*/
 		
 		// Check if we have a short circuit
 		if (CircuitSimulator.singleton.voltageError){
