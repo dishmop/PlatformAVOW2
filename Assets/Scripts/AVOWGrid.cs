@@ -102,9 +102,20 @@ public class AVOWGrid : MonoBehaviour {
 	
 	public void SetBubble(float minV, float maxV, float current){
 		float voltageDiff = maxV - minV;
-		bubble.transform.localScale = new Vector3(current, voltageDiff, 1);
-		bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
-		bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
+		if (float.IsNaN(current) || float.IsNaN(voltageDiff)){
+			Debug.Log("Error NAN");
+			return;
+		}
+		if (MathUtils.FP.Feq(current, 0) || MathUtils.FP.Feq(voltageDiff, 0)){
+			bubble.GetComponent<Renderer>().enabled = false;
+		}
+		else{
+			bubble.GetComponent<Renderer>().enabled = true;
+			bubble.transform.localScale = new Vector3(current, voltageDiff, 1);
+			bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
+			bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
+			bubble.GetComponent<Renderer>().material.SetFloat("_blue", 0);
+		}
 	}
 	
 	// Use this for initialization

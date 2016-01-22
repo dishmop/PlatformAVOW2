@@ -21,6 +21,7 @@ public class Wire : MonoBehaviour {
 	
 	
 	public GameObject 	  	currentWire;
+	public float resistance = 0;
 	
 	public List<GameObject> junctions;
 	
@@ -94,6 +95,12 @@ public class Wire : MonoBehaviour {
 	public bool IsPointInside(Vector3 point, out float distAlong){
 		return currentWire.GetComponent<WireLine>().IsPointInside(point, out distAlong);
 	}
+	
+	
+	public float CalMinDistToWire(Vector3 pos, out Vector3 nearstPos){
+		return currentWire.GetComponent<WireLine>().CalMinDistToWire(pos, out nearstPos);
+	}
+	
 	
 	
 	public void ClearMesh(){
@@ -354,6 +361,12 @@ public class Wire : MonoBehaviour {
 	
 	void Update(){
 		HandleMouseInput();
+		if (!MathUtils.FP.Feq(resistance, 0)){
+			GetComponent<AudioSource>().volume = 0.2f;
+		}
+		else{
+			GetComponent<AudioSource>().volume = 0f;
+		}
 	}
 	
 	// Get the voltage at one end of the wire and apply it to the colour
@@ -381,6 +394,7 @@ public class Wire : MonoBehaviour {
 		SetupEnds();
 		SetupPath();
 		UpdateCentralWire();
+		resistance = Mathf.Max (0, resistance - 0.1f);
 			
 
 		SetupColors();

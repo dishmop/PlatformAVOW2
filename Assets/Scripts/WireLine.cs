@@ -70,7 +70,7 @@ public class WireLine : MonoBehaviour {
 			
 			if (point.x > minX && point.x < maxX && point.y > minY && point.y < maxY){
 				// If a mid segment (rather than an end or a coner)
-					if ((i/4) % 2 == 1){
+				if ((i/4) % 2 == 1){
 					// If horizontal segment
 					if (MathUtils.FP.Feq(rootPos.y, otherPos1.y)){
 						distAlong += Mathf.Abs (point.x  - rootPos.x);
@@ -97,6 +97,51 @@ public class WireLine : MonoBehaviour {
 		}
 		return false;
 	
+	}
+	
+	public float CalMinDistToWire(Vector3 pos, out Vector3 nearestPos){
+		nearestPos = Vector2.zero;
+		if (pointsDirtyFlag){
+			ConstructMesh();
+		}
+		
+		pos.z = transform.TransformPoint(points[0]).z;
+		// Every set of 4 vertices is an axis aligned quad
+		float nearestDist = 100000f;
+		for (int i = 0; i < points.Length - 1; ++i){
+			// Do one line segment at a time
+			Vector3 startPos = transform.TransformPoint(points[i]);
+			Vector3 endPos = transform.TransformPoint(points[i+1]);
+			
+			// first get the nearest point to pos on the line
+			Vector3 startToEnd = endPos - startPos;
+			
+			float lambda = Vector3.Dot((pos - startPos), startToEnd) / startToEnd.sqrMagnitude;
+			
+			Vector3 thisNearestPos;
+			if (lambda < 0){
+				thisNearestPos = startPos;
+			}
+			else if (lambda > 1){
+				thisNearestPos = endPos;
+			}
+			else{
+				thisNearestPos = startPos + lambda * startToEnd;
+			}
+			
+			// If we are outside the range, then easy just return the level ground
+			float thisDist = (thisNearestPos - pos).magnitude;
+			
+			if (thisDist < nearestDist){
+				nearestDist= thisDist;
+				nearestPos = thisNearestPos;
+			}
+			
+		}
+
+		return nearestDist;
+
+		
 	}
 	
 	void ConstructMesh(){

@@ -2,6 +2,7 @@
 	Properties {
 		 _v0 ("v0", Float) = 0
 		 _v1 ("v1", Float) = 1
+		 _blue ("blue", Float) = 0
 
 	}
 	SubShader {
@@ -25,6 +26,7 @@
 				uniform float4	_Color2; 
 				uniform float _v0;
 				uniform float _v1;
+				uniform float _blue;
 
 		    
 		
@@ -61,9 +63,17 @@
 		        {
 		        	float4 col0 = float4(12f/256f, 0, 0, 1);
 		        	float4 col1 = float4(0, 12f/256f, 0, 1);
-		        	_Color1 = lerp(col0, col1, _v0);
-		        	_Color2 = lerp(col0, col1, _v1);
-		        	_Intensity = 0.75f;
+		        	if (_blue < 0.5f){
+			        	_Color1 = lerp(col0, col1, _v0);
+			        	_Color2 = lerp(col0, col1, _v1);
+			        	_Intensity = 0.75f;
+			        }
+			        else{
+			        	_Color1 = float4(1/256f, 1/256f, 12f/256f, 1);
+			        	_Color2 = float4(1/256f, 1/256f, 12f/256f, 1);
+			        	_Intensity = 0.75f;
+			        }
+		        	
 		        	
 		        	float left = abs(i.uv[0]);
 		        	float right = abs(1 - i.uv[0]);

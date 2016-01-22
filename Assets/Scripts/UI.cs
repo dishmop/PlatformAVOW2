@@ -6,13 +6,17 @@ public class UI : MonoBehaviour {
 	
 	public GameObject cursorJunction;
 	public GameObject attachedWire;
+	public GameObject lighteningGO;
+	float sparkDist = 1;
+
 	public Transform cursorTransform;
 	
 	Vector3 mouseWorldPos;
 	GameObject selectedComponent = null;
 	int selectedConnectorIndex = -1;
+	float lastSparkResistance =0;
 
-	
+
 	public bool RegisterSelected(GameObject electricalComponentGO, int index){
 		ValidateAttachedWire();
 		
@@ -22,6 +26,11 @@ public class UI : MonoBehaviour {
 		}
 	
 		if (attachedWire != null){
+			if (lastSparkResistance > 0){
+				attachedWire.GetComponent<Wire>().resistance = lastSparkResistance;
+				lastSparkResistance = 0;
+			}
+			
 			// If we are already attached to this, then ignore
 			ElectricalComponent component = electricalComponentGO.GetComponent<ElectricalComponent>();
 			Wire wire = attachedWire.GetComponent<Wire>();
@@ -172,7 +181,7 @@ public class UI : MonoBehaviour {
 	void Update () {
 	
 //		Debug.Log(Time.fixedTime + ": Update()");
-		
+
 	
 		// Calc the mouse posiiton on world space
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
@@ -223,8 +232,73 @@ public class UI : MonoBehaviour {
 //			}
 //		}
 		
-
 		ValidateAttachedWire();
+		
+		// Find out how close we are ot the nearest connection point
+		if (attachedWire != null){
+			Vector3 nearestPos = Vector3.zero;
+			float nearestDist = 1000000f;
+			Vector3 wirePos = attachedWire.GetComponent<Wire>().ends[1].pos;
+			GameObject nearComponent = null;
+			int nearComponentIndex = -1;
+			GameObject nearWire = null;
+			foreach(GameObject wireGO in Circuit.singleton.wireGOs){
+				Wire wire = wireGO.GetComponent<Wire>();
+				Vector3 thisNearestPos;
+				float thisNearestDist = wire.CalMinDistToWire(wirePos, out thisNearestPos);
+				if (thisNearestDist < nearestDist){
+					nearestDist = thisNearestDist;
+					nearestPos = thisNearestPos;
+					nearWire = wireGO;
+				}
+			}
+			foreach (GameObject componentGO in Circuit.singleton.electricalComponentGOs){
+				ElectricalComponent component = componentGO.GetComponent<ElectricalComponent>();
+				for (int i = 0; i < component.connectionData.Length; ++i){
+					ElectricalComponent.ConnectionData data = component.connectionData[i];
+					// If it is available for connecting,
+					if (data.wire == null){
+						Vector3 wireConnectionPos = componentGO.transform.TransformPoint(data.pos);
+						wireConnectionPos.z = wirePos.z;
+						// test distance
+						float thisNearestDist = (wireConnectionPos - wirePos).magnitude;
+						if (thisNearestDist < nearestDist){
+							nearestDist = thisNearestDist;
+							nearestPos = wireConnectionPos;
+							nearComponent = componentGO;
+							nearComponentIndex = i;
+						
+						}
+					}
+				}
+			}
+			Wire attWire = attachedWire.GetComponent<Wire>();
+			if (nearestDist < sparkDist && attWire.ends[1].component == cursorTransform.gameObject){
+				lighteningGO.GetComponent<LighteningSetup>().EnableLightening(nearestPos, wirePos);
+				lastSparkResistance = Mathf.Lerp(0, 10, nearestDist / sparkDist);
+				if (nearComponent != null){
+					
+					Circuit.singleton.EnableSpark(nearComponent, nearComponentIndex, attWire.ends[0].component, attWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
+				}
+				else{
+					Wire nearWireWire = nearWire.GetComponent<Wire>();
+					Circuit.singleton.EnableSpark(nearWireWire.ends[1].component, nearWireWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(nearWire), attWire.ends[0].component, attWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
+				}
+				
+			}	
+			else{
+				lighteningGO.GetComponent<LighteningSetup>().DisableLightening();
+				Circuit.singleton.DisableSpark();
+				
+			}
+
+
+				
+		}
+		else{
+			lighteningGO.GetComponent<LighteningSetup>().DisableLightening();
+			Circuit.singleton.DisableSpark();
+		}
 	
 	}
 	

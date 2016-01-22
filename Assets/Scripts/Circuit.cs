@@ -6,11 +6,33 @@ using System.Linq;
 public class Circuit : MonoBehaviour {
 
 	public static Circuit singleton = null;
-	List<GameObject> electricalComponentGOs = new List<GameObject>();
-	List<GameObject> wireGOs = new List<GameObject>();
+	public List<GameObject> electricalComponentGOs = new List<GameObject>();
+	public List<GameObject> wireGOs = new List<GameObject>();
+	
+	class Spark{
+		public GameObject[] electralCompoentGOs = new GameObject[2];
+		public int[] indices = new int[2];
+		public float resistance = 0;
+	}
+	Spark spark;
 	
 	CircuitSimulator sim = null;
 
+	public void EnableSpark(GameObject obj0, int index0, GameObject obj1, int index1, float resistance){
+		if (spark == null){
+			spark = new Spark();
+		}
+		spark.electralCompoentGOs[0] = obj0;
+		spark.electralCompoentGOs[1] = obj1;
+		spark.indices[0] = index0;
+		spark.indices[1] = index1;
+		spark.resistance = resistance;
+	}
+	
+	public void DisableSpark(){
+		spark = null;
+	}
+	
 	public void RegisterComponent(GameObject electricalComponent){
 		electricalComponentGOs.Add(electricalComponent);
 	}
@@ -111,6 +133,21 @@ public class Circuit : MonoBehaviour {
 		
 	}
 	
+	void AddSparkToSim(Spark thisSpark){
+		// Error catching:
+		if (thisSpark.indices[0] < 0 || thisSpark.indices[0] >= thisSpark.electralCompoentGOs[0].GetComponent<ElectricalComponent>().simNodeIndices.Length){
+			Debug.Log("Indexing Error thisSpark.indices[0]: " + thisSpark.indices[0]);
+		}
+		if (thisSpark.indices[1] < 0 || thisSpark.indices[1] >= thisSpark.electralCompoentGOs[1].GetComponent<ElectricalComponent>().simNodeIndices.Length){
+			Debug.Log("Indexing Error thisSpark.indices[1]: " + thisSpark.indices[1]);
+		}
+		int simIndex0 = thisSpark.electralCompoentGOs[0].GetComponent<ElectricalComponent>().simNodeIndices[thisSpark.indices[0]];
+		int simIndex1 = thisSpark.electralCompoentGOs[1].GetComponent<ElectricalComponent>().simNodeIndices[thisSpark.indices[1]];
+		float hOrder = (thisSpark.electralCompoentGOs[0].transform.position.x + thisSpark.electralCompoentGOs[1].transform.position.x) * 0.5f;
+		sim.AddLoadEdge(simIndex0, simIndex1, thisSpark.resistance, hOrder, CircuitSimulator.EdgeType.kBlue);
+	}
+	
+	
 	public void AddWireToSim(GameObject wireGO){
 	
 		UI.singleton.ValidateAttachedWire();
@@ -133,8 +170,14 @@ public class Circuit : MonoBehaviour {
 			ElectricalComponent nextComponent = thisJunctions[i].GetComponent<ElectricalComponent>();
 			int nextIndex = 0;	// always 0 for junctions
 			
+			
 			// Add the edge to the circuit sim
-			sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex]);
+			if (MathUtils.FP.Feq(wire.resistance, 0)){
+				sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex]);
+			}
+			else{
+				sim.AddLoadEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex], wire.resistance, wire.ends[0].component.transform.position.x, CircuitSimulator.EdgeType.kBlue);
+			}
 			
 			// Set last to next
 			lastComponent = nextComponent;
@@ -153,7 +196,16 @@ public class Circuit : MonoBehaviour {
 		
 		// Add the final segment in
 //		Debug.Log("lastIndex = " + lastIndex + ", endIndex = " + endIndex);
-		sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex]);
+
+		if (MathUtils.FP.Feq(wire.resistance, 0)){
+			sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex]);
+		}
+		else{
+			sim.AddLoadEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex], wire.resistance, wire.ends[0].component.transform.position.x, CircuitSimulator.EdgeType.kBlue);
+		}
+		
+		
+		
 	}
 	
 	void AddComponentToSim(GameObject componentGO){
@@ -217,6 +269,10 @@ public class Circuit : MonoBehaviour {
 		// Add the UI's wire
 		if (UI.singleton.attachedWire != null){	
 			AddWireToSim(UI.singleton.attachedWire );
+		}
+		
+		if (spark != null){
+			AddSparkToSim(spark);
 		}
 		
 

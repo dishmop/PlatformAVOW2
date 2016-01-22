@@ -17,6 +17,10 @@ public class CircuitSimulator : MonoBehaviour {
 		public int fromNodeIndex;		// 0 or 1
 	};
 	
+	public enum EdgeType{
+		kNormal,
+		kBlue
+	}
 	public bool voltageError;
 	public Edge batteryEdge;
 	
@@ -71,6 +75,8 @@ public class CircuitSimulator : MonoBehaviour {
 		// Graph traversal data
 		public bool disabled = false;
 		public bool visited = false;
+		
+		public EdgeType edgeType = EdgeType.kNormal;
 		
 		// Results data
 		public float resFwCurrent;
@@ -283,9 +289,9 @@ public class CircuitSimulator : MonoBehaviour {
 	}
 	
 	// Creates a new load edge and returns its Id
-	public int AddLoadEdge(int node0Id, int node1Id, float resistance, float hOrder){
+	public int AddLoadEdge(int node0Id, int node1Id, float resistance, float hOrder, EdgeType edgeType = EdgeType.kNormal){
 		
-		int edgeId = AddEdge(node0Id, node1Id,  hOrder);
+		int edgeId = AddEdge(node0Id, node1Id,  hOrder, edgeType);
 		allEdges[edgeId].resistance = resistance;
 		return edgeId;
 	}
@@ -382,7 +388,7 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	
 	// Creates a new voltage source edge and returns its Id
-	int AddEdge(int node0Id, int node1Id, float hOrder = -1){
+	int AddEdge(int node0Id, int node1Id, float hOrder = -1, EdgeType edgeType = EdgeType.kNormal){
 		int id = allEdges.Count();
 		
 		Edge newEdge = new Edge();
@@ -390,6 +396,7 @@ public class CircuitSimulator : MonoBehaviour {
 		newEdge.id = id;
 		newEdge.nodes[0] = allNodes[node0Id];
 		newEdge.nodes[1] = allNodes[node1Id];
+		newEdge.edgeType = edgeType;
 		
 		allNodes[node0Id].edges.Add(newEdge);
 		allNodes[node1Id].edges.Add(newEdge);

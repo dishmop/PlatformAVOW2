@@ -261,7 +261,7 @@ public class AVOWCellGrid : MonoBehaviour {
 		// Count how many blocks there are to make
 		int count = 0;
 		foreach (var edge in CircuitSimulator.singleton.allEdges){
-			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) ) continue;
+			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0)  || MathUtils.FP.Feq(edge.hWidth, 0)) continue;
 			++count;
 		}
 		while (bubbleList.Count < count){
@@ -276,7 +276,7 @@ public class AVOWCellGrid : MonoBehaviour {
 		}
 		
 		foreach (var edge in CircuitSimulator.singleton.allEdges){
-			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) ) continue;
+			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) || MathUtils.FP.Feq(edge.hWidth, 0)) continue;
 			++count;
 		}
 		
@@ -291,16 +291,22 @@ public class AVOWCellGrid : MonoBehaviour {
 		int index = 0;
 		for (int i = 0; i < CircuitSimulator.singleton.allEdges.Count; ++i){
 			CircuitSimulator.Edge edge = CircuitSimulator.singleton.allEdges[i];
-			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0) ) continue;
+			if (!edge.isInBatteryClique || !MathUtils.FP.Feq(edge.voltageRise, 0)  || MathUtils.FP.Feq(edge.hWidth, 0)) continue;
 			GameObject bubble = bubbleList[index++];
 			float v0 = edge.outNode.resVoltage;
 			float v1 = edge.inNode.resVoltage;
 			bubble.GetComponent<Renderer>().material.SetFloat("_v0", v0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v1", v1);
+			bubble.GetComponent<Renderer>().material.SetFloat("_blue", edge.edgeType == CircuitSimulator.EdgeType.kNormal ? 0 : 1);
 			bubble.transform.localScale = new Vector3(edge.resFwCurrent, v1 - v0, 1);
 			Vector2 vaPos = new Vector2(edge.h0 + 0.5f * edge.hWidth, 0.5f * (v0 + v1));
 			Vector2 realPos = TransformVAToReal(vaPos)- realOffset;
-			bubble.transform.localPosition = new Vector3(realPos.x, realPos.y, 0);
+			if (float.IsNaN(realPos.x) || float.IsNaN(realPos.y)){
+				Debug.Log("Error NAN");
+			}
+			else{
+				bubble.transform.localPosition = new Vector3(realPos.x, realPos.y, 0);
+			}
 			
 			
 		}
