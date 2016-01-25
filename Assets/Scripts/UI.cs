@@ -318,12 +318,12 @@ public class UI : MonoBehaviour {
 	}
 	
 	void OnGUI(){
-		if (attachedWire != null){
-			Wire wire = attachedWire.GetComponent<Wire>();
-			ElectricalComponent component = wire.ends[1].component.GetComponent<ElectricalComponent>();
-			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "attachedWire.end[1].simNodeID = " + component.simNodeIndices[component.GetConnectionDataIndex(attachedWire)]);
-			
-		}
+//		if (attachedWire != null){
+//			Wire wire = attachedWire.GetComponent<Wire>();
+//			ElectricalComponent component = wire.ends[1].component.GetComponent<ElectricalComponent>();
+//			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "attachedWire.end[1].simNodeID = " + component.simNodeIndices[component.GetConnectionDataIndex(attachedWire)]);
+//			
+//		}
 	}
 
 	

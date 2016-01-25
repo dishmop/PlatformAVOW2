@@ -21,7 +21,7 @@ public class Wire : MonoBehaviour {
 	public EndData[] ends = new EndData[2];
 	
 	
-	public GameObject 	  	currentWire;
+	public List<GameObject> coreWires = new List<GameObject>();
 	public float resistance = 0;
 	
 	public List<GameObject> junctions;
@@ -30,7 +30,7 @@ public class Wire : MonoBehaviour {
 	List<Vector3>[] rawPaths = new List<Vector3>[2];
 	
 	// These split up the path into sections (with a different section between each junction
-	List<List<Vector3>> usePaths = new List<List<Vector3>>();
+//	List<List<Vector3>> usePaths = new List<List<Vector3>>();
 	
 	float			pathLength;
 	
@@ -44,68 +44,116 @@ public class Wire : MonoBehaviour {
 		return 0;
 	}	
 	
+	public void AddJunction(GameObject gameObject){
+		junctions.Add(gameObject);
+		OnChangeJunctions();
+		OrderJunctions();
+	}
 	
-	void ReconstructUsePaths(){
-		// How meny sections should we have
-		int desNumSections = junctions.Count() + 1;
-		if (desNumSections != usePaths.Count()){
-			usePaths = new List<List<Vector3>>();
-			for (int i = 0; i < desNumSections; ++i){
-				usePaths.Add (new List<Vector3>());
-			}
-		}
-		
-		// Get an ordered list of the junctions in the wire
-		List<GameObject> orderedJunctions = junctions.OrderBy(obj => obj.GetComponent<WireJunction>().propAlongWire).ToList();
-		
-		int segmentIndex = 0;
-		int lastIndex = 0;
-		float distTravelled = 0;
-		Vector3 lastPos = rawPaths[0][lastIndex];
-		
-		// We need at least one path and the first point must go in it
-		usePaths[segmentIndex] = new List<Vector3>();
-		usePaths[segmentIndex].Add (lastPos);
-		
-		// If there are junctions, then do each segment at a time
-		for  (int i = 0; i < orderedJunctions.Count(); ++i){
-		
-			// Distance that the junction is along the wire
-			float juncDist = pathLength * orderedJunctions[i].GetComponent<WireJunction>().propAlongWire;
-
-			// position of next point in the line path			
-			Vector3 nextPos = rawPaths[0][lastIndex + 1];
-			Vector3 pathSegment= nextPos - lastPos;
-			float pathSegLength = pathSegment.magnitude;
-			
-			// If the junction is between this path segment then make a new path point and close off this usePath
-			if (distTravelled + pathSegLength > juncDist){
-				float distDownThisPathSegment = juncDist - distTravelled;
-				float propDownThisPathSegment = distDownThisPathSegment / pathSegLength;
-				Vector3 newPoint = Vector3.Lerp (lastPos, nextPos, propDownThisPathSegment);
-				usePaths[segmentIndex].Add (newPoint);
-				distTravelled = juncDist;
-			}
-			
-		}
+	public void RemoveJunction(GameObject gameObject){
+		junctions.Remove(gameObject);
+		OnChangeJunctions();
+		OrderJunctions();
+	}
+	
+	void OrderJunctions(){
+		junctions.Sort((obj1, obj2)=>obj1.GetComponent<WireJunction>().propAlongWire.CompareTo(obj2.GetComponent<WireJunction>().propAlongWire));
+	}
+	
+	void OnChangeJunctions(){
+		ClearMesh();
+		ConstructMesh();
 		
 	}
+//	
+//	void ReconstructUsePaths(){
+//		// How many sections should we have
+//		int desNumSections = junctions.Count() + 1;
+//		if (desNumSections != usePaths.Count()){
+//			usePaths = new List<List<Vector3>>();
+//			for (int i = 0; i < desNumSections; ++i){
+//				usePaths.Add (new List<Vector3>());
+//			}
+//		}
+//		
+//		// Get an ordered list of the junctions in the wire
+//		List<GameObject> orderedJunctions = junctions.OrderBy(obj => obj.GetComponent<WireJunction>().propAlongWire).ToList();
+//		
+//		int segmentIndex = 0;
+//		int lastIndex = 0;
+//		float distTravelled = 0;
+//		Vector3 lastPos = rawPaths[0][lastIndex];
+//		
+//		// We need at least one path and the first point must go in it
+//		usePaths[segmentIndex] = new List<Vector3>();
+//		usePaths[segmentIndex].Add (lastPos);
+//		
+//		// If there are junctions, then do each segment at a time
+//		for  (int i = 0; i < orderedJunctions.Count(); ++i){
+//		
+//			// Distance that the junction is along the wire
+//			float juncDist = pathLength * orderedJunctions[i].GetComponent<WireJunction>().propAlongWire;
+//
+//			// position of next point in the line path			
+//			Vector3 nextPos = rawPaths[0][lastIndex + 1];
+//			Vector3 pathSegment= nextPos - lastPos;
+//			float pathSegLength = pathSegment.magnitude;
+//			
+//			// If the junction is between this path segment then make a new path point and close off this usePath
+//			if (distTravelled + pathSegLength > juncDist){
+//				float distDownThisPathSegment = juncDist - distTravelled;
+//				float propDownThisPathSegment = distDownThisPathSegment / pathSegLength;
+//				Vector3 newPoint = Vector3.Lerp (lastPos, nextPos, propDownThisPathSegment);
+//				usePaths[segmentIndex].Add (newPoint);
+//				distTravelled = juncDist;
+//			}
+//			
+//		}
+//		
+//	}
 	
 	
 	void ConstructMesh(){
 		SetupEnds();
 		SetupPath();
-		currentWire = ConstructCentralWire();
+		
+		ConstructCentralWire();
 	
 	}
 	
 	public bool IsPointInside(Vector3 point, out float distAlong){
-		return currentWire.GetComponent<WireLine>().IsPointInside(point, out distAlong);
+//		return coreWires[0].GetComponent<WireLine>().IsPointInside(point, out distAlong);
+		
+		float thisDistAlong;
+		distAlong = 0;
+		for (int i = 0; i < coreWires.Count; ++i){
+			bool isInside = coreWires[i].GetComponent<WireLine>().IsPointInside(point, out thisDistAlong);
+			distAlong += thisDistAlong;
+			if (isInside){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
 	public float CalMinDistToWire(Vector3 pos, out Vector3 nearstPos){
-		return currentWire.GetComponent<WireLine>().CalMinDistToWire(pos, out nearstPos);
+	//	return coreWires[0].GetComponent<WireLine>().CalMinDistToWire(pos, out nearstPos);
+		
+		float thisMinDist;
+		nearstPos = Vector3.zero;
+		Vector3 thisNearstPos = Vector3.zero;
+		float nearstDist = 1000f;
+		
+		for (int i = 0; i < coreWires.Count; ++i){
+			thisMinDist = coreWires[i].GetComponent<WireLine>().CalMinDistToWire(pos, out thisNearstPos);
+			if (thisMinDist < nearstDist){
+				nearstDist = thisMinDist;
+				nearstPos = thisNearstPos;
+			}
+		}
+		return nearstDist;
+			
 	}
 	
 	
@@ -114,6 +162,7 @@ public class Wire : MonoBehaviour {
 		foreach(Transform child in transform){
 			Destroy(child.gameObject);
 		}
+		coreWires.Clear();
 	}
 	
 	public void SwapEnds(){
@@ -123,6 +172,7 @@ public class Wire : MonoBehaviour {
 		foreach (GameObject junction in junctions){
 			junction.GetComponent<WireJunction>().propAlongWire = 1 - junction.GetComponent<WireJunction>().propAlongWire;
 		}
+		OrderJunctions();
 		UI.singleton.ValidateAttachedWire();
 	}
 	
@@ -309,22 +359,22 @@ public class Wire : MonoBehaviour {
 	
 
 	
-	GameObject ConstructCentralWire(){
-		GameObject wireLine =  GameObject.Instantiate(Factory.singleton.wireLinePrefab);
-		wireLine.transform.SetParent(transform);
-		wireLine.transform.localPosition = Vector3.zero;
+	void ConstructCentralWire(){
+		coreWires.Add(GameObject.Instantiate(Factory.singleton.wireLinePrefab));
+		coreWires[0].transform.SetParent(transform);
+		coreWires[0].transform.localPosition = Vector3.zero;
 		
-		WireLine line = wireLine.GetComponent<WireLine>();
+		WireLine line = coreWires[0].GetComponent<WireLine>();
 		
 		line.SetNewPoints(rawPaths[0].ToArray());
 		line.end0 = WireLine.EndType.kContinue;
 		line.end1 = WireLine.EndType.kContinue;
 //		line.ConstructMesh();
-		return wireLine;
+		
 	}
 	
 	void UpdateCentralWire(){
-		currentWire.GetComponent<WireLine>().SetNewPoints(rawPaths[0].ToArray());
+		coreWires[0].GetComponent<WireLine>().SetNewPoints(rawPaths[0].ToArray());
 	
 	}
 	
@@ -390,14 +440,15 @@ public class Wire : MonoBehaviour {
 			if (simNodeIndex >= 0){
 				float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
 				Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
-				currentWire.GetComponent<WireLine>().wireColor = wireCol;
+				coreWires[0].GetComponent<WireLine>().wireColor = wireCol;
 			}
 			if (simEdgeId >= 0){
-				currentWire.GetComponent<WireLine>().SetSpeed(GetSimFwCurrent());
+				coreWires[0].GetComponent<WireLine>().SetSpeed(GetSimFwCurrent());
 			}
 		}
 		
 	}
+	
 	
 	// Update is called once per frame
 	void FixedUpdate () {

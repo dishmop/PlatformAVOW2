@@ -329,7 +329,7 @@ public class ElectricalComponent : MonoBehaviour {
 						if (type == Type.kJunction){
 							GameObject parentWire = GetComponent<WireJunction>().parentWire;
 							
-							parentWire.GetComponent<Wire>().junctions.Remove (gameObject);
+							parentWire.GetComponent<Wire>().RemoveJunction(gameObject);
 							
 							/// Attach the UI wire to the cursor
 							UI.singleton.attachedWire.GetComponent<Wire>().ends[1].component = UI.singleton.cursorTransform.gameObject;

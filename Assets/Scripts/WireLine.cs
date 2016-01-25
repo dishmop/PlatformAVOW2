@@ -277,6 +277,7 @@ public class WireLine : MonoBehaviour {
 		points = tempList.ToArray();
 	
 	}
+
 	
 	void CalcArraySizes(){
 		// Set up number of elements in each array for the mesh
