@@ -16,6 +16,7 @@ public class Wire : MonoBehaviour {
 	public bool markedForDeletion = false;
 	public bool autoUpdateWires = true;
 	public bool enableHandleInput = true;
+	public int 	simEdgeId = -1;
 	
 	public EndData[] ends = new EndData[2];
 	
@@ -36,6 +37,12 @@ public class Wire : MonoBehaviour {
 	// Debug (should be local)
 	float distAlong;
 	
+	public float GetSimFwCurrent(){
+		if (simEdgeId >= 0){
+			return CircuitSimulator.singleton.GetEdge(simEdgeId).resFwCurrent;
+		}
+		return 0;
+	}	
 	
 	
 	void ReconstructUsePaths(){
@@ -384,6 +391,9 @@ public class Wire : MonoBehaviour {
 				float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
 				Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
 				currentWire.GetComponent<WireLine>().wireColor = wireCol;
+			}
+			if (simEdgeId >= 0){
+				currentWire.GetComponent<WireLine>().SetSpeed(GetSimFwCurrent());
 			}
 		}
 		

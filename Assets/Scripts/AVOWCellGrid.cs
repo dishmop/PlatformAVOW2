@@ -258,6 +258,8 @@ public class AVOWCellGrid : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 	
+		if (CircuitSimulator.singleton == null || CircuitSimulator.singleton.batteryEdge == null) return;
+	
 		// Count how many blocks there are to make
 		int count = 0;
 		foreach (var edge in CircuitSimulator.singleton.allEdges){

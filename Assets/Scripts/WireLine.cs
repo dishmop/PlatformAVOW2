@@ -14,10 +14,10 @@ public class WireLine : MonoBehaviour {
 	public EndType end0;
 	public EndType end1;
 	
-	public Color 	caseColor;
-	public float 	caseIntensity;
 	public Color	wireColor;
 	public float 	wireIntensity;
+	public float	speed;
+	public float	offset;
 	
 	
 	public Vector3[] points;
@@ -25,11 +25,12 @@ public class WireLine : MonoBehaviour {
 	
 	// For internal storage of vertex data
 	
+	int numTrisInCorner = 20;
+	
 	// Useful numbers
 	int numCorePoints;
 	int numCoreLines;
 	int numJunctions;
-	int numCaps;
 	int numVertices;
 	int numUVs;
 	int numTris;
@@ -48,7 +49,23 @@ public class WireLine : MonoBehaviour {
 		pointsDirtyFlag = true;
 	}
 	
-	public bool IsPointInside(Vector3 point, out float distAlong){
+	// Sets the speed up and and adjusts the offset
+	// so there is not a big jump
+	public void SetSpeed(float newSpeed){
+		if (MathUtils.FP.Feq (newSpeed, speed)){
+			speed = newSpeed;
+			return;
+		}
+		
+		float distToMove = offset - Time.timeSinceLevelLoad * speed;
+
+		
+		// Now we want to figure out a new offset in order that the new speed starts with the same internal offset
+		offset = distToMove +  Time.timeSinceLevelLoad * newSpeed;
+		speed = newSpeed;
+	}
+	
+	public bool IsPointInsideOld(Vector3 point, out float distAlong){
 	
 		if (pointsDirtyFlag){
 			ConstructMesh();
@@ -57,6 +74,8 @@ public class WireLine : MonoBehaviour {
 		// Every set of 4 vertices is an axis aligned quad
 		// I.e. mega trivial to determin if we are inside
 		distAlong = 0;
+		
+		// It alternates betweem straight section and corner
 		
 		for (int i = 0; i < numVertices; i += 4){
 			Vector3 rootPos = transform.TransformPoint(newVertices[i]);
@@ -98,6 +117,60 @@ public class WireLine : MonoBehaviour {
 		return false;
 	
 	}
+	
+	
+	public bool IsPointInside(Vector3 point, out float distAlong){
+		
+		if (pointsDirtyFlag){
+			ConstructMesh();
+		}
+		
+		// Every set of 4 vertices is an axis aligned quad
+		// I.e. mega trivial to determin if we are inside
+		distAlong = 0;
+		float cumDistAlong = 0;
+		
+		point.z = transform.TransformPoint(points[0]).z;
+		// Every set of 4 vertices is an axis aligned quad
+		float nearestDist = 100000f;
+		for (int i = 0; i < points.Length - 1; ++i){
+			// Do one line segment at a time
+			Vector3 startPos = transform.TransformPoint(points[i]);
+			Vector3 endPos = transform.TransformPoint(points[i+1]);
+			
+			// first get the nearest point to pos on the line
+			Vector3 startToEnd = endPos - startPos;
+			
+			
+			float lambda = Vector3.Dot((point - startPos), startToEnd) / startToEnd.sqrMagnitude;
+			
+			Vector3 thisNearestPos;
+			if (lambda < 0){
+				thisNearestPos = startPos;
+			}
+			else if (lambda > 1){
+				thisNearestPos = endPos;
+			}
+			else{
+				thisNearestPos = startPos + lambda * startToEnd;
+			}
+			
+			// If we are outside the range, then easy just return the level ground
+			float thisDist = (thisNearestPos - point).magnitude;
+			
+			if (thisDist < nearestDist){
+				nearestDist= thisDist;
+				distAlong = cumDistAlong + (startPos - thisNearestPos).magnitude;
+			}
+			cumDistAlong += startToEnd.magnitude;
+			
+		}
+		
+		return nearestDist < width * 0.5f;
+		
+		
+	}		
+		
 	
 	public float CalMinDistToWire(Vector3 pos, out Vector3 nearestPos){
 		nearestPos = Vector2.zero;
@@ -210,12 +283,11 @@ public class WireLine : MonoBehaviour {
 		numCorePoints = points.Length;
 		numCoreLines = numCorePoints - 1;
 		numJunctions = numCoreLines - 1;
-		numCaps = 2;
 		
-		// Four points for each line segment and then 4 points at the junction to complete the corner square
-		numVertices = 4 * (numCaps + numCoreLines + numJunctions);
+		// Four points for each line segmen8t and then 6 points at the junction to complete the corner square
+		numVertices = 4 * numCoreLines + numTrisInCorner * 3 * numJunctions;
 		numUVs = numVertices;
-		numTris = 2 * (numCaps + numCoreLines + numJunctions);
+		numTris = 2 * numCoreLines + numTrisInCorner * numJunctions;
 		numTriIndices = 3 * numTris;
 	}
 	
@@ -231,6 +303,9 @@ public class WireLine : MonoBehaviour {
 		int vertexIndex = 0;
 		int uvIndex = 0;
 		int triIndex = 0;
+		
+		float startLen = 0;
+		float endLen= -1;
 				
 		for (int i = 0; i < points.Length-1; ++i){
 		
@@ -240,55 +315,20 @@ public class WireLine : MonoBehaviour {
 			
 			Vector3 lenVec = 0.5f * width * (point1 - point0).normalized;
 			
-			// Adjust the end positions in byb half  awidth
-			point0 += lenVec;
-			point1 -= lenVec;
+			// Adjust the end positions in byb half a width if not an end point
+			if (i != 0){
+				point0 += lenVec;
+			}
+			else{
+			}
+			if (i != points.Length-2){
+				point1 -= lenVec;
+			}
+			endLen = startLen +  (point0 - point1).magnitude * 0.25f / width;
+			
 			
 			// half-width Vector perpendicular to core line
 			Vector3 sideVec =  0.5f * width * Vector3.Cross(point1 - point0, new Vector3(0, 0, 1)).normalized;
-			
-			// If this is the first point, then do an initial cap (of half a width in side)
-			if (i == 0){
-				int firstCapVertexIndex = vertexIndex;
-				
-				Vector3 phantomPoint = point0 - lenVec;
-				
-				// The quad
-				newVertices[vertexIndex++] = phantomPoint - sideVec;
-				newVertices[vertexIndex++] = phantomPoint + sideVec;
-				newVertices[vertexIndex++] = point0 - sideVec;
-				newVertices[vertexIndex++] = point0 + sideVec;
-				
-				// Just use the thin band accross the middle of the texture
-				switch (end0){
-					case EndType.kContinue:{
-						newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-						newUV[uvIndex++] = new Vector2(1, 0.5f);
-						newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-						newUV[uvIndex++] = new Vector2(1, 0.5f);
-						break;
-					}
-					case EndType.kEnd:{
-						newUV[uvIndex++] = new Vector2(0.5f, 0.75f);
-					newUV[uvIndex++] = new Vector2(1, 0.75f);
-						newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-						newUV[uvIndex++] = new Vector2(1, 0.5f);
-						break;
-					}
-				}
-
-				
-				// Tri 0
-				newTriangles[triIndex++] = firstCapVertexIndex + 0;
-				newTriangles[triIndex++] = firstCapVertexIndex + 3;
-				newTriangles[triIndex++] = firstCapVertexIndex + 1;
-				
-				// Tri 1
-				newTriangles[triIndex++] = firstCapVertexIndex + 0;
-				newTriangles[triIndex++] = firstCapVertexIndex + 2;
-				newTriangles[triIndex++] = firstCapVertexIndex + 3;
-			}
-			
 			int firstVertexIndex = vertexIndex;
 			
 			// The quad
@@ -298,10 +338,10 @@ public class WireLine : MonoBehaviour {
 			newVertices[vertexIndex++] = point1 + sideVec;
 			
 			// Just use the thin band accross the middle of the texture
-			newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-			newUV[uvIndex++] = new Vector2(1, 0.5f);
-			newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-			newUV[uvIndex++] = new Vector2(1, 0.5f);
+			newUV[uvIndex++] = new Vector2(0f, startLen);
+			newUV[uvIndex++] = new Vector2(0.25f, startLen);
+			newUV[uvIndex++] = new Vector2(0f, endLen);
+			newUV[uvIndex++] = new Vector2(0.25f, endLen);
 			
 			// Tri 0
 			newTriangles[triIndex++] = firstVertexIndex + 0;
@@ -313,89 +353,79 @@ public class WireLine : MonoBehaviour {
 			newTriangles[triIndex++] = firstVertexIndex + 2;
 			newTriangles[triIndex++] = firstVertexIndex + 3;
 			
+			startLen = endLen;
+			
 			// If point1 is NOT the last one - then making a joining quad
 			if (i+1 != points.Length-1){
-				int firstJoinVertexIndex = vertexIndex;
+			
 				
-				Vector3 phantomPoint = point1 + 2f * lenVec;
+				int firstJoinVertexIndex = vertexIndex;
+			
+				// Length of this curved semgent
+				float segmentLen = 0.5f * Mathf.PI * sideVec.magnitude;
+				
+				endLen = startLen +  segmentLen * 0.25f / width;
 				
 				// The quad
-				newVertices[vertexIndex++] = point1 - sideVec;
-				newVertices[vertexIndex++] = point1 + sideVec;
-				newVertices[vertexIndex++] = phantomPoint - sideVec;
-				newVertices[vertexIndex++] = phantomPoint + sideVec;
+
 				
 				// Figure out if we are turning clockwise of anticlockwise
 				Vector3 point2 = points[i + 2];
 				float turnRes = Vector3.Dot(point2 - point1, sideVec);
-				// If going in the same direction as side
+				
+				
+				// If going clockwise
 				if (turnRes > 0){
-					newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-					newUV[uvIndex++] = new Vector2(1, 0.5f);
-					newUV[uvIndex++] = new Vector2(0.5f, 0);
-					newUV[uvIndex++] = new Vector2(1, 0);
+										
+					for (int j = 0; j < numTrisInCorner; ++j){
+						float ang0 = j * Mathf.PI * 0.5f / numTrisInCorner;
+						float ang1 = (j + 1) * Mathf.PI * 0.5f / numTrisInCorner;
+						Vector3 centre = point1 + sideVec;
+						
+						
+						newVertices[vertexIndex++] = centre;
+						newVertices[vertexIndex++] = centre + 2 * lenVec * Mathf.Sin(ang0) - 2 * sideVec * Mathf.Cos (ang0);
+						newVertices[vertexIndex++] = centre + 2 * lenVec * Mathf.Sin(ang1) - 2 * sideVec * Mathf.Cos (ang1);
+						
+						newUV[uvIndex++] = new Vector2(0.25f, Mathf.Lerp(startLen, endLen, ang0 / (Mathf.PI * 0.5f)));
+						newUV[uvIndex++] = new Vector2(0f, Mathf.Lerp(startLen, endLen, ang1 / (Mathf.PI * 0.5f)));
+						newUV[uvIndex++] = new Vector2(0f, Mathf.Lerp(startLen, endLen, ang1 / (Mathf.PI * 0.5f)));
+					}
+					
+				
+					
+//					newUV[uvIndex++] = new Vector2(1, 0.5f);
+//					newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
+//					newUV[uvIndex++] = new Vector2(1, 0);
+//					newUV[uvIndex++] = new Vector2(0.5f, 0);
 				}
 				else{
-					newUV[uvIndex++] = new Vector2(1, 0.5f);
-					newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-					newUV[uvIndex++] = new Vector2(1, 0);
-					newUV[uvIndex++] = new Vector2(0.5f, 0);
+					for (int j = 0; j < numTrisInCorner; ++j){
+						float ang0 = j * Mathf.PI * 0.5f / numTrisInCorner;
+						float ang1 = (j + 1) * Mathf.PI * 0.5f / numTrisInCorner;
+						Vector3 centre = point1 - sideVec;
+						
+						
+						newVertices[vertexIndex++] = centre;
+						newVertices[vertexIndex++] = centre + 2 * lenVec * Mathf.Sin(ang0) + 2 * sideVec * Mathf.Cos (ang0);
+						newVertices[vertexIndex++] = centre + 2 * lenVec * Mathf.Sin(ang1) + 2 * sideVec * Mathf.Cos (ang1);
+						
+						newUV[uvIndex++] = new Vector2(0.25f, Mathf.Lerp(startLen, endLen, ang0 / (Mathf.PI * 0.5f)));
+						newUV[uvIndex++] = new Vector2(0f, Mathf.Lerp(startLen, endLen, ang1 / (Mathf.PI * 0.5f)));
+						newUV[uvIndex++] = new Vector2(0f, Mathf.Lerp(startLen, endLen, ang1 / (Mathf.PI * 0.5f)));	
+					}
 				}
 				
 				
+				for (int j = 0; j < numTrisInCorner * 3; ++j){
+					newTriangles[triIndex++] = firstJoinVertexIndex++;
+				}
 				
-				// Tri 0
-				newTriangles[triIndex++] = firstJoinVertexIndex + 0;
-				newTriangles[triIndex++] = firstJoinVertexIndex + 3;
-				newTriangles[triIndex++] = firstJoinVertexIndex + 1;
-				
-				// Tri 1
-				newTriangles[triIndex++] = firstJoinVertexIndex + 0;
-				newTriangles[triIndex++] = firstJoinVertexIndex + 2;
-				newTriangles[triIndex++] = firstJoinVertexIndex + 3;
 			}
+			startLen = endLen;
+				
 			
-			// If this is the last point, then do an initial cap (of half a width in side)
-			if (i + 1 == points.Length - 1){
-				int firstCapVertexIndex = vertexIndex;
-				
-				Vector3 phantomPoint = point1 + lenVec;
-				
-				// The quad
-				newVertices[vertexIndex++] = point1 - sideVec;
-				newVertices[vertexIndex++] = point1 + sideVec;
-				newVertices[vertexIndex++] = phantomPoint - sideVec;
-				newVertices[vertexIndex++] = phantomPoint + sideVec;
-				
-				// Just use the thin band accross the middle of the texture
-				switch (end1){
-					case EndType.kContinue:{
-						newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-						newUV[uvIndex++] = new Vector2(1, 0.5f);
-						newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-						newUV[uvIndex++] = new Vector2(1, 0.5f);
-						break;
-					}
-					case EndType.kEnd:{
-						newUV[uvIndex++] = new Vector2(0.5f, 0.5f);
-						newUV[uvIndex++] = new Vector2(1, 0.5f);
-						newUV[uvIndex++] = new Vector2(0.5f, 0.75f);
-						newUV[uvIndex++] = new Vector2(1, 0.75f);
-						break;
-					}
-				}
-				
-				
-				// Tri 0
-				newTriangles[triIndex++] = firstCapVertexIndex + 0;
-				newTriangles[triIndex++] = firstCapVertexIndex + 3;
-				newTriangles[triIndex++] = firstCapVertexIndex + 1;
-				
-				// Tri 1
-				newTriangles[triIndex++] = firstCapVertexIndex + 0;
-				newTriangles[triIndex++] = firstCapVertexIndex + 2;
-				newTriangles[triIndex++] = firstCapVertexIndex + 3;
-			}
+			
 		}
 		
 		// Ensure all z values are the same as that of the WireLine itself
@@ -420,9 +450,9 @@ public class WireLine : MonoBehaviour {
 	
 	void SetupMaterials(){
 		GetComponent<MeshRenderer>().materials[0].SetFloat("_IntensityWire", wireIntensity);
-		GetComponent<MeshRenderer>().materials[0].SetFloat("_IntensityCase", caseIntensity);
 		GetComponent<MeshRenderer>().materials[0].SetColor("_ColorWire", wireColor);
-		GetComponent<MeshRenderer>().materials[0].SetColor("_ColorCase", caseColor);
+		GetComponent<MeshRenderer>().materials[0].SetFloat("_Speed", speed);
+		GetComponent<MeshRenderer>().materials[0].SetFloat("_Offset", offset);
 	}
 	
 

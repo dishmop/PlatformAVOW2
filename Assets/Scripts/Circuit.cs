@@ -99,6 +99,8 @@ public class Circuit : MonoBehaviour {
 	
 	
 	public void RemoveJunctionsJoining(GameObject wire){
+	
+		if (wire == null) return;
 
 		// Find wires that contain a child junction matching the end of this wire.	
 		foreach (GameObject testWire in wireGOs){
@@ -137,9 +139,11 @@ public class Circuit : MonoBehaviour {
 		// Error catching:
 		if (thisSpark.indices[0] < 0 || thisSpark.indices[0] >= thisSpark.electralCompoentGOs[0].GetComponent<ElectricalComponent>().simNodeIndices.Length){
 			Debug.Log("Indexing Error thisSpark.indices[0]: " + thisSpark.indices[0]);
+			return;
 		}
 		if (thisSpark.indices[1] < 0 || thisSpark.indices[1] >= thisSpark.electralCompoentGOs[1].GetComponent<ElectricalComponent>().simNodeIndices.Length){
 			Debug.Log("Indexing Error thisSpark.indices[1]: " + thisSpark.indices[1]);
+			return;
 		}
 		int simIndex0 = thisSpark.electralCompoentGOs[0].GetComponent<ElectricalComponent>().simNodeIndices[thisSpark.indices[0]];
 		int simIndex1 = thisSpark.electralCompoentGOs[1].GetComponent<ElectricalComponent>().simNodeIndices[thisSpark.indices[1]];
@@ -173,10 +177,10 @@ public class Circuit : MonoBehaviour {
 			
 			// Add the edge to the circuit sim
 			if (MathUtils.FP.Feq(wire.resistance, 0)){
-				sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex]);
+				nextComponent.simEdgeId = sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex]);
 			}
 			else{
-				sim.AddLoadEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex], wire.resistance, wire.ends[0].component.transform.position.x, CircuitSimulator.EdgeType.kBlue);
+				nextComponent.simEdgeId = sim.AddLoadEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex], wire.resistance, wire.ends[0].component.transform.position.x, CircuitSimulator.EdgeType.kBlue);
 			}
 			
 			// Set last to next
@@ -198,10 +202,10 @@ public class Circuit : MonoBehaviour {
 //		Debug.Log("lastIndex = " + lastIndex + ", endIndex = " + endIndex);
 
 		if (MathUtils.FP.Feq(wire.resistance, 0)){
-			sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex]);
+			wire.simEdgeId = sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex]);
 		}
 		else{
-			sim.AddLoadEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex], wire.resistance, wire.ends[0].component.transform.position.x, CircuitSimulator.EdgeType.kBlue);
+			wire.simEdgeId = sim.AddLoadEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex], wire.resistance, wire.ends[0].component.transform.position.x, CircuitSimulator.EdgeType.kBlue);
 		}
 		
 		

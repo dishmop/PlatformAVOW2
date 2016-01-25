@@ -8,9 +8,7 @@ public class WireRect : MonoBehaviour {
 	
 	
 	public Color 	caseColor;
-	public float 	caseIntensity;
 	public Color	wireColor;
-	public float 	wireIntensity;
 	
 	
 	// For internal storage of vertex data

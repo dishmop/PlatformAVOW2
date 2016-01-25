@@ -278,11 +278,13 @@ public class UI : MonoBehaviour {
 				lastSparkResistance = Mathf.Lerp(0, 10, nearestDist / sparkDist);
 				if (nearComponent != null){
 					
-					Circuit.singleton.EnableSpark(nearComponent, nearComponentIndex, attWire.ends[0].component, attWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
+					Circuit.singleton.EnableSpark(nearComponent, nearComponentIndex, 
+					attWire.ends[1].component, attWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
 				}
 				else{
 					Wire nearWireWire = nearWire.GetComponent<Wire>();
-					Circuit.singleton.EnableSpark(nearWireWire.ends[1].component, nearWireWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(nearWire), attWire.ends[0].component, attWire.ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
+					Circuit.singleton.EnableSpark(nearWireWire.ends[1].component, nearWireWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(nearWire), 
+					attWire.ends[1].component, attWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
 				}
 				
 			}	
@@ -316,12 +318,12 @@ public class UI : MonoBehaviour {
 	}
 	
 	void OnGUI(){
-//		if (attachedWire != null){
-//			Wire wire = attachedWire.GetComponent<Wire>();
-//			ElectricalComponent component = wire.ends[1].component.GetComponent<ElectricalComponent>();
-//			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "attachedWire.end[1].simNodeID = " + component.simNodeIndices[component.GetConnectionDataIndex(attachedWire)]);
-//			
-//		}
+		if (attachedWire != null){
+			Wire wire = attachedWire.GetComponent<Wire>();
+			ElectricalComponent component = wire.ends[1].component.GetComponent<ElectricalComponent>();
+			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "attachedWire.end[1].simNodeID = " + component.simNodeIndices[component.GetConnectionDataIndex(attachedWire)]);
+			
+		}
 	}
 
 	
