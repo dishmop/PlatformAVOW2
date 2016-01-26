@@ -29,6 +29,9 @@ public class Wire : MonoBehaviour {
 	
 	List<Vector3>[] rawPaths = new List<Vector3>[2];
 	
+	// Used to actuall construct the wires
+	List<Vector3>[] finalPaths;
+	
 	// These split up the path into sections (with a different section between each junction
 //	List<List<Vector3>> usePaths = new List<List<Vector3>>();
 	
@@ -45,22 +48,28 @@ public class Wire : MonoBehaviour {
 	}	
 	
 	public void AddJunction(GameObject gameObject){
+		Debug.Log ("Adding Junction: " + gameObject.GetInstanceID().ToString());
 		junctions.Add(gameObject);
 		OnChangeJunctions();
-		OrderJunctions();
 	}
 	
 	public void RemoveJunction(GameObject gameObject){
+		Debug.Log ("Remove Junction: " + gameObject.GetInstanceID().ToString());
 		junctions.Remove(gameObject);
 		OnChangeJunctions();
-		OrderJunctions();
 	}
 	
-	void OrderJunctions(){
-		junctions.Sort((obj1, obj2)=>obj1.GetComponent<WireJunction>().propAlongWire.CompareTo(obj2.GetComponent<WireJunction>().propAlongWire));
+	void SetupFinalPathArray(){
+		finalPaths = new List<Vector3>[junctions.Count + 1];
+		for (int i = 0; i < finalPaths.Count(); ++i){
+			finalPaths[i] = new List<Vector3>();
+		}
 	}
 	
 	void OnChangeJunctions(){
+		SetupFinalPathArray();
+		junctions.Sort((obj1, obj2)=>obj1.GetComponent<WireJunction>().propAlongWire.CompareTo(obj2.GetComponent<WireJunction>().propAlongWire));
+			
 		ClearMesh();
 		ConstructMesh();
 		
@@ -115,7 +124,7 @@ public class Wire : MonoBehaviour {
 	
 	void ConstructMesh(){
 		SetupEnds();
-		SetupPath();
+		SetupPaths();
 		
 		ConstructCentralWire();
 	
@@ -159,20 +168,23 @@ public class Wire : MonoBehaviour {
 	
 	
 	public void ClearMesh(){
-		foreach(Transform child in transform){
-			Destroy(child.gameObject);
+//		Debug.Log ("ClearMesh");
+		
+		foreach(GameObject go in coreWires){
+			Destroy(go);
 		}
 		coreWires.Clear();
 	}
 	
 	public void SwapEnds(){
+//		Debug.Log ("Swap Ends");
 		EndData temp = ends[0];
 		ends[0] = ends[1];
 		ends[1] = temp;
 		foreach (GameObject junction in junctions){
 			junction.GetComponent<WireJunction>().propAlongWire = 1 - junction.GetComponent<WireJunction>().propAlongWire;
 		}
-		OrderJunctions();
+		OnChangeJunctions();
 		UI.singleton.ValidateAttachedWire();
 	}
 	
@@ -249,7 +261,7 @@ public class Wire : MonoBehaviour {
 	
 	
 	// Sets up the master path in paths[0]
-	void SetupPath(){
+	void SetupPaths(){
 		int[] workingDirs = new int[2];
 		
 		for (int i = 0; i < 2; ++i){
@@ -351,10 +363,66 @@ public class Wire : MonoBehaviour {
 			pathLength += segment.magnitude;
 		}
 		
+		// Now construct a new path for each segment based on where the junctions are
+		float pathDist = 0;
+		GameObject nextJunction = null;
+		int junctionIndex = 0;
+		if (junctionIndex < junctions.Count){
+			nextJunction = junctions[junctionIndex];
+		}
+		int lastTransferedPointIndex = 0;
+		int pathNum = 0;
+
 		
-		
-		
-	
+		for (int i = 0; i < rawPaths[0].Count-1; ++i){
+			Vector3 segment = rawPaths[0][i] - rawPaths[0][i+1];
+			
+			float propAlongWire = 1;
+			if (nextJunction != null){
+				propAlongWire = nextJunction.GetComponent<WireJunction>().propAlongWire;
+			}
+			// If we are exactly at the correct point, then put this whole segment in
+			if (MathUtils.FP.Feq(pathDist + segment.magnitude, pathLength * propAlongWire)){
+				for (int j = lastTransferedPointIndex; j < i; ++j){
+					finalPaths[pathNum].Add(rawPaths[0][j]);
+				}
+				pathNum++;
+				lastTransferedPointIndex = i+1;
+				junctionIndex++;
+				if (junctionIndex < junctions.Count){
+					nextJunction = junctions[junctionIndex];
+				}	
+				else{
+					nextJunction = null;
+				}
+				
+				
+			}
+			// Otherwise, if we are chopping the segment in half then just put the 
+			// first point in and continue counting from the next one
+			else if (pathDist + segment.magnitude > pathLength * propAlongWire){
+				for (int j = lastTransferedPointIndex; j < i+1; ++j){
+					if (j > rawPaths[0].Count()-1 || pathNum > finalPaths.Count () - 1){
+						Debug.Log ("Error");
+					}
+					finalPaths[pathNum].Add(rawPaths[0][j]);
+				}
+				// We also add the junction point
+				finalPaths[pathNum].Add(nextJunction.transform.position);
+				
+				pathNum++;
+				lastTransferedPointIndex = i;
+				junctionIndex++;
+				if (junctionIndex < junctions.Count){
+					nextJunction = junctions[junctionIndex];
+				}				
+				else{
+					nextJunction = null;
+				}
+			}
+			pathDist += segment.magnitude;
+		}			
+			
 	}
 	
 
@@ -381,6 +449,7 @@ public class Wire : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		SetupFinalPathArray();
 		ConstructMesh();
 	
 	}
@@ -453,7 +522,7 @@ public class Wire : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		SetupEnds();
-		SetupPath();
+		SetupPaths();
 		UpdateCentralWire();
 		resistance = Mathf.Max (0, resistance - 0.1f);
 			

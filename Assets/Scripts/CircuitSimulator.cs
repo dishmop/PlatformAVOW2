@@ -306,7 +306,11 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	
 	public CircuitSimulator.Edge GetEdge(int id){
-		return allEdges.Find(obj=>obj.id == id);
+		CircuitSimulator.Edge edge = allEdges.Find(obj=>obj.id == id);
+		if (edge == null){
+			Debug.Log ("GetEdge (" + id + "): Edge Not found");
+		}
+		return edge;
 	}
 	
 	
@@ -408,6 +412,7 @@ public class CircuitSimulator : MonoBehaviour {
 		newEdge.nodeIndices[1] = allNodes[node1Id].edges.Count - 1;
 		
 		allEdges.Add (newEdge);
+//		Debug.Log ("Edge Added to Sim: " + newEdge.id);
 
 				
 		return id;

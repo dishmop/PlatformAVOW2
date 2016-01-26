@@ -158,6 +158,24 @@ public class Circuit : MonoBehaviour {
 		
 	
 		Wire wire = wireGO.GetComponent<Wire>();
+//		
+//		if (wire == null || wire.junctions == null){
+//			Debug.Log ("Error wire or wire.junction is null");
+//		}
+//		
+//		foreach (GameObject go in wire.junctions){
+//			if (go == null){
+//				Debug.Log ("Error go is null");
+//			}
+//			
+//		}
+//		
+//		if (wire.simEdgeId == 8){
+//			for (int i = 0 ; i < wire.junctions.Count(); ++i){
+//				Debug.Log ("[" + i + "] - Junction: " + ((wire.junctions[i] == null) ? "null" : wire.junctions[i].GetInstanceID().ToString()));
+//			}
+//		}
+		
 		
 		
 		// Get an ordered list of the junctions in the wire
@@ -242,6 +260,7 @@ public class Circuit : MonoBehaviour {
 		
 		// Add all voltage sources - need to do this first due to way loops are found
 		// assumes our first node is attached to the circuit
+//		Debug.Log ("---");
 		foreach (GameObject componentGO in electricalComponentGOs){
 			ElectricalComponent component = componentGO.GetComponent<ElectricalComponent>();
 			if (component.type == ElectricalComponent.Type.kVoltageSource){

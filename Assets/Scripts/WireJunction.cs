@@ -14,6 +14,8 @@ public class WireJunction : MonoBehaviour {
 		transform.SetParent(parentWire.transform);
 		UI.singleton.ValidateAttachedWire();
 		
+		Debug.Log ("AddSelfToParent: " + gameObject.GetInstanceID());
+		
 		
 	}
 	
