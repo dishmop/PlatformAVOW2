@@ -85,7 +85,7 @@
 		        	float4 colRight = 	CalcCol(right, i.uv[1]);
 		        	float4 colTop =		CalcCol(top, i.uv[1]);
 		        	float4 colBottom = 	CalcCol(bottom, i.uv[1]);
-		        	float4 colDiag = 	CalcCol(diag, i.uv[1]);
+		        	float4 colDiag = 	0 * CalcCol(diag, i.uv[1]);
 		        	
 		        	return _Intensity * (colLeft + colRight +  colTop + colBottom + colDiag);
 		        	

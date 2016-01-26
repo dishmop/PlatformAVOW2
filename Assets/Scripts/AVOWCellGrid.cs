@@ -8,9 +8,9 @@ using System.Collections.Generic;
 public class AVOWCellGrid : MonoBehaviour {
 	public GameObject background;
 	public GameObject bubblePrefab;
-	Color lightCol = new Color (0.85f, 0.85f, 0.85f);
-	Color mainCol = new Color (0.35f, 0.35f, 0.35f);
-	Color darkCol = new Color (0f, 0f, 0f);
+	public Color lightCol = new Color (0.85f, 0.85f, 0.85f);
+	public Color mainCol = new Color (0.35f, 0.35f, 0.35f);
+	public Color darkCol = new Color (0f, 0f, 0f);
 	
 	public float voltage = 1;
 	public float current = 1;

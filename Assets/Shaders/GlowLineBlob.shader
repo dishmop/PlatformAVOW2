@@ -9,7 +9,7 @@
         
         SubShader {
         		ZTest On
-            	//Blend SrcAlpha One // additive blending
+            //	Blend SrcAlpha One // additive blending
             	Cull Off
 			Tags {"Queue"="Transparent"}
 			

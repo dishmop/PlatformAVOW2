@@ -40,7 +40,7 @@ public class Wire : MonoBehaviour {
 	// Debug (should be local)
 	float distAlong;
 	
-	public float GetSimFwCurrent(){
+	public float GetSimFwCurrentOld(){
 		if (simEdgeId >= 0){
 			return CircuitSimulator.singleton.GetEdge(simEdgeId).resFwCurrent;
 		}
@@ -506,7 +506,6 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void UpdateCentralWire(){
-//		coreWires[0].GetComponent<WireLine>().SetNewPoints(rawPaths[0].ToArray());
 		
 		for (int i = 0; i < finalPaths.Count (); ++i){
 			coreWires[i].GetComponent<WireLine>().SetNewPoints(finalPaths[i].ToArray());
@@ -577,12 +576,30 @@ public class Wire : MonoBehaviour {
 			if (simNodeIndex >= 0){
 				float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
 				Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
-				coreWires[0].GetComponent<WireLine>().wireColor = wireCol;
-			}
-			if (simEdgeId >= 0){
-				coreWires[0].GetComponent<WireLine>().SetSpeed(GetSimFwCurrent());
+				foreach (GameObject go in coreWires){
+					go.GetComponent<WireLine>().wireColor = wireCol;
+				}
+				
 			}
 		}
+		int wireIndex = 0;
+		for (int i = 0; i < junctions.Count(); ++i){
+			int edgeId = junctions[i].GetComponent<ElectricalComponent>().simEdgeId;
+			CircuitSimulator.Edge edge = CircuitSimulator.singleton.GetEdge(edgeId);
+			
+			if (edge != null){
+				float current = edge.resFwCurrent;
+				coreWires[wireIndex++].GetComponent<WireLine>().SetSpeed(current);
+			}
+		}		
+		if (simEdgeId >= 0){
+			CircuitSimulator.Edge edge = CircuitSimulator.singleton.GetEdge(simEdgeId);
+			if (edge != null){
+				float current = edge.resFwCurrent;
+				coreWires[wireIndex].GetComponent<WireLine>().SetSpeed(current);
+			}
+		}
+		
 		
 	}
 	
