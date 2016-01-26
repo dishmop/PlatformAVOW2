@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class WireLine : MonoBehaviour {
 
@@ -19,6 +20,7 @@ public class WireLine : MonoBehaviour {
 	public float	speed;
 	public float	offset;
 	
+	public float wireLength;
 	
 	public Vector3[] points;
 	
@@ -63,59 +65,6 @@ public class WireLine : MonoBehaviour {
 		// Now we want to figure out a new offset in order that the new speed starts with the same internal offset
 		offset = distToMove +  Time.timeSinceLevelLoad * newSpeed;
 		speed = newSpeed;
-	}
-	
-	public bool IsPointInsideOld(Vector3 point, out float distAlong){
-	
-		if (pointsDirtyFlag){
-			ConstructMesh();
-		}
-	
-		// Every set of 4 vertices is an axis aligned quad
-		// I.e. mega trivial to determin if we are inside
-		distAlong = 0;
-		
-		// It alternates betweem straight section and corner
-		
-		for (int i = 0; i < numVertices; i += 4){
-			Vector3 rootPos = transform.TransformPoint(newVertices[i]);
-			Vector3 otherPos0 = transform.TransformPoint(newVertices[i+1]);
-			Vector3 otherPos1 = transform.TransformPoint(newVertices[i+2]);
-			
-			float minX = Mathf.Min (rootPos.x,  Mathf.Min (otherPos0.x, otherPos1.x));
-			float maxX = Mathf.Max (rootPos.x,  Mathf.Max (otherPos0.x, otherPos1.x));
-			float minY = Mathf.Min (rootPos.y,  Mathf.Min (otherPos0.y, otherPos1.y));
-			float maxY = Mathf.Max (rootPos.y,  Mathf.Max (otherPos0.y, otherPos1.y));
-			
-			if (point.x > minX && point.x < maxX && point.y > minY && point.y < maxY){
-				// If a mid segment (rather than an end or a coner)
-				if ((i/4) % 2 == 1){
-					// If horizontal segment
-					if (MathUtils.FP.Feq(rootPos.y, otherPos1.y)){
-						distAlong += Mathf.Abs (point.x  - rootPos.x);
-					}
-					// If vertical segment
-					else if (MathUtils.FP.Feq(rootPos.x, otherPos1.x)){
-						distAlong += Mathf.Abs (point.y  - rootPos.y);
-					}
-					else{
-						DebugUtils.Assert(false, "Not horizontal nor vertical");
-					}
-					    
-				}
-				else{
-					distAlong += 0.5f * (otherPos1 - rootPos).magnitude;
-					
-				}
-				return true;
-			}
-			else{
-				distAlong += (otherPos1 - rootPos).magnitude;
-				
-			}
-		}
-		return false;
-	
 	}
 	
 	
@@ -253,8 +202,13 @@ public class WireLine : MonoBehaviour {
 	
 	// Ensure it is all a series of horizontal and vertical lines
 	void SimplifyLine(){
+		wireLength = 0;
+		
 		// If no points then no simplification
-		if (points.Length == 0) return;
+		if (points.Length < 2){
+			Debug.Log("WireLine not enough points: " + GetInstanceID());
+			return;
+		}
 		
 		// Make a temporary list to store our simplified points and add the first one
 		List<Vector3> tempList = new List<Vector3>();
@@ -263,6 +217,8 @@ public class WireLine : MonoBehaviour {
 		// Now only add a new point if the direction changes - otherwise replace the last entry
 		int lastDir = Directions.kNull;
 		for (int i = 0; i < points.Length - 1; ++i){
+			wireLength += (points[i+1] - points[i]).magnitude;
+			
 			int thisDir = Directions.GetStrictDirection(points[i], points[i+1]);
 			if (thisDir != Directions.kNull){
 				if (thisDir != lastDir){
@@ -274,6 +230,11 @@ public class WireLine : MonoBehaviour {
 				lastDir = thisDir;
 			}
 		}
+		if (tempList.Count() < 2){
+			Debug.Log("WireLine not enough points: " + GetInstanceID());
+			return;
+		}
+		
 		points = tempList.ToArray();
 	
 	}
@@ -293,6 +254,9 @@ public class WireLine : MonoBehaviour {
 	}
 	
 	void ConstructArrays(){
+		if (numVertices < 3){
+			Debug.Log ("Not enough vertices");
+		}
 		// Set up the arrays themselves
 		newVertices = new Vector3[numVertices];
 		newUV = new Vector2[numUVs];

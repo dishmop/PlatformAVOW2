@@ -67,7 +67,6 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void OnChangeJunctions(){
-		SetupFinalPathArray();
 		junctions.Sort((obj1, obj2)=>obj1.GetComponent<WireJunction>().propAlongWire.CompareTo(obj2.GetComponent<WireJunction>().propAlongWire));
 			
 		ClearMesh();
@@ -126,23 +125,53 @@ public class Wire : MonoBehaviour {
 		SetupEnds();
 		SetupPaths();
 		
-		ConstructCentralWire();
+		ConstructCentralWires();
 	
 	}
 	
 	public bool IsPointInside(Vector3 point, out float distAlong){
-//		return coreWires[0].GetComponent<WireLine>().IsPointInside(point, out distAlong);
 		
-		float thisDistAlong;
+		// Every set of 4 vertices is an axis aligned quad
+		// I.e. mega trivial to determin if we are inside
 		distAlong = 0;
-		for (int i = 0; i < coreWires.Count; ++i){
-			bool isInside = coreWires[i].GetComponent<WireLine>().IsPointInside(point, out thisDistAlong);
-			distAlong += thisDistAlong;
-			if (isInside){
-				return true;
+		float cumDistAlong = 0;
+		
+		point.z = transform.TransformPoint(rawPaths[0][0]).z;
+		// Every set of 4 vertices is an axis aligned quad
+		float nearestDist = 100000f;
+		for (int i = 0; i < rawPaths[0].Count() - 1; ++i){
+			// Do one line segment at a time
+			Vector3 startPos = transform.TransformPoint(rawPaths[0][i]);
+			Vector3 endPos = transform.TransformPoint(rawPaths[0][i+1]);
+			
+			// first get the nearest point to pos on the line
+			Vector3 startToEnd = endPos - startPos;
+			
+			
+			float lambda = Vector3.Dot((point - startPos), startToEnd) / startToEnd.sqrMagnitude;
+			
+			Vector3 thisNearestPos;
+			if (lambda < 0){
+				thisNearestPos = startPos;
 			}
+			else if (lambda > 1){
+				thisNearestPos = endPos;
+			}
+			else{
+				thisNearestPos = startPos + lambda * startToEnd;
+			}
+			
+			// If we are outside the range, then easy just return the level ground
+			float thisDist = (thisNearestPos - point).magnitude;
+			
+			if (thisDist < nearestDist){
+				nearestDist= thisDist;
+				distAlong = cumDistAlong + (startPos - thisNearestPos).magnitude;
+			}
+			cumDistAlong += startToEnd.magnitude;
 		}
-		return false;
+		
+		return nearestDist < coreWires[0].GetComponent<WireLine>().width * 0.5f;			
 	}
 	
 	
@@ -262,6 +291,7 @@ public class Wire : MonoBehaviour {
 	
 	// Sets up the master path in paths[0]
 	void SetupPaths(){
+		SetupFinalPathArray();
 		int[] workingDirs = new int[2];
 		
 		for (int i = 0; i < 2; ++i){
@@ -363,6 +393,9 @@ public class Wire : MonoBehaviour {
 			pathLength += segment.magnitude;
 		}
 		
+		// Make a copy of the rawpath, because we are about to be destructive with it
+		rawPaths[1] = rawPaths[0].ToList();
+		
 		// Now construct a new path for each segment based on where the junctions are
 		float pathDist = 0;
 		GameObject nextJunction = null;
@@ -370,12 +403,14 @@ public class Wire : MonoBehaviour {
 		if (junctionIndex < junctions.Count){
 			nextJunction = junctions[junctionIndex];
 		}
-		int lastTransferedPointIndex = 0;
+		
+		int lastTransferedPointIndex = -1;
 		int pathNum = 0;
 
 		
 		for (int i = 0; i < rawPaths[0].Count-1; ++i){
-			Vector3 segment = rawPaths[0][i] - rawPaths[0][i+1];
+			Vector3 segment = rawPaths[0][i+1] - rawPaths[0][i];
+			if (MathUtils.FP.Feq (segment.magnitude, 0)) continue;
 			
 			float propAlongWire = 1;
 			if (nextJunction != null){
@@ -383,7 +418,7 @@ public class Wire : MonoBehaviour {
 			}
 			// If we are exactly at the correct point, then put this whole segment in
 			if (MathUtils.FP.Feq(pathDist + segment.magnitude, pathLength * propAlongWire)){
-				for (int j = lastTransferedPointIndex; j < i; ++j){
+				for (int j = lastTransferedPointIndex + 1; j <= i+1; ++j){
 					finalPaths[pathNum].Add(rawPaths[0][j]);
 				}
 				pathNum++;
@@ -395,23 +430,33 @@ public class Wire : MonoBehaviour {
 				else{
 					nextJunction = null;
 				}
+				pathDist += segment.magnitude;
+				
 				
 				
 			}
-			// Otherwise, if we are chopping the segment in half then just put the 
+			// Otherwise, if we are chopping the segment in half then put the 
 			// first point in and continue counting from the next one
 			else if (pathDist + segment.magnitude > pathLength * propAlongWire){
-				for (int j = lastTransferedPointIndex; j < i+1; ++j){
+				for (int j = lastTransferedPointIndex + 1; j <= i; ++j){
 					if (j > rawPaths[0].Count()-1 || pathNum > finalPaths.Count () - 1){
 						Debug.Log ("Error");
 					}
 					finalPaths[pathNum].Add(rawPaths[0][j]);
 				}
-				// We also add the junction point
-				finalPaths[pathNum].Add(nextJunction.transform.position);
+				// Calc the position of the junction (give that the object itself is
+				// probably not there
+				float propAlongSegment = (pathLength * propAlongWire - pathDist) / segment.magnitude;
+				Vector3 junctionPos = rawPaths[0][i] + propAlongSegment * segment;
+				Debug.DrawLine (Vector3.zero, transform.TransformPoint(junctionPos), Color.blue);
 				
+				
+				// We also add the junction point and move i back to the last point
+				finalPaths[pathNum].Add(junctionPos);
 				pathNum++;
-				lastTransferedPointIndex = i;
+				
+				
+				lastTransferedPointIndex = i-1;
 				junctionIndex++;
 				if (junctionIndex < junctions.Count){
 					nextJunction = junctions[junctionIndex];
@@ -419,37 +464,59 @@ public class Wire : MonoBehaviour {
 				else{
 					nextJunction = null;
 				}
+				rawPaths[0][i] = junctionPos;
+				i--;
+				
+				pathDist += segment.magnitude * propAlongSegment;
 			}
-			pathDist += segment.magnitude;
-		}			
+			else{
+				pathDist += segment.magnitude;
+				
+			}
+		}
+		
+		rawPaths[0] = rawPaths[1].ToList();
+		
 			
 	}
 	
 
 	
-	void ConstructCentralWire(){
-		coreWires.Add(GameObject.Instantiate(Factory.singleton.wireLinePrefab));
-		coreWires[0].transform.SetParent(transform);
-		coreWires[0].transform.localPosition = Vector3.zero;
-		
-		WireLine line = coreWires[0].GetComponent<WireLine>();
-		
-		line.SetNewPoints(rawPaths[0].ToArray());
-		line.end0 = WireLine.EndType.kContinue;
-		line.end1 = WireLine.EndType.kContinue;
+	void ConstructCentralWires(){
+//		if (finalPaths.Count () > 1){
+//			Debug.Log ("---");
+//		}
+		for (int i = 0; i < finalPaths.Count (); ++i){
+//			if (finalPaths.Count () > 1){
+//				Debug.Log ("wired simEdgeId = " + simEdgeId + " - wire no: " + i + " - count = " + finalPaths[i].Count());
+//			}
+			GameObject newWire = GameObject.Instantiate(Factory.singleton.wireLinePrefab);
+			coreWires.Add(newWire);
+			newWire.transform.SetParent(transform);
+			newWire.transform.localPosition = Vector3.zero;
+			
+			WireLine line = newWire.GetComponent<WireLine>();
+			
+			line.SetNewPoints(finalPaths[i].ToArray());
+			line.end0 = WireLine.EndType.kContinue;
+			line.end1 = WireLine.EndType.kContinue;
+		}
 //		line.ConstructMesh();
 		
 	}
 	
 	void UpdateCentralWire(){
-		coreWires[0].GetComponent<WireLine>().SetNewPoints(rawPaths[0].ToArray());
+//		coreWires[0].GetComponent<WireLine>().SetNewPoints(rawPaths[0].ToArray());
+		
+		for (int i = 0; i < finalPaths.Count (); ++i){
+			coreWires[i].GetComponent<WireLine>().SetNewPoints(finalPaths[i].ToArray());
+		}
 	
 	}
 	
 
 	// Use this for initialization
 	void Start () {
-		SetupFinalPathArray();
 		ConstructMesh();
 	
 	}
@@ -472,6 +539,7 @@ public class Wire : MonoBehaviour {
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 		distAlong = 0;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
+//			Debug.Log ("DistAlong = " + distAlong);
 			//currentWire.GetComponent<WireLine>().wireIntensity = 2;
 			float distUse = Mathf.Min (Mathf.Max (distAlong, 0.5f), pathLength-0.5f);
 			UI.singleton.RegisterWireSelect(gameObject, distUse / pathLength);
