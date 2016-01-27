@@ -74,10 +74,25 @@ public class ExitDoor : MonoBehaviour {
 	void Update(){
 	
 		if (avowGridGO != null){
+			float speed = 0;
+			float offset = 0;
+			
+			GameObject wire0GO = electricsGO.GetComponent<ElectricalComponent>().connectionData[0].wire;
+			if (wire0GO != null){
+				Wire wire0 = wire0GO.GetComponent<Wire>();
+				int wireEndIndex = wire0.ends[0].component == electricsGO ? 0 : 1;
+				
+				wire0.GetSpeedOffset(wireEndIndex, out speed, out offset);
+			}
+			
 			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
-				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent());
+				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent(),
+				speed,
+				offset
+				);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset);
 		}
 		
 	}

@@ -7,6 +7,12 @@ using System.IO;
 public class AVOWGrid : MonoBehaviour {
 	public GameObject background;
 	public GameObject bubble;
+	public GameObject bubbleTop;
+	public GameObject bubbleBottom;
+	
+	Color onMinCol = Color.blue;
+	Color offCol = Color.black;
+	
 	Color lightCol = new Color (0.85f, 0.85f, 0.85f);
 	Color mainCol = new Color (0.35f, 0.35f, 0.35f);
 	
@@ -21,9 +27,6 @@ public class AVOWGrid : MonoBehaviour {
 	
 	string savePath = "/Resources/Grids/";
 	string loadPath = "Grids/";
-	
-	
-	
 	
 	// Derived measurementes
 	float realSize;				// Width or height of full texture in world units
@@ -42,12 +45,16 @@ public class AVOWGrid : MonoBehaviour {
 	float maxAbsHeight = 0.00001f;
 	Texture2D gridDifffuse;
 	Texture2D gridNormal;
+	Texture2D gridGlow;
 	Color[] diffuseCols;
 	Color[] normalCols;
+	Color[] glowCols;
 	float[] heights;
 	float[] gradMags;
 	float[] grad2Mags;
 	Vector2[] grads;
+	
+	float thisCurrent = 0;
 	
 	float[,] sobelH = new float[3, 3]{ {-0.125f, -0.25f, -0.125f}, {0f, 0f, 0f}, {0.125f, 0.25f, 0.125f} };
 	float[,] sobelV = new float[3, 3]{ {-0.125f, 0f, 0.125f}, {-0.25f, 0f, 0.25f}, {-0.125f, 0f, 0.125f} };
@@ -100,7 +107,8 @@ public class AVOWGrid : MonoBehaviour {
 		}
 	}
 	
-	public void SetBubble(float minV, float maxV, float current){
+	public void SetBubble(float minV, float maxV, float current, float speed, float offset){
+		thisCurrent = current;
 		float voltageDiff = maxV - minV;
 		if (float.IsNaN(current) || float.IsNaN(voltageDiff)){
 			Debug.Log("Error NAN");
@@ -108,6 +116,12 @@ public class AVOWGrid : MonoBehaviour {
 		}
 		if (MathUtils.FP.Feq(current, 0) || MathUtils.FP.Feq(voltageDiff, 0)){
 			bubble.GetComponent<Renderer>().enabled = false;
+			if (bubbleTop != null){
+				bubbleTop.GetComponent<Renderer>().enabled = false;
+			}
+			if (bubbleBottom != null){
+				bubbleBottom.GetComponent<Renderer>().enabled = false;
+			}
 		}
 		else{
 			bubble.GetComponent<Renderer>().enabled = true;
@@ -115,6 +129,29 @@ public class AVOWGrid : MonoBehaviour {
 			bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
 			bubble.GetComponent<Renderer>().material.SetFloat("_blue", 0);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
+			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", (current < 0) ? 1 : 0);
+			
+			if (bubbleTop != null){
+				bubbleTop.GetComponent<Renderer>().enabled = true;
+				bubbleTop.transform.localScale = new Vector3(current, (maxVoltage-voltageDiff)/2, 1);
+				bubbleTop.transform.localPosition = new Vector3(0, maxVoltage - 0.5f * (maxVoltage-voltageDiff)/2-0.5f, 0);
+				bubbleTop.GetComponent<Renderer>().material.SetFloat("_v0", maxV);
+				bubbleTop.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
+				bubbleTop.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
+			}
+			
+			if (bubbleBottom != null){
+				bubbleBottom.GetComponent<Renderer>().enabled = true;
+				bubbleBottom.transform.localScale = new Vector3(current, -(maxVoltage-voltageDiff)/2, 1);
+				bubbleBottom.transform.localPosition = new Vector3(0, 0.5f * (maxVoltage-voltageDiff)/2-0.5f, 0);
+				bubbleBottom.GetComponent<Renderer>().material.SetFloat("_v0", minV);
+				bubbleBottom.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
+				bubbleBottom.GetComponent<Renderer>().material.SetFloat("_Offset", offset + 0.25f);
+			}
+			// Get it in sync with first terminal
+			
 		}
 	}
 	
@@ -156,6 +193,9 @@ public class AVOWGrid : MonoBehaviour {
 		return ConstructRawFilename() + "Normal.png";
 	}
 	
+	string ConstructGlowName(){
+		return ConstructRawFilename() + "Glow.png";
+	}
 	
 	void LoadOrCreateTextures(){
 		CalcTextureDimensions();
@@ -165,6 +205,7 @@ public class AVOWGrid : MonoBehaviour {
 		
 		string diffusePath = loadPath + ConstructDiffuseName();
 		string normalPath = loadPath + ConstructNormalName();
+		string glowPath = loadPath + ConstructGlowName();
 		// Debug.Log("LoadLevel: " + path);
 		TextAsset diffuseAsset = Resources.Load(diffusePath) as TextAsset;
 		if (diffuseAsset != null){
@@ -172,6 +213,8 @@ public class AVOWGrid : MonoBehaviour {
 			gridDifffuse.LoadImage(diffuseAsset.bytes);
 			TextAsset normalAsset = Resources.Load(normalPath) as TextAsset;
 			gridNormal.LoadImage(normalAsset.bytes);
+			TextAsset glowAsset = Resources.Load(glowPath) as TextAsset;
+			gridGlow.LoadImage(glowAsset.bytes);
 		}	
 		else{
 			Debug.Log ("Failed to load texture: " + ConstructDiffuseName());
@@ -189,7 +232,10 @@ public class AVOWGrid : MonoBehaviour {
 			normalFile.Write(normalBytes, 0, normalBytes.Length);
 			normalFile.Close();
 			
-			
+			FileStream glowFile = File.Create(Application.dataPath + savePath + ConstructGlowName() + ".bytes");
+			byte[] glowBytes = gridGlow.EncodeToPNG();
+			glowFile.Write(glowBytes, 0, glowBytes.Length);
+			glowFile.Close();			
 			
 			// Ensure the assets are all realoaded and the cache cleared.
 			UnityEditor.AssetDatabase.Refresh();
@@ -201,12 +247,6 @@ public class AVOWGrid : MonoBehaviour {
 		
 		
 	}
-	
-	public void SaveLevel(string filename){
-
-	}	
-	
-	
 		
 	
 	void CalcTextureDimensions(){
@@ -281,6 +321,15 @@ public class AVOWGrid : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+	
+		float useCurrent = (thisCurrent - minCurrent) / (maxCurrent - minCurrent);
+		Color useCol = onMinCol + new Color(Mathf.Pow(useCurrent, 2), useCurrent, 0);
+		if (MathUtils.FP.Fgeq(thisCurrent, minVoltage)){
+			background.GetComponent<Renderer>().material.SetColor("_EmissionColor", useCol);
+		}
+		else{
+			background.GetComponent<Renderer>().material.SetColor("_EmissionColor", offCol);
+		}
 
 		
 	
@@ -325,8 +374,8 @@ public class AVOWGrid : MonoBehaviour {
 		float maxProp = 0f;
 		DrawGridLines(1, maxProp, boxRadius);
 		DrawGridLines(0.5f, maxProp*0.5f, intAxisRadius);
-		DrawGridLines(0.25f, maxProp*0.25f, intAxisRadius * 0.5f);
-		DrawGridLines(0.125f, maxProp*0.125f, intAxisRadius * 0.25f);
+		DrawGridLines(0.25f, maxProp*0.25f, intAxisRadius * 0.75f);
+	//	DrawGridLines(0.125f, maxProp*0.125f, intAxisRadius * 0.25f);
 		
 		// Do minimum voltage - if we have one
 		if (!MathUtils.FP.Feq(minVoltage, 0)){
@@ -382,13 +431,14 @@ public class AVOWGrid : MonoBehaviour {
 	void CreateTextures(){
 		gridDifffuse  = new Texture2D(textSize, textSize, TextureFormat.ARGB32, true);
 		gridNormal = new Texture2D(textSize, textSize, TextureFormat.ARGB32, true);
-		
+		gridGlow = new Texture2D(textSize, textSize, TextureFormat.ARGB32, true);
 	}
 	
 	void CreateTextureData(){
 		
 		diffuseCols = new Color[textSize * textSize];
 		normalCols = new Color[textSize * textSize];
+		glowCols = new Color[textSize * textSize];
 		heights = new float[textSize * textSize];
 		gradMags = new float[textSize * textSize];
 		grad2Mags = new float[textSize * textSize];
@@ -396,12 +446,11 @@ public class AVOWGrid : MonoBehaviour {
 	
 	void FillTextures(){
 	
-		Color initCol = new Color(0.5f, 0.5f, 0.5f, 1);
-	
 		for (int i = 0; i < textSize * textSize; ++i){
-			diffuseCols[i] = initCol;
+			diffuseCols[i] = new Color(0.5f, 0.5f, 0.5f, 1);
 			normalCols[i] = new Color(0f, 0f, 0f, 0f);
 			heights[i] = 0;
+			glowCols[i] = new Color(0f, 0f, 0f, 0f);
 			
 		}
 	}
@@ -412,12 +461,16 @@ public class AVOWGrid : MonoBehaviour {
 		
 		gridNormal.SetPixels(normalCols);
 		gridNormal.Apply();
+		
+		gridGlow.SetPixels(glowCols);
+		gridGlow.Apply();		
 	}
 	
 	void AssignTexturesToMaterial(){
 		Material gridMat = background.GetComponent<MeshRenderer>().material;
 		gridMat.SetTexture("_MainTex", gridDifffuse);
 		gridMat.SetTexture("_BumpMap", gridNormal);
+		gridMat.SetTexture("_EmissionMap", gridGlow);
 		
 	}
 	
@@ -509,16 +562,14 @@ public class AVOWGrid : MonoBehaviour {
 			for (int x = 0; x < textSize; ++x){
 				Vector3 normal = CalcGradAtCoord(x, y);
 
-			//	grad2Mags[i] = Mathf.Clamp(CalcFilterResult(x, y, heights,sobel2H) * textSize / realSize, -0.5f, 0.5f);
 				grad2Mags[i] = CalcFilterResult(x, y, heights,sobel2H) * textSize / realSize;
 				
-
-
-	// This needs a different layout if on mobile!
-				normalCols[i] = new Color(0, 
-				                          0.5f + normal.y * 0.5f, 
-				                          0, 
-				                          0.5f + normal.x * 0.5f);
+				// This needs a different layout if on mobile!
+				normalCols[i] = new Color(
+					0, 
+					0.5f + normal.y * 0.5f, 
+					0, 
+					0.5f + normal.x * 0.5f);
 				++i;
 				
 			}
@@ -545,7 +596,8 @@ public class AVOWGrid : MonoBehaviour {
 				else{
 					diffuseCols[i] = Color.Lerp(mainCol, lightCol, grad2Mags[i]);
 				}
-//				
+				glowCols[i] = Color.Lerp(Color.black, Color.white, -3 * grad2Mags[i]);
+				//				
 //				diffuseCols[i] = new Color(0.5f + grad2Mags[i] * 0.5f, 
 //				                           0.5f + grad2Mags[i] * 0.5f, 
 //				                           0.5f + grad2Mags[i] * 0.5f, 

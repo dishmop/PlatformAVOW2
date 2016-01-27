@@ -274,8 +274,9 @@ public class UI : MonoBehaviour {
 			}
 			Wire attWire = attachedWire.GetComponent<Wire>();
 			if (nearestDist < sparkDist && attWire.ends[1].component == cursorTransform.gameObject){
+				float maxSparkResistance = 10;
+				lastSparkResistance = Mathf.Lerp(0, maxSparkResistance, nearestDist / sparkDist);
 				lighteningGO.GetComponent<LighteningSetup>().EnableLightening(nearestPos, wirePos);
-				lastSparkResistance = Mathf.Lerp(0, 10, nearestDist / sparkDist);
 				if (nearComponent != null){
 					
 					Circuit.singleton.EnableSpark(nearComponent, nearComponentIndex, 
@@ -286,7 +287,6 @@ public class UI : MonoBehaviour {
 					Circuit.singleton.EnableSpark(nearWireWire.ends[1].component, nearWireWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(nearWire), 
 					attWire.ends[1].component, attWire.ends[1].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire), lastSparkResistance);
 				}
-				
 			}	
 			else{
 				lighteningGO.GetComponent<LighteningSetup>().DisableLightening();

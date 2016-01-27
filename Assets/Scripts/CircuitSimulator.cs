@@ -8,6 +8,8 @@ using System.Linq;
 public class CircuitSimulator : MonoBehaviour {
 	public static CircuitSimulator singleton = null;
 	
+	public Dictionary<int, Eppy.Tuple<float, float>> bubblePulseLookup = new Dictionary<int, Eppy.Tuple<float, float>>();
+	
 	public class LoopRecord{
 		public LoopRecord(int loopId, int fromNodeIndex){
 			this.loopId = loopId;
@@ -129,12 +131,35 @@ public class CircuitSimulator : MonoBehaviour {
 	// Current solving	
 	double epsilon = 0.0001;
 	float[] loopCurrents;
+	
+	public void RegisterPulseEdge(int simEdgeId, float speed, float offset){
+		if (!bubblePulseLookup.ContainsKey(simEdgeId)){
+			bubblePulseLookup.Add(simEdgeId, new Eppy.Tuple<float, float>(speed, offset));
+		}
+		else{
+			bubblePulseLookup[simEdgeId] = new Eppy.Tuple<float, float>(speed, offset);
+			
+		}
+	}
+	
+	public  void LookupPulseEdge(int simEdgeId, out float speed, out float offset){
+		if (!bubblePulseLookup.ContainsKey(simEdgeId)){
+			speed = 0;
+			offset = 0;
+		}
+		else{
+			Eppy.Tuple<float, float> result = bubblePulseLookup[simEdgeId];
+			speed = result.Item1;
+			offset = result.Item2;
+		}
+	}
 
 
 	public void ClearCircuit(){
 		allNodes.Clear();
 		allEdges.Clear();
 	}
+	
 	
 	// Setup in and out nodes on each edge.
 	// Also mark any eges and nodes which are in the same clique as the battery.

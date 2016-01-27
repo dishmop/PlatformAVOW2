@@ -25,6 +25,7 @@ public class LighteningSetup : MonoBehaviour {
 	void Update () {
 		Lightening lightening = GetComponent<Lightening>();
 		if (isOn){
+			float size = 4f * Circuit.singleton.GetSparkCurrent();
 			Vector3 fromHereToThere = pos1 - pos2;
 			fromHereToThere.Normalize();
 			
@@ -33,9 +34,9 @@ public class LighteningSetup : MonoBehaviour {
 			
 			float len = (lightening.startPoint  - lightening.endPoint).magnitude;
 			lightening.numStages = Mathf.Max ((int)(len * 10), 2);
-			lightening.size =   1f;
+			lightening.size =   size * size;
 			lightening.ConstructMesh();
-			GetComponent<AudioSource>().volume = 0.2f;
+			GetComponent<AudioSource>().volume = size * 0.2f;
 		
 		}
 		else{

@@ -104,6 +104,7 @@ public class AVOWCellGrid : MonoBehaviour {
 	void Start () {
 	
 		LoadOrCreateTextures();
+		background.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.black);
 				
 	}
 	
@@ -300,6 +301,15 @@ public class AVOWCellGrid : MonoBehaviour {
 			bubble.GetComponent<Renderer>().material.SetFloat("_v0", v0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v1", v1);
 			bubble.GetComponent<Renderer>().material.SetFloat("_blue", edge.edgeType == CircuitSimulator.EdgeType.kNormal ? 0 : 1);
+			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", (edge.resFwCurrent < 0) ? 1 : 0);
+			
+			float speed;
+			float offset;
+			CircuitSimulator.singleton.LookupPulseEdge(edge.id, out speed, out offset);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
+			
+			
 			bubble.transform.localScale = new Vector3(edge.resFwCurrent, v1 - v0, 1);
 			Vector2 vaPos = new Vector2(edge.h0 + 0.5f * edge.hWidth, 0.5f * (v0 + v1));
 			Vector2 realPos = TransformVAToReal(vaPos)- realOffset;

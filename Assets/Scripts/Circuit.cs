@@ -13,10 +13,20 @@ public class Circuit : MonoBehaviour {
 		public GameObject[] electralCompoentGOs = new GameObject[2];
 		public int[] indices = new int[2];
 		public float resistance = 0;
+		public int simEdgeId = -1;
 	}
 	Spark spark;
 	
 	CircuitSimulator sim = null;
+	
+	public float GetSparkCurrent(){
+		if (spark != null && spark.simEdgeId >= 0){
+			return Mathf.Abs(CircuitSimulator.singleton.GetEdge(spark.simEdgeId).resFwCurrent);
+		}
+		else{
+			return 0f;
+		}
+	}
 
 	public void EnableSpark(GameObject obj0, int index0, GameObject obj1, int index1, float resistance){
 		if (spark == null){
@@ -148,7 +158,7 @@ public class Circuit : MonoBehaviour {
 		int simIndex0 = thisSpark.electralCompoentGOs[0].GetComponent<ElectricalComponent>().simNodeIndices[thisSpark.indices[0]];
 		int simIndex1 = thisSpark.electralCompoentGOs[1].GetComponent<ElectricalComponent>().simNodeIndices[thisSpark.indices[1]];
 		float hOrder = (thisSpark.electralCompoentGOs[0].transform.position.x + thisSpark.electralCompoentGOs[1].transform.position.x) * 0.5f;
-		sim.AddLoadEdge(simIndex0, simIndex1, thisSpark.resistance, hOrder, CircuitSimulator.EdgeType.kBlue);
+		thisSpark.simEdgeId = sim.AddLoadEdge(simIndex0, simIndex1, thisSpark.resistance, hOrder, CircuitSimulator.EdgeType.kBlue);
 	}
 	
 	

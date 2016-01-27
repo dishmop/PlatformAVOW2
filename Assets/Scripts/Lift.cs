@@ -24,10 +24,26 @@ public class Lift : MonoBehaviour {
 	
 	void Update(){
 		if (avowGridGO != null){
+			float speed = 0;
+			float offset = 0;
+			
+			GameObject wire0GO = electricsGO.GetComponent<ElectricalComponent>().connectionData[0].wire;
+			if (wire0GO != null){
+				Wire wire0 = wire0GO.GetComponent<Wire>();
+				int wireEndIndex = wire0.ends[0].component == electricsGO ? 0 : 1;
+				
+				wire0.GetSpeedOffset(wireEndIndex, out speed, out offset);
+			}
+			
 			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
-				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent());
+				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent(),
+				speed,
+				offset
+				);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset);
+			
 		}
 	}
 	
@@ -38,13 +54,14 @@ public class Lift : MonoBehaviour {
 		
 		float oldHeight = liftHeight;
 		
-		if (current > 0.5f){
+		if (MathUtils.FP.Fgeq(current, 0.5f)){
 			liftHeight = Mathf.Min (liftHeight + speed * Time.deltaTime, liftMax);
 			
 		}
-		else if (current < -0.5f){
+		else if (MathUtils.FP.Fleq(current, -0.5f)){
 			liftHeight = Mathf.Max (liftHeight - speed * Time.deltaTime, 0);
 		}
+		
 		Vector3 newPos = platformInitPos + new Vector3(0, liftHeight, 0);
 		liftPlatformGO.transform.position = newPos;
 		

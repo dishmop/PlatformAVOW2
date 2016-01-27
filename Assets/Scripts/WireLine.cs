@@ -327,7 +327,11 @@ public class WireLine : MonoBehaviour {
 				int firstJoinVertexIndex = vertexIndex;
 			
 				// Length of this curved semgent
-				float segmentLen = 0.5f * Mathf.PI * sideVec.magnitude;
+				//float segmentLen = 0.5f * Mathf.PI * sideVec.magnitude;
+				
+				// Use this method because easier to keep track off offset down wire
+				// (simply a funciton of its length).
+				float segmentLen = 2f * sideVec.magnitude;
 				
 				endLen = startLen +  segmentLen * 0.25f / width;
 				

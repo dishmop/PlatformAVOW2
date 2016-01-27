@@ -205,8 +205,35 @@ public class Wire : MonoBehaviour {
 		coreWires.Clear();
 	}
 	
+	public void GetSpeedOffset(int endIndex, out float speed, out float offset){
+		if (coreWires.Count() == 0){
+			speed = 0;
+			offset = 0;
+			return;
+		}
+		// if we are asking about end0, then this is easy - otherwise, we need to
+		// do some work
+		if (endIndex == 0){
+			speed = coreWires[0].GetComponent<WireLine>().speed;
+			offset = coreWires[0].GetComponent<WireLine>().offset;
+		}
+		else{
+			int wireIndex = coreWires.Count() - 1;
+			float otherEndSpeed = coreWires[wireIndex].GetComponent<WireLine>().speed;
+			float otherEndOffset = coreWires[wireIndex].GetComponent<WireLine>().offset;
+			
+			float numUnits = coreWires[wireIndex].GetComponent<WireLine>().wireLength / (4 * coreWires[wireIndex].GetComponent<WireLine>().width);
+			speed = otherEndSpeed;
+			offset = otherEndOffset + numUnits;
+			
+		
+		}
+	}
+	
 	public void SwapEnds(){
-//		Debug.Log ("Swap Ends");
+		Debug.Log ("Swap Ends");
+		
+		
 		EndData temp = ends[0];
 		ends[0] = ends[1];
 		ends[1] = temp;
@@ -448,7 +475,7 @@ public class Wire : MonoBehaviour {
 				// probably not there
 				float propAlongSegment = (pathLength * propAlongWire - pathDist) / segment.magnitude;
 				Vector3 junctionPos = rawPaths[0][i] + propAlongSegment * segment;
-				Debug.DrawLine (Vector3.zero, transform.TransformPoint(junctionPos), Color.blue);
+//				Debug.DrawLine (Vector3.zero, transform.TransformPoint(junctionPos), Color.blue);
 				
 				
 				// We also add the junction point and move i back to the last point
