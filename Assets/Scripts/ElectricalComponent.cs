@@ -11,8 +11,11 @@ public class ElectricalComponent : MonoBehaviour {
 		kCursor,
 		kSwitch,
 		kJunction,
-		kInternal
+		kInternal,
+		kEnd,
 	};
+	
+	public bool isInteractive = true;
 	
 	int rotDirAdd = 0;
 	
@@ -144,6 +147,7 @@ public class ElectricalComponent : MonoBehaviour {
 				numNodeIndices = 1;
 				break;
 			}
+	
 			case Type.kLoad:{
 				numNodeIndices = 2;
 				break;
@@ -154,6 +158,10 @@ public class ElectricalComponent : MonoBehaviour {
 			}
 			case Type.kSwitch:{
 				numNodeIndices = 3;
+				break;
+			}
+			case Type.kEnd:{
+				numNodeIndices = 1;
 				break;
 			}
 			case Type.kInternal:{
@@ -196,7 +204,7 @@ public class ElectricalComponent : MonoBehaviour {
 		
 		// Set up the little bits of wire that are the conneciton points
 		if (type != Type.kCursor && type != Type.kInternal){
-			if (type != Type.kJunction){
+			if (type != Type.kJunction && type != Type.kEnd){
 				for (int i = 0; i < connectionData.Length; ++i){
 					connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.socketPrefab);
 					connectionData[i].emptyConnector.transform.parent = transform;
@@ -210,13 +218,29 @@ public class ElectricalComponent : MonoBehaviour {
 					connectionData[1].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kPlus;
 				}
 			}
-			else{
+			else if (type == Type.kJunction){
 				connectionData[0].emptyConnector = GameObject.Instantiate(Factory.singleton.socketTPrefab);
 				connectionData[0].emptyConnector.transform.parent = transform;
+			}
+		
+			else if (type == Type.kEnd){
+				for (int i = 0; i < connectionData.Length; ++i){
+					connectionData[i].emptyConnector = GameObject.Instantiate(Factory.singleton.socketEndPrefab);
+					connectionData[i].emptyConnector.transform.parent = transform;
+				}
 			}
 			SetupConnectorPositions();
 		}
 		SetupSimIndices();
+		for (int i = 0; i < connectionData.Length; ++i){
+			GameObject connector = connectionData[i].emptyConnector;
+			if (connector == null) continue;
+			Collider2D collider = connector.GetComponent<Collider2D>();
+			
+			if (collider == null) continue;
+			collider.enabled = isInteractive;
+			
+		}
 	}
 	
 	void OnDestroy(){

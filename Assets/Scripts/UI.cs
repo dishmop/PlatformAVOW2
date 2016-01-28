@@ -301,6 +301,10 @@ public class UI : MonoBehaviour {
 			lighteningGO.GetComponent<LighteningSetup>().DisableLightening();
 			Circuit.singleton.DisableSpark();
 		}
+		
+//		if (attachedWire != null){
+//			Debug.Log ("IU.simEdgeID = " + attachedWire.GetComponent<Wire>().simEdgeId);
+//		}
 	
 	}
 	

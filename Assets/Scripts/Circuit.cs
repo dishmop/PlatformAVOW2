@@ -204,6 +204,9 @@ public class Circuit : MonoBehaviour {
 			
 			
 			// Add the edge to the circuit sim
+			if (nextIndex >= nextComponent.simNodeIndices.Count()){
+				continue;
+			}
 			if (MathUtils.FP.Feq(wire.resistance, 0)){
 				nextComponent.simEdgeId = sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], nextComponent.simNodeIndices[nextIndex]);
 			}
@@ -228,6 +231,10 @@ public class Circuit : MonoBehaviour {
 		
 		// Add the final segment in
 //		Debug.Log("lastIndex = " + lastIndex + ", endIndex = " + endIndex);
+
+		if (endIndex >= endComponent.simNodeIndices.Count()){
+			return;
+		}
 
 		if (MathUtils.FP.Feq(wire.resistance, 0)){
 			wire.simEdgeId = sim.AddConductorEdge(lastComponent.simNodeIndices[lastIndex], endComponent.simNodeIndices[endIndex]);

@@ -25,7 +25,12 @@ public class SlidingDoor : MonoBehaviour {
 	
 	void HandleSliderVisibility(){
 		foreach (Transform child in slideDoorTransform){
-			child.gameObject.SetActive(child.position.y < transform.position.y);
+			if (MathUtils.FP.Feq(transform.rotation.eulerAngles.z, 180, 1)){
+				child.gameObject.SetActive(child.position.y > transform.position.y);
+			}
+			else{
+				child.gameObject.SetActive(child.position.y < transform.position.y);
+			}
 		}
 	}
 	

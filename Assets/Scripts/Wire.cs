@@ -540,11 +540,17 @@ public class Wire : MonoBehaviour {
 	
 	}
 	
+	
 
 	// Use this for initialization
 	void Start () {
 		ConstructMesh();
 	
+	}
+	
+	
+	void Awake(){
+//		Debug.Log ("Awake Wire");
 	}
 	
 
@@ -565,7 +571,7 @@ public class Wire : MonoBehaviour {
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 		distAlong = 0;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
-//			Debug.Log ("DistAlong = " + distAlong);
+//			Debug.Log ("Wire: " + simEdgeId);
 			//currentWire.GetComponent<WireLine>().wireIntensity = 2;
 			float distUse = Mathf.Min (Mathf.Max (distAlong, 0.5f), pathLength-0.5f);
 			UI.singleton.RegisterWireSelect(gameObject, distUse / pathLength);

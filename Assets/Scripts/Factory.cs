@@ -12,7 +12,8 @@ public class Factory : MonoBehaviour {
 	public GameObject socketPrefab;
 	public GameObject socketTPrefab;
 	public GameObject emptyConnectorPrefab;
-	
+	public GameObject socketEndPrefab;
+	public GameObject socketTPrefabInert;
 
 
 	
