@@ -48,13 +48,13 @@ public class Wire : MonoBehaviour {
 	}	
 	
 	public void AddJunction(GameObject gameObject){
-		Debug.Log ("Adding Junction: " + gameObject.GetInstanceID().ToString());
+//		Debug.Log ("Adding Junction: " + gameObject.GetInstanceID().ToString());
 		junctions.Add(gameObject);
 		OnChangeJunctions();
 	}
 	
 	public void RemoveJunction(GameObject gameObject){
-		Debug.Log ("Remove Junction: " + gameObject.GetInstanceID().ToString());
+//		Debug.Log ("Remove Junction: " + gameObject.GetInstanceID().ToString());
 		junctions.Remove(gameObject);
 		OnChangeJunctions();
 	}

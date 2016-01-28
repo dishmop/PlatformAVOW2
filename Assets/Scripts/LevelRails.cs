@@ -30,7 +30,7 @@ public class LevelRails : MonoBehaviour {
 		wireUpGO = SetupWire(cellComponentGO, 1 , junctionT, 0);
 		
 		junctionB = ConstructJunction(wireBGO, cellComponentGO, 0);
-		wireUpGO = SetupWire(cellComponentGO, 0 , junctionB, 0);
+		wireDownGO = SetupWire(cellComponentGO, 0 , junctionB, 0);
 
 	}
 	

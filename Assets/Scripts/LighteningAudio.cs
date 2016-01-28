@@ -7,20 +7,30 @@ public class LighteningAudio : MonoBehaviour {
 	//const float fundamentalF = 34.65f; // c#
 	int index = 0;
 	int periodInSamples = (int)(44100f / fundamentalF);
+	public float thisVolume = 0;
 
 	void OnAudioFilterRead(float[] data, int channels){
-//		int halfPeriod = periodInSamples / 2;
-		for (int i = 0; i < data.Length; i += 2){
-			int inPeriodIndex = index % periodInSamples;
-			data[i] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;
-			data[i+1] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;
-			
-			// Sinwave
-//			data[i] = Mathf.Sin (2 * 3.14f * fundamentalF * index / 44100f);
-//			data[i+1] = data[i];
-			
-			
-			index++;
+		if (MathUtils.FP.Feq(thisVolume, 0)){
+			for (int i = 0; i < data.Length; i++){
+				
+				data[i] = 0;
+				index++;
+			}
+		}
+		else{
+	//		int halfPeriod = periodInSamples / 2;
+			for (int i = 0; i < data.Length; i += 2){
+				int inPeriodIndex = index % periodInSamples;
+				data[i] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;
+				data[i+1] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;
+				
+				// Sinwave
+	//			data[i] = Mathf.Sin (2 * 3.14f * fundamentalF * index / 44100f);
+	//			data[i+1] = data[i];
+				
+				
+				index++;
+			}
 		}
 		
 		
@@ -34,6 +44,13 @@ public class LighteningAudio : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (GetComponent<Lightening>() != null){
+			thisVolume = GetComponent<Lightening>().size * 0.2f;
+		}
+		else{
+			thisVolume = 0;
+		}
+	
 	
 	}
 }

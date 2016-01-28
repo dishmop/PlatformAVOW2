@@ -287,7 +287,7 @@ public class ElectricalComponent : MonoBehaviour {
 				}
 			
 
-				if (connectionData[i].uiIsSelected){
+				if (connectionData[i].uiIsSelected ){
 					bool ok = UI.singleton.RegisterSelected(gameObject, i);
 					if (!ok){
 						connectionData[i].uiIsSelected = false;
