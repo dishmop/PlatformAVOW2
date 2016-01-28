@@ -21,8 +21,8 @@ public class LighteningAudio : MonoBehaviour {
 	//		int halfPeriod = periodInSamples / 2;
 			for (int i = 0; i < data.Length; i += 2){
 				int inPeriodIndex = index % periodInSamples;
-				data[i] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;
-				data[i+1] = 2 * (float)inPeriodIndex / (float)periodInSamples - 1;
+				data[i] =  (float)inPeriodIndex / (float)periodInSamples - 1;
+				data[i+1] =  (float)inPeriodIndex / (float)periodInSamples - 1;
 				
 				// Sinwave
 	//			data[i] = Mathf.Sin (2 * 3.14f * fundamentalF * index / 44100f);

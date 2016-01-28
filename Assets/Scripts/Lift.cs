@@ -54,12 +54,18 @@ public class Lift : MonoBehaviour {
 		
 		float oldHeight = liftHeight;
 		
-		if (MathUtils.FP.Fgeq(current, 0.5f)){
+		if (MathUtils.FP.Fgeq(current, 0.9f)){
 			liftHeight = Mathf.Min (liftHeight + speed * Time.deltaTime, liftMax);
+			speed = 0.25f;
 			
 		}
-		else if (MathUtils.FP.Fleq(current, -0.5f)){
-			liftHeight = Mathf.Max (liftHeight - speed * Time.deltaTime, 0);
+		if (MathUtils.FP.Fgeq(current, 0.5f)){
+			liftHeight = Mathf.Min (liftHeight + speed * Time.deltaTime, liftMax);
+			speed = 0.125f;
+			
+		}
+		else/* if (MathUtils.FP.Fleq(current, -0.5f))*/{
+			liftHeight = Mathf.Max (liftHeight - 10 * speed * Time.deltaTime, 0);
 		}
 		
 		Vector3 newPos = platformInitPos + new Vector3(0, liftHeight, 0);
@@ -69,6 +75,15 @@ public class Lift : MonoBehaviour {
 			if (!GetComponent<ASDAudioSource>().IsPlaying()){
 				GetComponent<ASDAudioSource>().Play();
 			}
+			if (liftHeight > oldHeight){
+				GetComponent<AudioSource>().pitch = speed * 4;
+				GetComponent<AudioSource>().volume = 1f;
+			}
+			else{
+				GetComponent<AudioSource>().pitch = 1.6f;
+				GetComponent<AudioSource>().volume = 0.6f;
+			}
+			
 		}
 		else{
 			if (GetComponent<ASDAudioSource>().IsPlaying()){
@@ -78,7 +93,7 @@ public class Lift : MonoBehaviour {
 		
 		bool haveMissedLift = liftHeight > 0.7 && playerGO.transform.position.y < transform.position.y + 0.2f;
 		
-		transform.FindChild("LiftPlatform").FindChild("Text").gameObject.SetActive(haveMissedLift);
+	//	transform.FindChild("LiftPlatform").FindChild("Text").gameObject.SetActive(haveMissedLift);
 		
 	
 	}

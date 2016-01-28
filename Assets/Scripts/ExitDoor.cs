@@ -46,15 +46,7 @@ public class ExitDoor : MonoBehaviour {
 			doorOpen.Play ();
 		}
 		
-		if (current < -0.1){
-			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorError;
-		}
-		else if (current < 0.75f){
-			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorUnpowered;
-		}
-		else {
-			indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorOK;
-		}
+
 		doorPanelGO.transform.localPosition = new Vector3((panelDir == Dir.kGoRight) ? panelPos : -panelPos, 0, 0);
 		
 		if (isOpen){

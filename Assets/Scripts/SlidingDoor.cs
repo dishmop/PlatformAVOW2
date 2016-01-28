@@ -115,18 +115,7 @@ public class SlidingDoor : MonoBehaviour {
 				
 			}
 			
-			if (current < -0.1){
-				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorError;
-			}
-			else if (MathUtils.FP.Fgeq(current, minVoltage)){
-				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorUnpowered;
-			}
-			else if (current < 0.85f){
-				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorSemi;
-			}
-			else {
-				indicatorGO.GetComponent<SpriteRenderer>().color = GameConfig.singleton.indicatorOK;
-			}
+
 		}
 	}
 }

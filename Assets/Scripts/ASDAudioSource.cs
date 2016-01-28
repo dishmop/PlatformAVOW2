@@ -25,6 +25,10 @@ public class ASDAudioSource : MonoBehaviour {
 		play = false;
 	}
 	
+	public bool IsSustainingOrAttacking(){
+		return play && clipNum != 2;
+	}
+	
 	public bool IsPlaying(){
 		return play || clipNum != -1;
 	}
