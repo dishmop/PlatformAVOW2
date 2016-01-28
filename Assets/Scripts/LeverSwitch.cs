@@ -39,7 +39,12 @@ public class LeverSwitch : MonoBehaviour {
 		connectionGO1.GetComponent<ElectricalComponent>().connectionData[0].wire = wireGO;
 		
 		
-		
+		if (isOn){
+			angle = 45;
+		}
+		else{
+			angle = -45;
+		}
 
 		
 	}

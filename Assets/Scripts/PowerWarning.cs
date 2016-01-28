@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PowerWarning : MonoBehaviour {
 
-	float triggerTime = -100;
+	float triggerTime = -200;
 	float pulseDuration = 1;
 
 	// Use this for initialization

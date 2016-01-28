@@ -136,7 +136,7 @@ public class UI : MonoBehaviour {
 
 	public void AttachConnector(GameObject electricalComponent, int connectionIndex){
 		DebugUtils.Assert(attachedWire == null, "Wire already attached");
-		Debug.Log ("Attach - :" + electricalComponent.name + " Connection Index = " + connectionIndex);
+//		Debug.Log ("Attach - :" + electricalComponent.name + " Connection Index = " + connectionIndex);
 		
 		attachedWire = GameObject.Instantiate(Factory.singleton.wirePrefab);
 		attachedWire.transform.SetParent(transform);
@@ -146,7 +146,7 @@ public class UI : MonoBehaviour {
 		electricalComponent.GetComponent<ElectricalComponent>().connectionData[connectionIndex].wire = attachedWire;
 		cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;
 		
-		Debug.Log (Time.time + ": electricalComponent.GetComponent<ElectricalComponent>().connectionData[connectionIndex].wire:" + electricalComponent.GetComponent<ElectricalComponent>().connectionData[connectionIndex].wire.name);
+//		Debug.Log (Time.time + ": electricalComponent.GetComponent<ElectricalComponent>().connectionData[connectionIndex].wire:" + electricalComponent.GetComponent<ElectricalComponent>().connectionData[connectionIndex].wire.name);
 		
 		ValidateAttachedWire();
 	}
@@ -190,9 +190,9 @@ public class UI : MonoBehaviour {
 	
 //		Debug.Log(Time.fixedTime + ": Update()");
 
-		if (attachedWire){
-			Debug.Log (Time.time + ": attachedWire, end[0]: = " + attachedWire.GetComponent<Wire>().ends[0].component.name);
-		}
+//		if (attachedWire){
+//			Debug.Log (Time.time + ": attachedWire, end[0]: = " + attachedWire.GetComponent<Wire>().ends[0].component.name);
+//		}
 
 	
 		// Calc the mouse posiiton on world space

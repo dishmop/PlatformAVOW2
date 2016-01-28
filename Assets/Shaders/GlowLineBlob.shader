@@ -68,7 +68,7 @@
 			       	
 			       	
 		        	if (xx  > 1){
-		        		return float4(1, 0, 1, 1);
+		        		return float4(0, 0, 0, 1);
 			        }
 			        else{
 			        	float xxx = xx - 0.5f;
