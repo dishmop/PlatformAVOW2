@@ -119,7 +119,6 @@ public class UI : MonoBehaviour {
 			
 				Debug.Log (Time.time + ": UnregisterSelected");
 				
-				Wire tempWire = attachedWire.GetComponent<Wire>();
 				
 				attachedWire.GetComponent<Wire>().ends[1].component = cursorTransform.gameObject;
 				cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = attachedWire;

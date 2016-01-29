@@ -11,9 +11,25 @@ public class LeverSwitch : MonoBehaviour {
 	public GameObject connectionGO0;
 	public GameObject connectionGO1;
 	
-	public bool isOn = false;
+	public bool desiredOn = false;
+	
 	float angle = -45;
 	float angleSpeed = 360f;
+	
+	enum State{
+		kOn,
+		kOff,
+		kOnToOff,
+		kOffToOn
+	};
+	
+	State state;
+	
+	float transDuration = 0.2f;
+	float onResistanceAngle;
+	float maxResistanceAngle = 90f;
+	float minResistanceAngle = 0f;
+	
 	
 	// Use this for initialization
 	void Start () {
@@ -38,20 +54,33 @@ public class LeverSwitch : MonoBehaviour {
 		connectionGO0.GetComponent<ElectricalComponent>().connectionData[0].wire = wireGO;
 		connectionGO1.GetComponent<ElectricalComponent>().connectionData[0].wire = wireGO;
 		
-		
-		if (isOn){
+		if (desiredOn){
 			angle = 45;
+			state = State.kOn;
+			onResistanceAngle = minResistanceAngle;
 		}
 		else{
 			angle = -45;
+			state = State.kOff;
+			onResistanceAngle = maxResistanceAngle;
 		}
 
-		
+			
+	}
+	
+	float GetResistance(float resistance){
+		if (MathUtils.FP.Fgeq(resistance, 90)){
+			return -1;
+		}
+		else{
+			return Mathf.Tan(Mathf.Deg2Rad * resistance);
+		}
 	}
 	
 	
 	void  UpdateEmptyConnectors(){
-		int index = isOn ? 1 : 2;
+	
+		int index = desiredOn ? 1 : 2;
 		
 		connectionGO1.transform.position =  transform.TransformPoint(switchElectricsGO.GetComponent<ElectricalComponent>().connectionData[index].pos);
 		connectionGO1.GetComponent<ElectricalComponent>().connectionData[0].dir = Directions.CalcOppDir(switchElectricsGO.GetComponent<ElectricalComponent>().connectionData[index].dir);
@@ -68,7 +97,7 @@ public class LeverSwitch : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (isOn){
+		if (desiredOn){
 			angle = Mathf.Min (45, angle + angleSpeed * Time.deltaTime);
 		}
 		else{
@@ -80,12 +109,56 @@ public class LeverSwitch : MonoBehaviour {
 		
 		
 		if (isInTrigger && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
-			isOn = !isOn;
+			desiredOn = !desiredOn;
 			
 		}
 		UpdateEmptyConnectors();
 		
-		switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[0].connectionIndex1 = isOn ? 1 : 2;
+		float angleToTurn = (maxResistanceAngle - minResistanceAngle) * Time.deltaTime / transDuration;
+		
+
+		switch (state){
+			case State.kOn:
+			{
+				onResistanceAngle = minResistanceAngle;
+				if (!desiredOn)
+				{
+					state = State.kOnToOff;
+				}
+				break;
+			}
+			case State.kOnToOff:
+			{
+				onResistanceAngle += angleToTurn;
+				if (onResistanceAngle >= maxResistanceAngle){
+					onResistanceAngle = maxResistanceAngle;
+					state = State.kOff;
+				}
+				break;
+			}
+			case State.kOff:
+			{
+				onResistanceAngle = maxResistanceAngle;
+				if (desiredOn)
+				{
+					state = State.kOffToOn;
+				}
+				break;
+			}
+			case State.kOffToOn:
+			{
+				onResistanceAngle -= angleToTurn;
+				if (onResistanceAngle <= minResistanceAngle){
+					onResistanceAngle = minResistanceAngle;
+					state = State.kOn;
+				}
+				break;
+			}
+		}
+		
+		
+		switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[0].resistance = GetResistance(maxResistanceAngle - onResistanceAngle);
+		switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[1].resistance = GetResistance(onResistanceAngle);
 		
 		transform.FindChild("Text").gameObject.SetActive(isInTrigger);
 	

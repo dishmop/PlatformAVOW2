@@ -16,8 +16,6 @@ public class LevelRails : MonoBehaviour {
 	
 	GameObject junctionT;
 	GameObject junctionB;
-	GameObject wireUpGO;
-	GameObject wireDownGO;
 	
 
 		
@@ -27,10 +25,10 @@ public class LevelRails : MonoBehaviour {
 		wireBGO = SetupWire(connectionBLGO, 0, connectionBRGO, 0);
 		
 		junctionT = ConstructJunction(wireTGO, cellComponentGO, 1);
-		wireUpGO = SetupWire(cellComponentGO, 1 , junctionT, 0);
+		SetupWire(cellComponentGO, 1 , junctionT, 0);
 		
 		junctionB = ConstructJunction(wireBGO, cellComponentGO, 0);
-		wireDownGO = SetupWire(cellComponentGO, 0 , junctionB, 0);
+		SetupWire(cellComponentGO, 0 , junctionB, 0);
 
 	}
 	
