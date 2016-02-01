@@ -117,7 +117,7 @@ public class UI : MonoBehaviour {
 			// Check if we have a wire attached and is so move it back on to the cursor
 			if (attachedWire != null && attachedWire.GetComponent<Wire>().ends[1].component != cursorTransform.gameObject){
 			
-				Debug.Log (Time.time + ": UnregisterSelected");
+//				Debug.Log (Time.time + ": UnregisterSelected");
 				
 				
 				attachedWire.GetComponent<Wire>().ends[1].component = cursorTransform.gameObject;
