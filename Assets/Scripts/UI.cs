@@ -86,7 +86,7 @@ public class UI : MonoBehaviour {
 		cursorJunction.GetComponent<WireJunction>().otherComponent = attachedWire.GetComponent<Wire>().ends[0].component;
 		cursorJunction.GetComponent<WireJunction>().otherComponentIndex = attachedWire.GetComponent<Wire>().ends[0].component.GetComponent<ElectricalComponent>().GetConnectionDataIndex(attachedWire);
 		
-		
+//		Debug.Log("RegisterWireSelect(): propAlong: " + propAlong);
 		
 		attachedWire.GetComponent<Wire>().ends[1].component = cursorJunction;
 		cursorTransform.GetComponent<ElectricalComponent>().connectionData[0].wire = null;

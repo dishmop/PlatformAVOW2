@@ -39,6 +39,8 @@ public class Wire : MonoBehaviour {
 	
 	// Debug (should be local)
 	float distAlong;
+	bool isInsideWire;
+	Vector3 cursorPoint;
 	
 	public float GetSimFwCurrentOld(){
 		if (simEdgeId >= 0){
@@ -67,7 +69,6 @@ public class Wire : MonoBehaviour {
 	}
 	
 	void OnChangeJunctions(){
-		junctions.Sort((obj1, obj2)=>obj1.GetComponent<WireJunction>().propAlongWire.CompareTo(obj2.GetComponent<WireJunction>().propAlongWire));
 			
 		ClearMesh();
 		ConstructMesh();
@@ -423,6 +424,9 @@ public class Wire : MonoBehaviour {
 		// Make a copy of the rawpath, because we are about to be destructive with it
 		rawPaths[1] = rawPaths[0].ToList();
 		
+		// Our junctions should always be on order of "along the path"-ness
+		junctions.Sort((obj1, obj2)=>obj1.GetComponent<WireJunction>().propAlongWire.CompareTo(obj2.GetComponent<WireJunction>().propAlongWire));
+		
 		// Now construct a new path for each segment based on where the junctions are
 		float pathDist = 0;
 		GameObject nextJunction = null;
@@ -544,6 +548,7 @@ public class Wire : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		ClearMesh();
 		ConstructMesh();
 	
 	}
@@ -570,7 +575,10 @@ public class Wire : MonoBehaviour {
 //		}
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 		distAlong = 0;
+		isInsideWire = false;
+		cursorPoint = mouseWorldPos;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
+			isInsideWire = true;
 //			Debug.Log ("Wire: " + simEdgeId);
 			//currentWire.GetComponent<WireLine>().wireIntensity = 2;
 			float distUse = Mathf.Min (Mathf.Max (distAlong, 0.5f), pathLength-0.5f);
@@ -650,9 +658,21 @@ public class Wire : MonoBehaviour {
 	
 	}
 	
-	void OnGUI(){
-//		if (pathLength > 1){
-//			GUI.Label(new Rect(0,0,Screen.width,Screen.height), "pathLength: " + pathLength + ", distAlong: " + distAlong);
+//	void OnGUI(){
+//		int lineSize = 12;
+//		int lineNum = 10;
+//		if (pathLength > 1 && isInsideWire){
+//			GUI.Label(new Rect(20,lineSize * lineNum++,Screen.width,Screen.height), "pathLength: " + pathLength + ", distAlong: " + distAlong);
+//			
+//			// NOw check each of the sub-wires
+//			for (int i = 0; i < coreWires.Count(); ++i){
+//				WireLine wireLine = coreWires[i].GetComponent<WireLine>();
+//				float distAlong2 = 0;
+//				if (wireLine.IsPointInside(cursorPoint, out distAlong2)){
+//					float speed = wireLine.GetComponent<Renderer>().material.GetFloat("_Speed");
+//					GUI.Label(new Rect(20, lineSize * lineNum++,Screen.width,Screen.height), "wire num: " + i + ", distAlong2: " + distAlong2 + ", speed: " + speed);
+//				}
+//			}
 //		}
-	}
+//	}
 }
