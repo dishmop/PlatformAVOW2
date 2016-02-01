@@ -53,16 +53,23 @@ public class PlayerController : MonoBehaviour {
 			
 			return;	
 		}
+		bool climbIsPlaying = model.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Climb");
+		
 		horizontalSpeed = walkSpeed * Input.GetAxis("Horizontal");
-		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit){
+		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit && !climbIsPlaying){
 			if (horizontalSpeed > 0){
 				model.transform.rotation = Quaternion.Euler(0, 90, 0);
 			}
 			else{
 				model.transform.rotation = Quaternion.Euler(0, -90, 0);
 			}
+			model.GetComponent<Animator>().speed = 1;
 		}
-		
+		else if (climbIsPlaying){
+			model.transform.rotation = Quaternion.Euler(0, 0, 0);
+			model.GetComponent<Animator>().speed = 0.85f * Mathf.Abs (GetComponent<Rigidbody2D>().velocity.y);
+			
+		}
 		tryJump = Input.GetKey(KeyCode.Space);
 		
 		
