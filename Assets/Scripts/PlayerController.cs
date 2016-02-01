@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour {
 	// Footstep generator (hacky!)	
 	public GameObject leftFoot;
 	public GameObject rightFoot;
+	
+	
 	Vector3 lastLeftFootPos = Vector3.zero;
 	Vector3 lastRightFootPos = Vector3.zero;
 	Vector3 lastLeftFootVel = Vector3.zero;
@@ -26,6 +28,8 @@ public class PlayerController : MonoBehaviour {
 	bool rightTriggered = false;
 	
 	bool firstFallHit = true;
+	public bool isOnLadder = false;
+	GameObject  lastLadder = null;
 	
 
 	
@@ -62,6 +66,7 @@ public class PlayerController : MonoBehaviour {
 		tryJump = Input.GetKey(KeyCode.Space);
 		
 		
+		
 		ProcessFootsteps();
 		
 		
@@ -80,16 +85,49 @@ public class PlayerController : MonoBehaviour {
 		model.GetComponent<Animator>().SetBool ("isGrounded", isGrounded);
 		
 		
-		if (tryJump && isGrounded && !GameMode.singleton.isEditingCircuit){
+		if (tryJump && (isGrounded || (isOnLadder && GetComponent<Rigidbody2D>().velocity.y <= 0)) && !GameMode.singleton.isEditingCircuit){
 			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 2.5f), ForceMode2D.Impulse);
 		}
 		
 			
 		model.GetComponent<Animator>().SetBool("isActioning", GameMode.singleton.isEditingCircuit);
+		
+		Vector2 vel = GetComponent<Rigidbody2D>().velocity;
+		if (isOnLadder && vel.y <= 0){
+			GetComponent<Rigidbody2D>().gravityScale = 0;
+			vel.y = 0;
+			GetComponent<Rigidbody2D>().velocity = vel;
+		}
+		else{
+			GetComponent<Rigidbody2D>().gravityScale = 1;
+		}
 
 		
 		// Reset (so it can be set asgain by any collision messages)
 		isGrounded = false;
+		
+		if (isOnLadder){
+			float ladderSpeed = walkSpeed * Input.GetAxis("Vertical");
+			
+			// If jumping up
+			if (vel.y > 0){
+				vel = GetComponent<Rigidbody2D>().velocity;
+				vel.y = Mathf.Max (vel.y, ladderSpeed);
+			}
+			else{
+				vel.y = ladderSpeed;
+			}
+			GetComponent<Rigidbody2D>().velocity = vel;
+			
+			
+		}
+		
+		// Reset the collider stuff
+		isOnLadder = false;
+		if (lastLadder){
+			lastLadder.gameObject.GetComponent<Ladder>().playerOnLadder = null;
+		}
+		
 	}
 	
 	bool TestForGround(Collision2D collision){
@@ -153,6 +191,15 @@ public class PlayerController : MonoBehaviour {
 		}
 		
 	}
+	
+	void OnTriggerStay2D(Collider2D collider){
+		if (collider.tag == "Ladder"){
+			isOnLadder = true;
+			lastLadder = collider.gameObject;
+			lastLadder.GetComponent<Ladder>().playerOnLadder = gameObject;
+		}
+	}
+	
 	
 	void OnGUI2(){
 

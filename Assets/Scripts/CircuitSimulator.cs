@@ -348,7 +348,7 @@ public class CircuitSimulator : MonoBehaviour {
 	
 	//	Debug.Log ("numNodes = " + allNodes.Count() + ", numEdges = " + allEdges.Count());
 	
-		if (allEdges.Count == 0 || allNodes.Count == 0) return;
+		if (allEdges.Count < 2 || allNodes.Count == 0) return;
 		
 		// Check that the graph is valid
 		DebugUtils.Assert(ValidateGraph(), "The graph is invalid");
