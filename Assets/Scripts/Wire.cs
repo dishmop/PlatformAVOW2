@@ -39,8 +39,8 @@ public class Wire : MonoBehaviour {
 	
 	// Debug (should be local)
 	float distAlong;
-	bool isInsideWire;
-	Vector3 cursorPoint;
+//	bool isInsideWire;
+//	Vector3 cursorPoint;
 	
 	public float GetSimFwCurrentOld(){
 		if (simEdgeId >= 0){
@@ -575,10 +575,10 @@ public class Wire : MonoBehaviour {
 //		}
 		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 		distAlong = 0;
-		isInsideWire = false;
-		cursorPoint = mouseWorldPos;
+//		isInsideWire = false;
+//		cursorPoint = mouseWorldPos;
 		if (IsPointInside(mouseWorldPos, out distAlong)){
-			isInsideWire = true;
+//			isInsideWire = true;
 //			Debug.Log ("Wire: " + simEdgeId);
 			//currentWire.GetComponent<WireLine>().wireIntensity = 2;
 			float distUse = Mathf.Min (Mathf.Max (distAlong, 0.5f), pathLength-0.5f);
@@ -617,6 +617,10 @@ public class Wire : MonoBehaviour {
 			if (simNodeIndex >= 0){
 				float voltage = CircuitSimulator.singleton.allNodes[simNodeIndex].resVoltage;
 				Color wireCol = Color.Lerp (GameConfig.singleton.lowVolt, GameConfig.singleton.highVolt, voltage);
+				// If not part of the battery clique, then make the voltage grey
+				if (!CircuitSimulator.singleton.allNodes[simNodeIndex].isInBatteryClique){
+					wireCol = Color.grey;
+				}
 				foreach (GameObject go in coreWires){
 					go.GetComponent<WireLine>().wireColor = wireCol;
 				}

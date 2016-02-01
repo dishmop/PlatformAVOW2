@@ -16,6 +16,7 @@ public class AVOWCellGrid : MonoBehaviour {
 	public float current = 1;
 	public float vAToRealSize = 1f;		// Size of 1v or 1A in real space
 	public float borderSize = 0.1f;		// Size of border in real world 
+	
 	float gradScale = -10f;
 	
 	string savePath = "/Resources/Grids/";
@@ -260,6 +261,16 @@ public class AVOWCellGrid : MonoBehaviour {
 	void FixedUpdate () {
 	
 		if (CircuitSimulator.singleton == null || CircuitSimulator.singleton.batteryEdge == null) return;
+		
+		// If we are tripped
+		if (transform.parent.GetComponent<Cell>().isTripped){
+			foreach (GameObject go in bubbleList){
+				go.GetComponent<Renderer>().material.SetFloat("_Grey", 1f);
+				go.GetComponent<Renderer>().material.SetFloat("_Speed", 0f);
+			}
+
+			return;
+		}
 	
 		// Count how many blocks there are to make
 		int count = 0;
@@ -300,8 +311,9 @@ public class AVOWCellGrid : MonoBehaviour {
 			float v1 = edge.inNode.resVoltage;
 			bubble.GetComponent<Renderer>().material.SetFloat("_v0", v0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v1", v1);
-			bubble.GetComponent<Renderer>().material.SetFloat("_blue", edge.edgeType == CircuitSimulator.EdgeType.kNormal ? 0 : 1);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Blue", edge.edgeType == CircuitSimulator.EdgeType.kNormal ? 0 : 1);
 			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", (edge.resFwCurrent < 0) ? 1 : 0);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Grey", 0f);
 			
 			float speed;
 			float offset;

@@ -128,7 +128,8 @@ public class AVOWGrid : MonoBehaviour {
 			bubble.transform.localScale = new Vector3(current, voltageDiff, 1);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v0", minV);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v1", maxV);
-			bubble.GetComponent<Renderer>().material.SetFloat("_blue", 0);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Blue", 0);
+			bubble.GetComponent<Renderer>().material.SetFloat("_Grey", 0f);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
 			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", (current < 0) ? 1 : 0);

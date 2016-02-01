@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -516,14 +516,14 @@ public class AVOWSim : MonoBehaviour {
 		// Make a copy of the nodes in the tree
 		int numCliquedNodes = 0;
 		foreach (CircuitSimulator.Node node in sim.allNodes){
-			if (node.isInBatteryClique) {
+			if (node.isInBatteryCliqueRep) {
 				numCliquedNodes++;
 			}
 		}
 		allSimNodes = new SimNode[numCliquedNodes];
 		int nodeIndex = 0;
 		foreach (CircuitSimulator.Node node in sim.allNodes){
-			if (!node.isInBatteryClique) continue;
+			if (!node.isInBatteryCliqueRep) continue;
 			SimNode newNode = new SimNode();
 			newNode.id = node.id;
 			newNode.blockList[kIn] = new List<SimBlock>();
@@ -617,7 +617,7 @@ public class AVOWSim : MonoBehaviour {
 		
 		// Sort all out in/out lists
 		foreach (CircuitSimulator.Node node in sim.allNodes){
-			if (!node.isInBatteryClique) continue;
+			if (!node.isInBatteryCliqueRep) continue;
 			node.inEdges.Sort ((obj1, obj2) => obj1.hOrder.CompareTo(obj2.hOrder));
 			node.outEdges.Sort ((obj1, obj2) => obj1.hOrder.CompareTo(obj2.hOrder));
 		}

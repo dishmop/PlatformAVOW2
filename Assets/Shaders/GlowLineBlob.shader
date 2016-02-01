@@ -62,8 +62,8 @@
 		        	float distToMove = _Offset - _Time[1] * _Speed;
 
 			       	float4 col;
-			       	float xx = i.uv[0] * 4f;
-			       	float yy = (i.uv[1] + distToMove) * 4f;
+			       	float xx = i.uv[0] * 4;
+			       	float yy = (i.uv[1] + distToMove) * 4;
 			       	
 			       	
 			       	

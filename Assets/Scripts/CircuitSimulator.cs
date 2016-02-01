@@ -52,6 +52,7 @@ public class CircuitSimulator : MonoBehaviour {
 		public float h0;
 		public float hWidth;
 		public bool hasBeenLayedOut;
+		public bool isInBatteryCliqueRep;
 		public bool isInBatteryClique;
 		public Node repNode;		// All nodes which are connected by zero resistance edges for a group who will all have the same repnode (the node with the lowest ID).
 		
@@ -178,6 +179,7 @@ public class CircuitSimulator : MonoBehaviour {
 		
 		
 		foreach(Node node in allNodes){
+			node.isInBatteryCliqueRep = false;
 			node.isInBatteryClique = false;
 		}
 		if (batteryEdge != null){
@@ -193,6 +195,8 @@ public class CircuitSimulator : MonoBehaviour {
 				Node node1 = thisEdge.nodes[1];
 				
 				// Ensure the nodes at either end are also in the clique
+				node0.isInBatteryCliqueRep = true;
+				node1.isInBatteryCliqueRep = true;
 				node0.isInBatteryClique = true;
 				node1.isInBatteryClique = true;
 				
@@ -251,11 +255,11 @@ public class CircuitSimulator : MonoBehaviour {
 
 			}
 		}
-		// If we are no a "representative node" then we should not be part of the clique	
+		// If we are not a "representative node" then we should not be part of the clique	
 		foreach(Node node in allNodes){	
 			// We should not have duplicates as part of the battery clique
 			if (node != node.repNode){
-				node.isInBatteryClique = false;
+				node.isInBatteryCliqueRep = false;
 			}	
 		}	
 		

@@ -2,7 +2,8 @@
 	Properties {
 		 _v0 ("v0", Float) = 0
 		 _v1 ("v1", Float) = 1
-		 _blue ("blue", Float) = 0
+		 _Blue ("Blue", Float) = 0
+		 _Grey ("Blue", Float) = 0
 		 _Spacing ("Spacing", Float) = 1
       	 _Speed ("Speed", Float) = 1
       	 _Offset ("Offset", Float) = 1
@@ -30,7 +31,8 @@
 				uniform float4	_Color2; 
 				uniform float _v0;
 				uniform float _v1;
-				uniform float _blue;
+				uniform float _Blue;
+				uniform float _Grey;
 				uniform float _Spacing;
       	 		uniform float _Speed;
       	 		uniform float _Offset;
@@ -99,16 +101,21 @@
 		        	float4 col0 = float4(12f/256f, 0, 0, 1);
 		        	float4 col1 = float4(0, 12f/256f, 0, 1);
 		        	float doCross = 0;
-		        	if (_blue < 0.5f){
+			        if (_Grey > 0.5){
+			        	_Color1 = float4(3/256f, 3/256f, 3f/256f, 1);
+			        	_Color2 = float4(3/256f, 3/256f, 3f/256f, 1);
+			        	_Intensity = 0.75f;
+			        }
+		        	else if (_Blue > 0.5){
+			        	_Color1 = float4(1/256f, 1/256f, 12f/256f, 1);
+			        	_Color2 = float4(1/256f, 1/256f, 12f/256f, 1);
+			        	_Intensity = 0.75f;
+			        }
+			        else{
 			        	_Color1 = lerp(col0, col1, _v0);
 			        	_Color2 = lerp(col0, col1, _v1);
 			        	_Intensity = 0.75f;
 			        	doCross =1;
-			        }
-			        else{
-			        	_Color1 = float4(1/256f, 1/256f, 12f/256f, 1);
-			        	_Color2 = float4(1/256f, 1/256f, 12f/256f, 1);
-			        	_Intensity = 0.75f;
 			        }
 		        	
 		        	
