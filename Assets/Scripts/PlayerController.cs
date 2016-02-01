@@ -75,6 +75,7 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate () {
 //		Debug.Log("FixedUpdate: " + Time.fixedTime);
 		model.GetComponent<Animator>().SetFloat("speed", Mathf.Abs (GetComponent<Rigidbody2D>().velocity.x));
+		model.GetComponent<Animator>().SetFloat("vSpeed", Mathf.Abs (GetComponent<Rigidbody2D>().velocity.y));
 		
 		if (!GameMode.singleton.isEditingCircuit){
 			Vector3 newVel = GetComponent<Rigidbody2D>().velocity;
@@ -83,7 +84,7 @@ public class PlayerController : MonoBehaviour {
 			
 		}
 		model.GetComponent<Animator>().SetBool ("isGrounded", isGrounded);
-		
+		model.GetComponent<Animator>().SetBool ("isOnLadder", isOnLadder);
 		
 		if (tryJump && (isGrounded || (isOnLadder && GetComponent<Rigidbody2D>().velocity.y <= 0)) && !GameMode.singleton.isEditingCircuit){
 			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 2.5f), ForceMode2D.Impulse);
