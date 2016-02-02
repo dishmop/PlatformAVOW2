@@ -31,6 +31,9 @@ public class PlayerController : MonoBehaviour {
 	public bool isOnLadder = false;
 	GameObject  lastLadder = null;
 	
+	float jumpTime = 0;
+	float jumpDisableDuration = 0.1f;
+	
 
 	
 	GameObject model;
@@ -56,7 +59,6 @@ public class PlayerController : MonoBehaviour {
 		bool climbIsPlaying = model.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Climb");
 		
 		horizontalSpeed = walkSpeed * Input.GetAxis("Horizontal");
-		Debug.Log ("speed = " + horizontalSpeed);
 		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit && (!climbIsPlaying || !isOnLadder)){
 			if (horizontalSpeed > 0){
 				model.transform.rotation = Quaternion.Euler(0, 90, 0);
@@ -94,9 +96,13 @@ public class PlayerController : MonoBehaviour {
 		model.GetComponent<Animator>().SetBool ("isGrounded", isGrounded);
 		model.GetComponent<Animator>().SetBool ("isOnLadder", isOnLadder);
 		
-		if (tryJump && (isGrounded || (isOnLadder && GetComponent<Rigidbody2D>().velocity.y <= 0)) && !GameMode.singleton.isEditingCircuit){
-			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 2.5f), ForceMode2D.Impulse);
+		if (Time.fixedTime > jumpTime + jumpDisableDuration){
+			if (tryJump && (isGrounded || (isOnLadder && GetComponent<Rigidbody2D>().velocity.y <= 0)) && !GameMode.singleton.isEditingCircuit){
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 5f), ForceMode2D.Impulse);
+				jumpTime = Time.fixedTime;
+			}
 		}
+			
 		
 			
 		model.GetComponent<Animator>().SetBool("isActioning", GameMode.singleton.isEditingCircuit);

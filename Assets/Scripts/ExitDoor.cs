@@ -10,7 +10,6 @@ public class ExitDoor : MonoBehaviour {
 	public GameObject doorPanelGO;
 	public AudioSource doorOpen;
 	public AudioSource doorClose;
-	public GameObject indicatorGO;
 	public GameObject avowGridGO;
 	
 	public string nextLevelName;
@@ -35,6 +34,8 @@ public class ExitDoor : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate(){
+		if (!electricsGO) return;
+		
 		bool wasOpen = isOpen;
 		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() ;
 		isOpen = (current> 0.75f);
