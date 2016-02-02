@@ -56,7 +56,8 @@ public class PlayerController : MonoBehaviour {
 		bool climbIsPlaying = model.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Climb");
 		
 		horizontalSpeed = walkSpeed * Input.GetAxis("Horizontal");
-		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit && !climbIsPlaying){
+		Debug.Log ("speed = " + horizontalSpeed);
+		if (Mathf.Abs (horizontalSpeed) > 0.01f && !GameMode.singleton.isEditingCircuit && (!climbIsPlaying || !isOnLadder)){
 			if (horizontalSpeed > 0){
 				model.transform.rotation = Quaternion.Euler(0, 90, 0);
 			}
