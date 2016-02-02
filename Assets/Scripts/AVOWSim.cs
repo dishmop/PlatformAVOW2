@@ -817,6 +817,7 @@ public class AVOWSim : MonoBehaviour {
 	bool SetupPermutation(int i){
 		ClearTestData();
 		
+		if (batteryNodeIndex == -1) return false;
 		
 		// Set up an h0 value for a node that is connected to the battery
 		allSimNodes[batteryNodeIndex].h0 = 0;
@@ -838,7 +839,7 @@ public class AVOWSim : MonoBehaviour {
 			}
 		}
 		if (validPermutations.Count == 0){
-			Debug.LogError ("Failed to layout circuit");
+//			Debug.Log ("Failed to layout circuit");
 		}
 	}
 	
