@@ -37,8 +37,8 @@ public class ExitDoor : MonoBehaviour {
 		if (!electricsGO) return;
 		
 		bool wasOpen = isOpen;
-		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() ;
-		isOpen = (current> 0.75f);
+		float current = Mathf.Abs(electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() );
+		isOpen = (current> 0.9f);
 		// If closing
 		if (wasOpen && !isOpen){
 			doorClose.Play ();

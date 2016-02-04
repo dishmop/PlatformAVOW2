@@ -15,7 +15,6 @@ public class ElectricalComponent : MonoBehaviour {
 		kEnd,
 	};
 	
-	public bool isInteractive = true;
 	
 	int rotDirAdd = 0;
 	
@@ -28,6 +27,13 @@ public class ElectricalComponent : MonoBehaviour {
 		public float resistance;
 	}
 	public InternalRoute[] internalRouting;
+	public enum PolarityType{
+		kAgnostic,
+		kBidirectional,
+//		kUnidirectional,
+	}
+	
+	public PolarityType polarityType = PolarityType.kAgnostic;
 	
 
 	[System.Serializable]
@@ -38,6 +44,8 @@ public class ElectricalComponent : MonoBehaviour {
 		public GameObject emptyConnector;
 		public bool uiIsSelected;
 		public bool uiIsAttached;
+		public bool isInteractive;
+		
 		
 	};
 	
@@ -120,21 +128,20 @@ public class ElectricalComponent : MonoBehaviour {
 					connectionData[i].emptyConnector.transform.localRotation = Quaternion.Euler(0, 0, useDir * 90);
 				}
 			}
-			/*
-			WireLine wireLine = connectionData[i].emptyConnector.GetComponent<WireLine>();
-			
-			Vector3 goDir = Directions.GetDirVec(connectionData[i].dir);
-			
-			Vector3[] newPoints = new Vector3[2];
-			newPoints[0] = Vector3.zero;
-			newPoints[1] = goDir * wireLine.width * 1.01f;
-			wireLine.SetNewPoints(newPoints);
-			wireLine.end0 = WireLine.EndType.kContinue;
-			wireLine.end1 = WireLine.EndType.kEnd;
-			*/
+
 			
 		}
 	}
+	
+	
+	void SetupConnectorColours(){
+		for (int i = 0; i < connectionData.Length; ++i){
+			
+			if (connectionData[i].emptyConnector != null){
+				connectionData[i].emptyConnector.GetComponent<Renderer>().material.color = connectionData[i].isInteractive ? Color.white : new Color(0.25f, 0.25f, 0.25f, 1);
+			}
+		}
+	}	
 	
 	void SetupSimIndices(){
 		int numNodeIndices = 0;
@@ -210,8 +217,20 @@ public class ElectricalComponent : MonoBehaviour {
 					connectionData[i].emptyConnector.transform.parent = transform;
 				}
 				if (type == Type.kLoad){
-					connectionData[0].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kPlus;
-					connectionData[1].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kMinus;
+					switch (polarityType){
+						case PolarityType.kAgnostic:
+						{
+							connectionData[0].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kNeutral;
+							connectionData[1].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kNeutral;
+							break;
+						}
+						case PolarityType.kBidirectional:
+						{
+							connectionData[0].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kPlus;
+							connectionData[1].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kMinus;
+							break;
+						}
+					}
 				}
 				if (type == Type.kVoltageSource){
 					connectionData[0].emptyConnector.GetComponent<PipeSocket>().type = PipeSocket.Type.kMinus;
@@ -230,6 +249,7 @@ public class ElectricalComponent : MonoBehaviour {
 				}
 			}
 			SetupConnectorPositions();
+			SetupConnectorColours();
 		}
 		SetupSimIndices();
 		for (int i = 0; i < connectionData.Length; ++i){
@@ -238,7 +258,7 @@ public class ElectricalComponent : MonoBehaviour {
 			Collider2D collider = connector.GetComponent<Collider2D>();
 			
 			if (collider == null) continue;
-			collider.enabled = isInteractive;
+			collider.enabled = connectionData[i].isInteractive;
 			
 		}
 	}
@@ -256,6 +276,8 @@ public class ElectricalComponent : MonoBehaviour {
 		for (int i = 0; i < connectionData.Length; ++i){
 		}
 		SetupConnectorPositions();
+		SetupConnectorColours();
+		
 		UI.singleton.ValidateAttachedWire();
 	}
 	

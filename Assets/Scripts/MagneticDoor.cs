@@ -11,6 +11,7 @@ public class MagneticDoor : MonoBehaviour {
 	public GameObject avowGridGO;
 	public float maxDoorPos;
 	public float minDoorPos;
+	public GameObject magneticLinesGO;
 	
 	
 	public bool isUp = false;
@@ -27,6 +28,8 @@ public class MagneticDoor : MonoBehaviour {
 	void FixedUpdate(){
 		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent() ;
 		isUp =  (Mathf.Abs (current) > 0.9f);
+		
+		magneticLinesGO.GetComponent<Renderer>().material.SetFloat("_Intensity", Mathf.Abs(current));
 		
 		
 		Vector3 doorPos = doorPanelGO.transform.localPosition;

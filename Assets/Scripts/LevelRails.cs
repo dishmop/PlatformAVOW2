@@ -17,6 +17,9 @@ public class LevelRails : MonoBehaviour {
 	GameObject junctionT;
 	GameObject junctionB;
 	
+	
+	bool firstUpdate = true;
+	
 
 		
 	// Use his for initialization
@@ -44,7 +47,8 @@ public class LevelRails : MonoBehaviour {
 		newJunction.GetComponent<WireJunction>().propAlongWire = GetPropAlong(otherComponentGO, index, wireGO);
 		newJunction.GetComponent<WireJunction>().otherComponent = otherComponentGO;
 		newJunction.GetComponent<WireJunction>().otherComponentIndex = index;
-		newJunction.GetComponent<ElectricalComponent>().isInteractive = false;
+		newJunction.GetComponent<ElectricalComponent>().connectionData[0].isInteractive = false;
+		
 		
 		return newJunction;
 	}
@@ -97,6 +101,11 @@ public class LevelRails : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+	
+		// Needs to be done after Start() has been called on the junctions
+		if (firstUpdate){
+			firstUpdate = false;
+		}
 //		UpdateEmptyConnectors();
 //		for (int i = 0; i < 2; ++i){		
 //			connectionGO[i*2+0].GetComponent<ElectricalComponent>().simNodeIndices [0] = levelElectricsGO.GetComponent<ElectricalComponent>().simNodeIndices[i*2+0];

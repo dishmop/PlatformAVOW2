@@ -27,7 +27,7 @@ public class Terminal : MonoBehaviour {
 		transform.FindChild("Text").gameObject.SetActive(isInTrigger);
 		TextMesh textComponent = transform.FindChild("Text").GetComponent<TextMesh>();
 		
-		textComponent.text = GameMode.singleton.isEditingCircuit ? "Press [↑] to stop" : "Press [↑] to interact";
+		textComponent.text = GameMode.singleton.isEditingCircuit ? "Press [W] to stop" : "Press [W] to interact";
 		
 		
 	}

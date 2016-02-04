@@ -7,8 +7,8 @@ public class Cell : MonoBehaviour {
 	public GameObject avowGridBackgroundGO;
 	public GameObject resetGO;
 	public Color resetCol;
-	Color glowCol = Color.red;
-	Color oldCellCol;
+//	Color glowCol = Color.red;
+//	Color oldCellCol;
 	
 	public float maxCurrent = 2.25f;
 	
@@ -27,7 +27,7 @@ public class Cell : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		oldVoltageRise = cellElectrics.GetComponent<ElectricalComponent>().voltageRise;
-		oldCellCol = GetComponent<SpriteRenderer>().color;
+//		oldCellCol = GetComponent<SpriteRenderer>().color;
 	
 	}
 	

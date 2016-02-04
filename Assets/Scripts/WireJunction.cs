@@ -43,6 +43,9 @@ public class WireJunction : MonoBehaviour {
 		Vector3 newPos;
 		int newDir;
 		
+		ElectricalComponent electricalComponent = GetComponent<ElectricalComponent>();
+		GetComponent<Renderer>().material.color = electricalComponent.connectionData[0].isInteractive ? Color.white : new Color(0.25f, 0.25f, 0.25f, 1);
+		
 		// Calc the position of the thing we are tryig to attach on
 		if (otherComponent == null || otherComponentIndex == -1){
 			return;
