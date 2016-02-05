@@ -110,7 +110,7 @@ public class LeverSwitch : MonoBehaviour {
 		leverGO.transform.FindChild ("SwitchLever").GetComponent<SpriteRenderer>().color = isInTrigger ? GameConfig.singleton.interactionReady : GameConfig.singleton.interactionNormal;
 		
 		
-		if (isInTrigger && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
+		if (isInTrigger  && Time.timeScale != 0 && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
 			desiredOn = !desiredOn;
 			
 		}

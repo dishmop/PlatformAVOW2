@@ -16,8 +16,8 @@ public class Cell : MonoBehaviour {
 	public bool isTripped = false;
 	
 	float oldVoltageRise = -1;
-	float resetMin = 1f;
-	float resetMax = 1.55f;
+	float resetMin = 0.97f;
+	float resetMax = 1.75f;
 	float resetSpeed = 0.2f;
 	
 	bool tripTimerStarted;
@@ -82,11 +82,7 @@ public class Cell : MonoBehaviour {
 			// Calc the mouse posiiton on world space
 			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 			
-			Collider2D collider = resetGO.GetComponent<Collider2D>();
-			bool isOver = collider.OverlapPoint(new Vector2(mouseWorldPos.x, mouseWorldPos.y));
-			resetGO.transform.GetChild(0).gameObject.SetActive(isOver);
-			
-			if (isOver && Input.GetMouseButtonDown(0)){
+			if (Input.GetKeyDown(KeyCode.R) && Time.timeScale != 0){
 				isTripped = false;
 				GetComponent<AudioSource>().Play();
 			}

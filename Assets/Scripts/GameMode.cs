@@ -67,7 +67,7 @@ public class GameMode : MonoBehaviour {
 		
 		wasEndOfLevel = isEndOfLevel;
 		
-		if (Input.GetKeyDown(KeyCode.R)){
+		if (Input.GetKeyDown(KeyCode.L) && Time.timeScale != 0){
 //			Debug.Log ("restartLevel - levelName: " + Application.loadedLevelName + "levelTime: " + Time.timeSinceLevelLoad + ", gameTime: " + (Time.time - GameMode.gameStartTime));
 			GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "restartLevel", Application.loadedLevelName, Time.timeSinceLevelLoad);
 //						
@@ -81,7 +81,7 @@ public class GameMode : MonoBehaviour {
 			Application.LoadLevel (Application.loadedLevelName);
 		}
 		
-		Cursor.visible = isEditingCircuit;
+		if (Time.timeScale != 0) Cursor.visible = isEditingCircuit;
 	
 	}
 	
