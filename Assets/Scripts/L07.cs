@@ -15,7 +15,9 @@ public class L07 : MonoBehaviour {
 	
 		float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent();
 		
-	//	if (feq(
+		bool showMessage = (Mathf.Abs(current) > 0.9f);
+		cellTextGO.SetActive(showMessage);
+			
 	
 	}
 }

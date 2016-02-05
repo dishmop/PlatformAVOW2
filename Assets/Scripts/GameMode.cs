@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 //using System.Collections.Generic;
 //using UnityEngine.Analytics;
 
@@ -13,7 +14,10 @@ public class GameMode : MonoBehaviour {
 	
 	public bool isEditingCircuit = false;
 	public bool isEndOfLevel = true;
-	public string nextLevelName;
+	bool wasEndOfLevel = true;
+	
+	float endOfLevelTime = 0;
+	float endOfLevelFadeDuration = 1;
 	
 	public static float gameStartTime;
 
@@ -35,12 +39,33 @@ public class GameMode : MonoBehaviour {
 	
 		canvasGO.SetActive(true);
 		
-		endOfLevelPanelGO.SetActive(isEndOfLevel);
-		if (isEndOfLevel){
-			if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)){
-			 	Application.LoadLevel(nextLevelName);
-			}
+		if (!wasEndOfLevel && isEndOfLevel){
+			endOfLevelTime = Time.time;
 		}
+		
+		if (isEndOfLevel && endOfLevelPanelGO){
+			endOfLevelPanelGO.SetActive(true);
+			float fadeVal = (Time.time - endOfLevelTime) / endOfLevelFadeDuration;
+			endOfLevelPanelGO.GetComponent<Image>().color = Color.Lerp(new Color(0, 0, 0, 0), new Color(0, 0, 0, 1), fadeVal);
+			endOfLevelPanelGO.GetComponentInChildren<Text>().text = "Level Complete";
+			
+			if (fadeVal > 1){
+				Application.LoadLevel(Application.loadedLevel + 1);
+			}
+			
+		}
+		else if (Time.timeSinceLevelLoad < endOfLevelFadeDuration){
+			endOfLevelPanelGO.SetActive(true);
+			float fadeVal = Time.timeSinceLevelLoad / endOfLevelFadeDuration;
+			endOfLevelPanelGO.GetComponent<Image>().color = Color.Lerp(new Color(0, 0, 0, 1), new Color(0, 0, 0, 0), fadeVal);
+			endOfLevelPanelGO.GetComponentInChildren<Text>().text = "";
+		}
+		else{
+			endOfLevelPanelGO.SetActive(false);
+		}
+		
+		
+		wasEndOfLevel = isEndOfLevel;
 		
 		if (Input.GetKeyDown(KeyCode.R)){
 //			Debug.Log ("restartLevel - levelName: " + Application.loadedLevelName + "levelTime: " + Time.timeSinceLevelLoad + ", gameTime: " + (Time.time - GameMode.gameStartTime));

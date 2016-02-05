@@ -12,8 +12,7 @@ public class ExitDoor : MonoBehaviour {
 	public AudioSource doorClose;
 	public GameObject avowGridGO;
 	
-	public string nextLevelName;
-	
+
 	public enum Dir{
 		kGoLeft,
 		kGoRight,
@@ -93,7 +92,6 @@ public class ExitDoor : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collider){
 		if (isOpen && collider.gameObject.tag == "Player" && !hasTriggered){
 			GameMode.singleton.isEndOfLevel = true;
-			GameMode.singleton.nextLevelName = nextLevelName;
 			hasTriggered = true;
 //			Debug.Log ("levelComplete - levelTime: " + Time.timeSinceLevelLoad + ", gameTime: " + (Time.time - GameMode.gameStartTime));
 			
