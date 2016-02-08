@@ -13,7 +13,9 @@ public class ResetScript : MonoBehaviour {
 	void Start () {
 		resetPanel = transform.FindChild("ResetPanel").gameObject;
 		skipPanel = transform.FindChild ("SkipPanel").gameObject;
-		fuelCellGO = GameObject.Find ("Cell");
+		if (fuelCellGO == null){
+			fuelCellGO = GameObject.Find ("Cell");
+		}
 		
 	
 	}

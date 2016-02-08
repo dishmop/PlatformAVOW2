@@ -15,9 +15,9 @@ public class Terminal : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		GetComponent<SpriteRenderer>().color = isInTrigger ? GameConfig.singleton.interactionReady : GameConfig.singleton.interactionNormal;
+		GetComponent<SpriteRenderer>().color = (isInTrigger  || isEditing) ? GameConfig.singleton.interactionReady : GameConfig.singleton.interactionNormal;
 		
-		if (isInTrigger && Time.timeScale != 0 && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
+		if ((isInTrigger  || isEditing) && Time.timeScale != 0 && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
 			GameMode.singleton.isEditingCircuit = !GameMode.singleton.isEditingCircuit;
 			isEditing = GameMode.singleton.isEditingCircuit;
 			
@@ -26,7 +26,7 @@ public class Terminal : MonoBehaviour {
 			Circuit.singleton.RemoveAllWires();
 		}
 		
-		transform.FindChild("Text").gameObject.SetActive(isInTrigger);
+		transform.FindChild("Text").gameObject.SetActive(isInTrigger || isEditing);
 		TextMesh textComponent = transform.FindChild("Text").GetComponent<TextMesh>();
 		
 		textComponent.text = GameMode.singleton.isEditingCircuit ? "Press [W] to stop" : "Press [W] to interact";
