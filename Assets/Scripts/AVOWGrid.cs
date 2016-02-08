@@ -132,7 +132,8 @@ public class AVOWGrid : MonoBehaviour {
 			bubble.GetComponent<Renderer>().material.SetFloat("_Grey", 0f);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
-			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", (current < 0) ? 1 : 0);
+			bool isReversed = (current < 0);
+			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", isReversed ? 1 : 0);
 			
 			if (bubbleTop != null){
 				bubbleTop.GetComponent<Renderer>().enabled = true;

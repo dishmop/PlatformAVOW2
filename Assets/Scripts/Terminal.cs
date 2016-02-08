@@ -4,6 +4,7 @@ using System.Collections;
 
 public class Terminal : MonoBehaviour {
 
+	public bool isEditing = false;
 	bool isInTrigger = false;
 
 	// Use this for initialization
@@ -18,6 +19,7 @@ public class Terminal : MonoBehaviour {
 		
 		if (isInTrigger && Time.timeScale != 0 && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
 			GameMode.singleton.isEditingCircuit = !GameMode.singleton.isEditingCircuit;
+			isEditing = GameMode.singleton.isEditingCircuit;
 			
 		}
 		if (GameMode.singleton.isEditingCircuit && Input.GetKeyDown(KeyCode.C) && Time.timeScale != 0){

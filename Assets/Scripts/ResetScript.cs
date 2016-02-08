@@ -6,11 +6,15 @@ public class ResetScript : MonoBehaviour {
 	public GameObject fuelCellGO;
 	bool oldCursorVis;
 	float oldTimeScale;
+	GameObject resetPanel;
+	GameObject skipPanel;
 
 	// Use this for initialization
 	void Start () {
-	
+		resetPanel = transform.FindChild("ResetPanel").gameObject;
+		skipPanel = transform.FindChild ("SkipPanel").gameObject;
 		fuelCellGO = GameObject.Find ("Cell");
+		
 	
 	}
 	
@@ -18,7 +22,8 @@ public class ResetScript : MonoBehaviour {
 	void Update () {
 	
 		if (fuelCellGO.GetComponent<Cell>().isTripped && !messageShown){
-			transform.GetChild(0).gameObject.SetActive(true);
+			resetPanel.SetActive(true);
+			skipPanel.SetActive (false);
 			messageShown = true;
 			oldCursorVis = Cursor.visible;
 			oldTimeScale = Time.timeScale;
@@ -30,7 +35,8 @@ public class ResetScript : MonoBehaviour {
 	
 	public void OK(){
 		Cursor.visible = oldCursorVis;
-		gameObject.SetActive(false);
+		resetPanel.SetActive(false);
+		skipPanel.SetActive (true);
 		Time.timeScale = oldTimeScale;
 	}
 }

@@ -67,11 +67,11 @@ public class MagneticDoor : MonoBehaviour {
 			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
-				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent(),
+				Mathf.Abs (electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent()),
 				speed,
 				offset
 				);
-			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, true);
 		}
 		
 	}

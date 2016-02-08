@@ -42,7 +42,7 @@ public class Lift : MonoBehaviour {
 				speed,
 				offset
 				);
-			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false);
 			
 		}
 	}

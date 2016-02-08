@@ -256,7 +256,9 @@ public class WireLine : MonoBehaviour {
 	void ConstructArrays(){
 		if (numVertices < 3){
 			Debug.Log ("Not enough vertices");
+			return;
 		}
+		
 		// Set up the arrays themselves
 		newVertices = new Vector3[numVertices];
 		newUV = new Vector2[numUVs];

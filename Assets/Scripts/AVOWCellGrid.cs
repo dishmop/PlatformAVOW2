@@ -312,12 +312,14 @@ public class AVOWCellGrid : MonoBehaviour {
 			bubble.GetComponent<Renderer>().material.SetFloat("_v0", v0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_v1", v1);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Blue", edge.edgeType == CircuitSimulator.EdgeType.kNormal ? 0 : 1);
-			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", (edge.resFwCurrent < 0) ? 1 : 0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Grey", 0f);
 			
 			float speed;
 			float offset;
-			CircuitSimulator.singleton.LookupPulseEdge(edge.id, out speed, out offset);
+			bool isDirectionAgnostic;
+			CircuitSimulator.singleton.LookupPulseEdge(edge.id, out speed, out offset, out isDirectionAgnostic);
+			bool isReversed = (edge.resFwCurrent < 0) && !isDirectionAgnostic;
+			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", isReversed ? 1 : 0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
 			

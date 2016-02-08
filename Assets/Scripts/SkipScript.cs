@@ -21,12 +21,15 @@ public class SkipScript : MonoBehaviour {
 		kFadeOut
 	};
 	State state = State.kWaiting;
+	GameObject confirmPanel;
 	
 	
 	// Use this for initialization
 	void Start () {
 		lastTimeStamp = Time.time + timeTillShow - interval;
 		transform.FindChild ("Message").GetComponent<Text>().color = new Color(1, 1, 1, 0);
+		confirmPanel = transform.FindChild("ConfirmPanel").gameObject;
+		confirmPanel.SetActive(false);
 	
 	}
 	
@@ -73,7 +76,7 @@ public class SkipScript : MonoBehaviour {
 			}
 		}
 		if (Input.GetKeyDown(KeyCode.M) && Time.timeScale != 0){	
-			transform.FindChild("ConfirmPanel").gameObject.SetActive(true);
+			confirmPanel.SetActive(true);
 			cursorViz = Cursor.visible;
 			timeScale = Time.timeScale;
 			Cursor.visible = true;
@@ -91,7 +94,7 @@ public class SkipScript : MonoBehaviour {
 	}
 	
 	public void DontSkip(){
-		transform.FindChild("ConfirmPanel").gameObject.SetActive(false);
+		confirmPanel.gameObject.SetActive(false);
 		Cursor.visible = cursorViz;
 		Time.timeScale = timeScale;
 		
