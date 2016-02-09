@@ -80,7 +80,7 @@ public class Cell : MonoBehaviour {
 			resetGO.GetComponent<Renderer>().material.color = resetCol + Mathf.Sin (Time.time * 2 * Mathf.PI) * new Color(32f/256f, 32f/256f, 32f/256f, 0);
 			
 			// Calc the mouse posiiton on world space
-			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
+//			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 			
 			if (Input.GetKeyDown(KeyCode.R) && Time.timeScale != 0){
 				isTripped = false;

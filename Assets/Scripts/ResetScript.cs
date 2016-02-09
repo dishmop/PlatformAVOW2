@@ -9,6 +9,7 @@ public class ResetScript : MonoBehaviour {
 	GameObject resetPanel;
 	GameObject skipPanel;
 
+	
 	// Use this for initialization
 	void Start () {
 		resetPanel = transform.FindChild("ResetPanel").gameObject;

@@ -12,6 +12,9 @@ public class MagneticDoor : MonoBehaviour {
 	public float maxDoorPos;
 	public float minDoorPos;
 	public GameObject magneticLinesGO;
+	public AudioSource humm;
+	public AudioSource crash;
+	public AudioSource scrape;
 	
 	
 	public bool isUp = false;
@@ -33,12 +36,16 @@ public class MagneticDoor : MonoBehaviour {
 		
 		
 		Vector3 doorPos = doorPanelGO.transform.localPosition;
-		if (isUp && !GetComponent<AudioSource>().isPlaying){
+		if (isUp && !humm.isPlaying){
 			GetComponent<AudioSource>().Play();
+			scrape.Play();
 		}
-		else if (!isUp && GetComponent<AudioSource>().isPlaying){
-			GetComponent<AudioSource>().Stop();
+		else if (!isUp && humm.isPlaying){
+			humm.Stop();
+			scrape.Play();
 		}
+		
+		float oldDoorPos = doorPos.y;
 		
 		if (isUp){
 			doorPos.y = Mathf.Min (doorPos.y + speed * Time.fixedDeltaTime, maxDoorPos);
@@ -48,6 +55,11 @@ public class MagneticDoor : MonoBehaviour {
 			doorPos.y = Mathf.Max (doorPos.y - speed * Time.fixedDeltaTime, minDoorPos);
 		}
 		doorPanelGO.transform.localPosition = doorPos;
+		
+		// If is moving, but the new door pos is at a max or min
+		if (!MathUtils.FP.Feq(oldDoorPos, doorPos.y) && (MathUtils.FP.Feq(maxDoorPos, doorPos.y) || MathUtils.FP.Feq(minDoorPos, doorPos.y))){
+			crash.Play();
+		}
 	}
 	
 	void Update(){

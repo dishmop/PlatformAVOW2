@@ -5,6 +5,9 @@ using System.Collections;
 
 public class SplashScreen : MonoBehaviour {
 
+	public string firstLevelName;
+	
+
 	public void StartGame(){
 //		Debug.Log ("startGame");
 		GoogleAnalytics.Client.SendEventHit("gameFlow", "startGame");
@@ -15,7 +18,7 @@ public class SplashScreen : MonoBehaviour {
 //			{ "dummy", 0 },
 //		});			
 		GameMode.gameStartTime = Time.time;
-		Application.LoadLevel("Level1");
+		Application.LoadLevel(firstLevelName);
 	}
 
 	// Use this for initialization

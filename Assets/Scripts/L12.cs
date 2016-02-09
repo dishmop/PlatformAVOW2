@@ -21,7 +21,7 @@ public class L12 : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		bool isOnTerminal1 = terminal1.GetComponent<Terminal>().isEditing;
+//		bool isOnTerminal1 = terminal1.GetComponent<Terminal>().isEditing;
 		bool isOnTerminal2 = terminal2.GetComponent<Terminal>().isEditing;
 		
 		
