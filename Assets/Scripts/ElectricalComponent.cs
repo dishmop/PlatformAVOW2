@@ -15,6 +15,8 @@ public class ElectricalComponent : MonoBehaviour {
 		kEnd,
 	};
 	
+	public Color squareCol;
+	
 	
 	int rotDirAdd = 0;
 	
@@ -261,6 +263,8 @@ public class ElectricalComponent : MonoBehaviour {
 			collider.enabled = connectionData[i].isInteractive;
 			
 		}
+		
+		squareCol = GameConfig.singleton.GetNextSquareCol();
 	}
 	
 	void OnDestroy(){

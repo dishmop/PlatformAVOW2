@@ -88,9 +88,10 @@ public class SlidingDoor : MonoBehaviour {
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
 				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent(),
 				speed,
-				offset
-				);
-			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false);
+				offset,
+				electricsGO.GetComponent<ElectricalComponent>().squareCol
+			);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false, electricsGO.GetComponent<ElectricalComponent>().squareCol);
 			
 		}
 	}

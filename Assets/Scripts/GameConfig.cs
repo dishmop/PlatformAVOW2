@@ -8,17 +8,24 @@ public class GameConfig : MonoBehaviour {
 	public Color interactionNormal = new Color(0, 0.75f, 0, 1);
 	public Color interactionReady = new Color(0.25f, 1, 0.25f, 1);
 	
-	public Color indicatorOK = new Color(0, 1, 0, 1);
-	public Color indicatorSemi = new Color(1, 1, 0, 1);
-	public Color indicatorError = new Color(1, 0, 0, 1);
-	public Color indicatorUnpowered = new Color(0, 0, 0, 1);
+	public Color squareInsideCol1 = new Color(0f, 0f, 0f, 1);
+	public Color squareInsideCol2 = new Color(0f, 0f, 0f, 1);
 	
 	public float routingFirstStepDist = 0.35f;
 	public bool showDebug = false;
 	
+	public Color GetNextSquareCol(){
+		float valR = Random.Range(0f, 1f);
+		float valG = Random.Range(0f, 1f);
+		float valB = Random.Range(0f, 1f);
+		return new Color(valR, valG, valB, 1);
+		
+	}
+	
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
 		singleton = this;
+		Random.seed = 3;
 	}
 	
 	

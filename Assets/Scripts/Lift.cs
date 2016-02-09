@@ -40,9 +40,10 @@ public class Lift : MonoBehaviour {
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
 				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent(),
 				speed,
-				offset
+				offset,
+				electricsGO.GetComponent<ElectricalComponent>().squareCol
 				);
-			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false, electricsGO.GetComponent<ElectricalComponent>().squareCol);
 			
 		}
 	}

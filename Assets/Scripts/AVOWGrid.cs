@@ -107,7 +107,7 @@ public class AVOWGrid : MonoBehaviour {
 		}
 	}
 	
-	public void SetBubble(float minV, float maxV, float current, float speed, float offset){
+	public void SetBubble(float minV, float maxV, float current, float speed, float offset, Color col){
 		thisCurrent = current;
 		float voltageDiff = maxV - minV;
 		if (float.IsNaN(current) || float.IsNaN(voltageDiff)){
@@ -132,6 +132,7 @@ public class AVOWGrid : MonoBehaviour {
 			bubble.GetComponent<Renderer>().material.SetFloat("_Grey", 0f);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Speed", speed);
 			bubble.GetComponent<Renderer>().material.SetFloat("_Offset", offset);
+			bubble.GetComponent<Renderer>().material.SetColor("_InsideCol", col);
 			bool isReversed = (current < 0);
 			bubble.GetComponent<Renderer>().material.SetFloat("_IsReversed", isReversed ? 1 : 0);
 			

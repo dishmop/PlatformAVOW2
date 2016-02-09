@@ -112,6 +112,7 @@ public class LeverSwitch : MonoBehaviour {
 		
 		if (isInTrigger  && Time.timeScale != 0 && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))){
 			desiredOn = !desiredOn;
+			GetComponent<AudioSource>().Play();
 			
 		}
 		UpdateEmptyConnectors();

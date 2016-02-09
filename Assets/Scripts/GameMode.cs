@@ -23,6 +23,14 @@ public class GameMode : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+	
+		if (!endOfLevelPanelGO){
+			endOfLevelPanelGO = GameObject.Find ("EndOfLevelPanel");
+		}
+		if (!canvasGO){
+			canvasGO = GameObject.Find ("Canvas");
+		}
+		
 //		Debug.Log ("startLevel - levelName: " + Application.loadedLevelName + ", gameTime: " + (Time.time - gameStartTime));
 		GoogleAnalytics.Client.SendEventHit("gameFlow", "startLevel", Application.loadedLevelName);
 		

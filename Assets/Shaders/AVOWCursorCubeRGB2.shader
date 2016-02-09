@@ -3,11 +3,18 @@
 		 _v0 ("v0", Float) = 0
 		 _v1 ("v1", Float) = 1
 		 _Blue ("Blue", Float) = 0
-		 _Grey ("Blue", Float) = 0
+		 _Grey ("Grey", Float) = 0
 		 _Spacing ("Spacing", Float) = 1
       	 _Speed ("Speed", Float) = 1
       	 _Offset ("Offset", Float) = 1
       	 _IsReversed ("IsReversed", Float) = 0
+      	 
+      	 _GreyCol("GreyCol", Color) = (1,1,1,1)
+      	 _BlueCol("BlueCol", Color) = (1,1,1,1)
+      	 _NormCol1("NormCol1", Color) = (1,1,1,1)
+      	 _NormCol2("NormCol2", Color) = (1,1,1,1)
+      	 
+		 _InsideCol("InsideCol", Color) = (1,1,1,1)
 
 	}
 	SubShader {
@@ -37,6 +44,12 @@
       	 		uniform float _Speed;
       	 		uniform float _Offset;
 				uniform float _IsReversed;
+				uniform float4 _GreyCol;
+				uniform float4 _BlueCol;
+				uniform float4 _NormCol1;
+				uniform float4 _NormCol2;
+				uniform float4 _InsideCol;
+				
 		    
 		
 		        struct v2f {
@@ -98,22 +111,30 @@
 		   
 		        float4 frag(v2f i) : COLOR
 		        {
-		        	float4 col0 = float4(12f/256f, 0, 0, 1);
-		        	float4 col1 = float4(0, 12f/256f, 0, 1);
+		        
+//				uniform float4 _GreyCol;
+//				uniform float4 _BlueCol;
+//				uniform float4 _NormCol1;
+//				uniform float4 _NormCol2;
+				
+//						        		        
+//		        	float4 col0 = float4(12f/256f, 0, 0, 1);
+//		        	float4 col1 = float4(0, 12f/256f, 0, 1);
+		        	
 		        	float doCross = 0;
 			        if (_Grey > 0.5){
-			        	_Color1 = float4(3/256f, 3/256f, 3f/256f, 1);
-			        	_Color2 = float4(3/256f, 3/256f, 3f/256f, 1);
+			        	_Color1 = _GreyCol;
+			        	_Color2 = _GreyCol;
 			        	_Intensity = 0.75f;
 			        }
 		        	else if (_Blue > 0.5){
-			        	_Color1 = float4(1/256f, 1/256f, 12f/256f, 1);
-			        	_Color2 = float4(1/256f, 1/256f, 12f/256f, 1);
+			        	_Color1 = _BlueCol;
+			        	_Color2 = _BlueCol;
 			        	_Intensity = 0.75f;
 			        }
 			        else{
-			        	_Color1 = lerp(col0, col1, _v0);
-			        	_Color2 = lerp(col0, col1, _v1);
+			        	_Color1 = lerp(_NormCol1, _NormCol2, _v0);
+			        	_Color2 = lerp(_NormCol1, _NormCol2, _v1);
 			        	_Intensity = 0.75f;
 			        	doCross =1;
 			        }
@@ -133,7 +154,12 @@
 		        	float4 colDiag1 = 	doCross * _IsReversed * CalcCol(diag1, i.uv[1]);
 		        	float4 colDiag2 = 	doCross * _IsReversed * CalcCol(diag2, i.uv[1]);
 		        	
-		        	return CalcIntensity() * _Intensity * (colLeft + colRight +  colTop + colBottom + colDiag1 + colDiag2);
+		        	float4 edgeCol =  0.5f * _Intensity * (colLeft + colRight +  colTop + colBottom);
+		        	
+		        	float4 edgeAndDiagCol =  0.8f * _Intensity * (colDiag1 + colDiag2);
+		        	
+		        	float4 middleCol = _InsideCol * (1-edgeCol[3]);
+		        	return CalcIntensity() * (edgeCol + edgeAndDiagCol) + middleCol ;
 		        	
 		        
 	//		        	return lerp(_Color0, _Color1, val);

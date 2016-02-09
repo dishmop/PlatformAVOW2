@@ -623,6 +623,9 @@ public class Wire : MonoBehaviour {
 				}
 				foreach (GameObject go in coreWires){
 					go.GetComponent<WireLine>().wireColor = wireCol;
+					
+					// Need this cos blue needs to be boosted up a bit!
+					go.GetComponent<WireLine>().wireIntensity = 1 + voltage;
 				}
 				
 			}

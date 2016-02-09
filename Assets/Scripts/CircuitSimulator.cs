@@ -8,7 +8,7 @@ using System.Linq;
 public class CircuitSimulator : MonoBehaviour {
 	public static CircuitSimulator singleton = null;
 	
-	public Dictionary<int, Eppy.Tuple<float, float, bool>> bubblePulseLookup = new Dictionary<int, Eppy.Tuple<float, float, bool>>();
+	public Dictionary<int, Eppy.Tuple<float, float, bool, Color>> bubblePulseLookup = new Dictionary<int, Eppy.Tuple<float, float, bool, Color>>();
 	
 	public class LoopRecord{
 		public LoopRecord(int loopId, int fromNodeIndex){
@@ -133,27 +133,29 @@ public class CircuitSimulator : MonoBehaviour {
 	double epsilon = 0.0001;
 	float[] loopCurrents;
 	
-	public void RegisterPulseEdge(int simEdgeId, float speed, float offset, bool isDirectionAgnositic){
+	public void RegisterPulseEdge(int simEdgeId, float speed, float offset, bool isDirectionAgnositic, Color col){
 		if (!bubblePulseLookup.ContainsKey(simEdgeId)){
-			bubblePulseLookup.Add(simEdgeId, new Eppy.Tuple<float, float, bool>(speed, offset, isDirectionAgnositic));
+			bubblePulseLookup.Add(simEdgeId, new Eppy.Tuple<float, float, bool, Color>(speed, offset, isDirectionAgnositic, col));
 		}
 		else{
-			bubblePulseLookup[simEdgeId] = new Eppy.Tuple<float, float, bool>(speed, offset, isDirectionAgnositic);
+			bubblePulseLookup[simEdgeId] = new Eppy.Tuple<float, float, bool, Color>(speed, offset, isDirectionAgnositic, col);
 			
 		}
 	}
 	
-	public  void LookupPulseEdge(int simEdgeId, out float speed, out float offset, out bool isDirectionAgnostic){
+	public  void LookupPulseEdge(int simEdgeId, out float speed, out float offset, out bool isDirectionAgnostic, out Color col){
 		if (!bubblePulseLookup.ContainsKey(simEdgeId)){
 			speed = 0;
 			offset = 0;
 			isDirectionAgnostic = false;
+			col = Color.black;
 		}
 		else{
-			Eppy.Tuple<float, float, bool> result = bubblePulseLookup[simEdgeId];
+			Eppy.Tuple<float, float, bool, Color> result = bubblePulseLookup[simEdgeId];
 			speed = result.Item1;
 			offset = result.Item2;
 			isDirectionAgnostic = result.Item3;
+			col = result.Item4;
 		}
 	}
 

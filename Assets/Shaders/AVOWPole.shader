@@ -4,6 +4,8 @@
 		 _Spacing ("Spacing", Float) = 1
       	 _Speed ("Speed", Float) = 1
       	 _Offset ("Offset", Float) = 1
+      	 _Color1 ("Color1", Color) = (1, 1, 1, 1)
+      	 _Color2 ("Color2", Color) = (1, 1, 1, 1)
 
 	}
 	SubShader {
@@ -23,6 +25,7 @@
 		        
 		
 		        uniform float  _Intensity;
+				uniform float4	_UseColor;
 				uniform float4	_Color1;
 				uniform float4	_Color2; 
 				uniform float _v0;
@@ -55,7 +58,7 @@
 		        }	
 		        
 		       	float4 CalcCol(float x){		       		
-	       			return float4(CalcCurve(x, _Color1.r), CalcCurve(x, _Color1.g), CalcCurve(x, _Color1.b), CalcCurve(x, _Color1.a));
+	       			return float4(CalcCurve(x, _UseColor.r), CalcCurve(x, _UseColor.g), CalcCurve(x, _UseColor.b), CalcCurve(x, _UseColor.a));
 		       	}
 		       	
 		       	
@@ -102,10 +105,8 @@
 		   
 		        float4 frag(v2f i) : COLOR
 		        {
-		        	float4 col0 = float4(12f/256f, 0, 0, 1);
-		        	float4 col1 = float4(0, 12f/256f, 0, 1);
 		        	
-		        	_Color1 = lerp(col0, col1, _v0);
+		        	_UseColor = lerp(_Color1, _Color2, _v0);
 		        	_Intensity = 0.75f;
 		        	
 		        	

@@ -81,9 +81,10 @@ public class MagneticDoor : MonoBehaviour {
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
 				Mathf.Abs (electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent()),
 				speed,
-				offset
+				offset,
+				electricsGO.GetComponent<ElectricalComponent>().squareCol
 				);
-			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, true);
+			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, true, electricsGO.GetComponent<ElectricalComponent>().squareCol);
 		}
 		
 	}
