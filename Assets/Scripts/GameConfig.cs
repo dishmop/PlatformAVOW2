@@ -13,11 +13,19 @@ public class GameConfig : MonoBehaviour {
 	
 	public float routingFirstStepDist = 0.35f;
 	public bool showDebug = false;
+	int randCount;
 	
 	public Color GetNextSquareCol(){
+		Random.seed = randCount++;
 		float valR = Random.Range(0f, 1f);
 		float valG = Random.Range(0f, 1f);
 		float valB = Random.Range(0f, 1f);
+		float invSum = 2f/(valR + valG + valB);
+		valR *= invSum;
+		valG *= invSum;
+		valB *= invSum;
+		
+	
 		return new Color(valR, valG, valB, 1);
 		
 	}
@@ -25,7 +33,8 @@ public class GameConfig : MonoBehaviour {
 	void Awake(){
 		if (singleton != null) Debug.LogError ("Error assigning singleton");
 		singleton = this;
-		Random.seed = 3;
+		randCount = 10;
+		
 	}
 	
 	

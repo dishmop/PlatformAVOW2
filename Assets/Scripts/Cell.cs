@@ -7,6 +7,9 @@ public class Cell : MonoBehaviour {
 	public GameObject avowGridBackgroundGO;
 	public GameObject resetGO;
 	public Color resetCol;
+	public AudioSource clickWhir;
+	public AudioSource buzz;
+	
 //	Color glowCol = Color.red;
 //	Color oldCellCol;
 	
@@ -19,6 +22,8 @@ public class Cell : MonoBehaviour {
 	float resetMin = 0.97f;
 	float resetMax = 1.75f;
 	float resetSpeed = 0.2f;
+	
+	float startBuzzTime;
 	
 	bool tripTimerStarted;
 	float tripTime = 0;
@@ -35,8 +40,15 @@ public class Cell : MonoBehaviour {
 	void FixedUpdate () {
 		if (isTripped){
 			cellElectrics.GetComponent<ElectricalComponent>().voltageRise = 0.001f;
+			if (!buzz.isPlaying){
+				buzz.Play();
+				startBuzzTime = Time.time;
+			}
 		}
 		else{
+			if (buzz.isPlaying){
+				buzz.Stop();
+			}
 			cellElectrics.GetComponent<ElectricalComponent>().voltageRise = Mathf.Min (cellElectrics.GetComponent<ElectricalComponent>().voltageRise +0.06f, oldVoltageRise);
 			
 		}
@@ -55,7 +67,7 @@ public class Cell : MonoBehaviour {
 		
 		if (tripTimerStarted && Time.time > tripTime + tripSafeDuration){
 			isTripped = true;
-			GetComponent<AudioSource>().Play();
+			clickWhir.Play();
 			tripTimerStarted = false;
 		}
 		
@@ -77,14 +89,14 @@ public class Cell : MonoBehaviour {
 		Vector3 localPos = resetGO.transform.localPosition;
 		if (isTripped){
 			localPos.y = Mathf.Min (resetMax, localPos.y + resetSpeed);
-			resetGO.GetComponent<Renderer>().material.color = resetCol + Mathf.Sin (Time.time * 2 * Mathf.PI) * new Color(32f/256f, 32f/256f, 32f/256f, 0);
+			resetGO.GetComponent<Renderer>().material.color = resetCol + Mathf.Sin ((Time.time - startBuzzTime) * 2 * Mathf.PI) * new Color(32f/256f, 32f/256f, 32f/256f, 0);
 			
 			// Calc the mouse posiiton on world space
 //			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
 			
 			if (Input.GetKeyDown(KeyCode.R) && Time.timeScale != 0){
 				isTripped = false;
-				GetComponent<AudioSource>().Play();
+				clickWhir.Play();
 			}
 			
 			

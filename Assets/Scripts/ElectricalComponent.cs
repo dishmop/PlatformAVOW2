@@ -263,8 +263,9 @@ public class ElectricalComponent : MonoBehaviour {
 			collider.enabled = connectionData[i].isInteractive;
 			
 		}
-		
-		squareCol = GameConfig.singleton.GetNextSquareCol();
+		if (!MathUtils.FP.Fleq(resistance, 0)){
+			squareCol = GameConfig.singleton.GetNextSquareCol();
+		}
 	}
 	
 	void OnDestroy(){

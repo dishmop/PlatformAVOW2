@@ -8,6 +8,7 @@ public class Piston : MonoBehaviour {
 	public GameObject springPoleGO;
 	public GameObject electricsGO;
 	public GameObject avowGridGO;
+	public GameObject hummGO;
 	
 	float springConstant = 4;
 	float motorMaxForce = 8;
@@ -40,19 +41,22 @@ public class Piston : MonoBehaviour {
 				
 				wire0.GetSpeedOffset(wireEndIndex, out speed, out offset);
 			}
-			
+			float current = electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent();
 			avowGridGO.GetComponent<AVOWGrid>().SetBubble(
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMin(), 
 				electricsGO.GetComponent<ElectricalComponent>().GetVoltageMax(),
-				electricsGO.GetComponent<ElectricalComponent>().GetSimFwCurrent(),
+				current,
 				speed,
 				offset,
 				electricsGO.GetComponent<ElectricalComponent>().squareCol
 				);
 			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false, electricsGO.GetComponent<ElectricalComponent>().squareCol);
 			
+			hummGO.GetComponent<AudioSource>().volume = Mathf.Abs (Mathf.Clamp01(2 * current));
+			hummGO.GetComponent<AudioSource>().pitch = Mathf.Abs (2 * current);
 		}
 		UpdateSpring();
+		
 	}
 	
 	// Update is called once per frame

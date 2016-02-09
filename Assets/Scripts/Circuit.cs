@@ -80,7 +80,9 @@ public class Circuit : MonoBehaviour {
 	
 	public void RemoveWire(GameObject wire){
 		int index = wireGOs.IndexOf(wire);
-		wireGOs.RemoveAt(index);
+		if (wireGOs.Count > index && wireGOs[index] != null){
+			wireGOs.RemoveAt(index);
+		}
 //		ElectricalComponent component0 = wire.GetComponent<Wire>().ends[0].component.GetComponent<ElectricalComponent>();
 //		ElectricalComponent component1 = wire.GetComponent<Wire>().ends[1].component.GetComponent<ElectricalComponent>();
 //		
