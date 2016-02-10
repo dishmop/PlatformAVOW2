@@ -160,6 +160,11 @@ public class LeverSwitch : MonoBehaviour {
 		}
 		
 		
+		int simEdgeId = switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[0].simEdgeId;
+		
+		wireGO.GetComponent<Wire>().simEdgeId = simEdgeId;
+		
+		
 		switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[0].resistance = GetResistance(maxResistanceAngle - onResistanceAngle);
 		switchElectricsGO.GetComponent<ElectricalComponent>().internalRouting[1].resistance = GetResistance(onResistanceAngle);
 		

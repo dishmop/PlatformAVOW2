@@ -52,7 +52,7 @@ public class Piston : MonoBehaviour {
 				);
 			CircuitSimulator.singleton.RegisterPulseEdge(electricsGO.GetComponent<ElectricalComponent>().simEdgeId, speed, offset, false, electricsGO.GetComponent<ElectricalComponent>().squareCol);
 			
-			hummGO.GetComponent<AudioSource>().volume = Mathf.Abs (Mathf.Clamp01(2 * current));
+			hummGO.GetComponent<AudioSource>().volume = Mathf.Clamp01(Mathf.Abs (2 * current));
 			hummGO.GetComponent<AudioSource>().pitch = Mathf.Abs (2 * current);
 		}
 		UpdateSpring();

@@ -27,6 +27,7 @@ public class ElectricalComponent : MonoBehaviour {
 		public int connectionIndex0;
 		public int connectionIndex1;
 		public float resistance;
+		public int simEdgeId;
 	}
 	public InternalRoute[] internalRouting;
 	public enum PolarityType{

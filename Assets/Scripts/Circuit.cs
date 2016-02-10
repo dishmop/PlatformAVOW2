@@ -266,7 +266,7 @@ public class Circuit : MonoBehaviour {
 		// Do any internal routing
 		foreach (ElectricalComponent.InternalRoute route in component.internalRouting){
 			if (route.resistance >= 0){
-				sim.AddLoadEdge(component.simNodeIndices[route.connectionIndex0], component.simNodeIndices[route.connectionIndex1], route.resistance, component.gameObject.transform.position.x, CircuitSimulator.EdgeType.kBlue);
+				route.simEdgeId = sim.AddLoadEdge(component.simNodeIndices[route.connectionIndex0], component.simNodeIndices[route.connectionIndex1], route.resistance, component.gameObject.transform.position.x, CircuitSimulator.EdgeType.kBlue);
 			}
 		}
 	}

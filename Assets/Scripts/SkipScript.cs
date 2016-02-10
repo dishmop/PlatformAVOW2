@@ -47,7 +47,7 @@ public class SkipScript : MonoBehaviour {
 			case State.kFadeIn:
 			{
 				float fadeVal = (Time.time - lastTimeStamp) / fadeTime;
-				transform.FindChild ("Message").GetComponent<Text>().color = Color.Lerp(new Color(1, 1, 1, 0), Color.white,fadeVal);
+				transform.FindChild ("Message").GetComponent<Text>().color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.75f), fadeVal);
 				if (fadeVal > 1){
 					lastTimeStamp = Time.time;
 					state = State.kShow;
@@ -66,7 +66,7 @@ public class SkipScript : MonoBehaviour {
 			case State.kFadeOut:
 			{
 				float fadeVal = (Time.time - lastTimeStamp) / fadeTime;
-				transform.FindChild ("Message").GetComponent<Text>().color = Color.Lerp(Color.white, new Color(1, 1, 1, 0), fadeVal);
+				transform.FindChild ("Message").GetComponent<Text>().color = Color.Lerp(new Color(1, 1, 1, 0.75f), new Color(1, 1, 1, 0), fadeVal);
 				if (fadeVal > 1){
 					lastTimeStamp = Time.time;
 					state = State.kWaiting;
