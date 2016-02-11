@@ -58,6 +58,11 @@ public class GameMode : MonoBehaviour {
 			endOfLevelPanelGO.GetComponentInChildren<Text>().text = "Level Complete";
 			
 			if (fadeVal > 1){
+			
+				PlayerPrefs.SetInt("ResumeLevelNumber", Application.loadedLevel+1);
+				PlayerPrefs.SetFloat("ResumeLevelTime", Time.time - GameMode.gameStartTime);
+				
+				
 				Application.LoadLevel(Application.loadedLevel + 1);
 			}
 			

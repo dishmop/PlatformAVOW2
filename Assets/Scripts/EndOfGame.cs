@@ -15,6 +15,10 @@ public class EndOfGame : MonoBehaviour {
 //		Debug.Log ("gameComplete - gameTime: " + (Time.time - GameMode.gameStartTime));
 		GoogleAnalytics.Client.SendTimedEventHit("gameFlow", "gameComplete", "", (Time.time - GameMode.gameStartTime));
 //		Analytics.CustomEvent("gameComplete", new Dictionary<string, object>{ { "gameTime", (Time.time - GameMode.gameStartTime) }	});		
+
+
+		PlayerPrefs.DeleteKey("ResumeLevelNumber");
+		PlayerPrefs.DeleteKey("ResumeLevelTime");
 	
 	}
 	
