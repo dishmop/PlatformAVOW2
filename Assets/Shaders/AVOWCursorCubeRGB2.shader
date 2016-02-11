@@ -158,7 +158,7 @@
 		        	
 		        	float4 edgeAndDiagCol =  0.8f * _Intensity * (colDiag1 + colDiag2);
 		        	
-		        	float4 middleCol = _InsideCol * (1-edgeCol[3]);
+		        	float4 middleCol = 0.4 * _InsideCol;// * (1-edgeCol[3]);
 		        	return CalcIntensity() * (edgeCol + edgeAndDiagCol) + middleCol ;
 		        	
 		        

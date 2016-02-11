@@ -22,20 +22,20 @@ public class L12 : MonoBehaviour {
 	void Update () {
 	
 //		bool isOnTerminal1 = terminal1.GetComponent<Terminal>().isEditing;
-		bool isOnTerminal2 = terminal2.GetComponent<Terminal>().isEditing;
+	///	bool isOnTerminal2 = terminal2.GetComponent<Terminal>().isEditing;
 		
 		
 		bool isParallel = 
 			(Mathf.Abs(pistonGO1.GetComponent<ElectricalComponent>().GetSimFwCurrent()) > 0.75f) && 
 			(Mathf.Abs(pistonGO2.GetComponent<ElectricalComponent>().GetSimFwCurrent()) > 0.75f);
 		
-		textParallel.SetActive(!isOnTerminal2 && isParallel);
+		textParallel.SetActive( isParallel);
 		
 		bool isBackwards = 
 			(pistonGO1.GetComponent<ElectricalComponent>().GetSimFwCurrent() < -0.1f) || 
 			(pistonGO2.GetComponent<ElectricalComponent>().GetSimFwCurrent() < -0.1f);
 		
-		textBackwards.SetActive(!isOnTerminal2 && isBackwards && !isParallel);
+		textBackwards.SetActive( isBackwards && !isParallel);
 		
 		bool isSuccess = 
 			MathUtils.FP.Feq(pistonGO1.GetComponent<ElectricalComponent>().GetSimFwCurrent(),  0.5f) && 
@@ -43,8 +43,6 @@ public class L12 : MonoBehaviour {
 			
 		textSuccess.SetActive(isSuccess);
 		
-		
-		step2.SetActive(isOnTerminal2);
 		
 		
 		

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class GameConfig : MonoBehaviour {
 	public static GameConfig singleton = null;
@@ -11,11 +12,20 @@ public class GameConfig : MonoBehaviour {
 	public Color squareInsideCol1 = new Color(0f, 0f, 0f, 1);
 	public Color squareInsideCol2 = new Color(0f, 0f, 0f, 1);
 	
+	
+	public Color[] componentColourList;
+	
 	public float routingFirstStepDist = 0.35f;
+	
+	public float componentColGreyness = 0.5f;
+	
 	public bool showDebug = false;
 	int randCount;
 	
 	public Color GetNextSquareCol(){
+		return componentColourList[randCount++ % componentColourList.Count()];
+	
+	/*
 		Random.seed = randCount++;
 		float valR = Random.Range(0f, 1f);
 		float valG = Random.Range(0f, 1f);
@@ -27,6 +37,7 @@ public class GameConfig : MonoBehaviour {
 		
 	
 		return new Color(valR, valG, valB, 1);
+		*/
 		
 	}
 	

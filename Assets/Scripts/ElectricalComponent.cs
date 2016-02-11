@@ -16,7 +16,7 @@ public class ElectricalComponent : MonoBehaviour {
 	};
 	
 	public Color squareCol;
-	
+	public GameObject[] realColourBits;
 	
 	int rotDirAdd = 0;
 	
@@ -266,6 +266,10 @@ public class ElectricalComponent : MonoBehaviour {
 		}
 		if (!MathUtils.FP.Fleq(resistance, 0)){
 			squareCol = GameConfig.singleton.GetNextSquareCol();
+			foreach (GameObject go in realColourBits){
+				Renderer renderer = go.GetComponent<Renderer>();
+				renderer.material.color = Color.Lerp(squareCol, Color.grey, GameConfig.singleton.componentColGreyness);
+			}
 		}
 	}
 	
