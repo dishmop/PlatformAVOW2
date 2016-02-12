@@ -9,10 +9,22 @@ public class CamController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
+		if (!trackObject){
+			GameObject envGO = GameObject.Find("Environment");
+			if (envGO){
+				Transform trackedTrans = envGO.transform.FindChild("Background");
+				if (trackedTrans){
+					trackObject = trackedTrans.gameObject;
+				}
+			}
+		}
+	
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		if (!trackObject) return;
+		
 		Renderer renderer = trackObject.GetComponent<Renderer>();
 		if (renderer != null){
 			Bounds trackBounds = renderer.bounds;

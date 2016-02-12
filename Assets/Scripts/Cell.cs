@@ -6,6 +6,8 @@ public class Cell : MonoBehaviour {
 	
 	public GameObject avowGridBackgroundGO;
 	public GameObject resetGO;
+	public GameObject resetPanelGO;
+	
 	public Color resetCol;
 	public AudioSource clickWhir;
 	public AudioSource buzz;
@@ -33,11 +35,23 @@ public class Cell : MonoBehaviour {
 	void Start () {
 		oldVoltageRise = cellElectrics.GetComponent<ElectricalComponent>().voltageRise;
 //		oldCellCol = GetComponent<SpriteRenderer>().color;
+		if (!resetPanelGO){
+			GameObject canvasGO = GameObject.Find ("Canvas");
+			if (canvasGO)
+			{
+				Transform resetPanelParent = canvasGO.transform.FindChild("Reset");
+				if (resetPanelParent){
+					resetPanelGO = resetPanelParent.GetChild(0).gameObject;
+				}
+			}
+			
+		}
 	
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		resetPanelGO.SetActive(isTripped);
 		if (isTripped){
 			cellElectrics.GetComponent<ElectricalComponent>().voltageRise = 0.001f;
 			if (!buzz.isPlaying){

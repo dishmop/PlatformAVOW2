@@ -6,12 +6,12 @@
 // 
 // Usage
 // ------
-// Place this component in a game object somewehre in your scene.
-// When it starts up in the editor, it will fill the scenes array with the names of all your scenes in the build settings
-// it will also save them as a binary file in your Resources folder
+// Place this component in one game object somewhere in your scene.
+// When it starts up in the editor, it will fill the "scenes" array with the names of all your scenes in the build settings
+// it will also save them as a binary file in your Resources folder in assets
 //
-// When you start this up in non editor mode it will load in the file from your resources
-// and fill the scene array that way
+// When you start this up in non editor mode it will load in the file from your resources folder (this uses the resource managemnet system
+// Rather than the raw file IO so should also work on web player builds).., and fills the scene array that way
 //
 // You can force these functions to be called from the editor by right clicking the component in the inspector
 //

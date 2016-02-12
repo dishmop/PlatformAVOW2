@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 public class SkipScript : MonoBehaviour {
 
-	float timeTillShow = 120;
-	float interval = 10;
-	float showDuration = 5;
+	float timeTillShow = 60 * 5;
+	float interval = 60;
+	float showDuration = 10;
 	float lastTimeStamp = 0;
 	float fadeTime = 1;
 	
@@ -21,16 +21,31 @@ public class SkipScript : MonoBehaviour {
 		kFadeOut
 	};
 	State state = State.kWaiting;
-	GameObject confirmPanel;
+	GameObject confirmPanelGO;
+	GameObject messageGO;
+	GameObject messagePanelGO;
 	
 	
 	// Use this for initialization
 	void Start () {
 		lastTimeStamp = Time.time + timeTillShow - interval;
-		transform.FindChild ("Message").GetComponent<Text>().color = new Color(1, 1, 1, 0);
-		confirmPanel = transform.FindChild("ConfirmPanel").gameObject;
-		confirmPanel.SetActive(false);
+		messagePanelGO = transform.FindChild ("Panel").gameObject;
+		messageGO = messagePanelGO.transform.FindChild ("Message").gameObject;
+		
+		SetSkipMessageAlpha(0);
+		
+		confirmPanelGO = transform.FindChild("ConfirmPanel").gameObject;
+		confirmPanelGO.SetActive(false);
+	}
 	
+	void SetSkipMessageAlpha(float alpha){
+		messagePanelGO.GetComponent<Image>().color = SetAlpha(messagePanelGO.GetComponent<Image>().color, alpha);
+		messageGO.GetComponent<Text>().color = SetAlpha(messageGO.GetComponent<Text>().color, alpha);
+	}
+	
+	Color SetAlpha (Color col, float alpha){
+		col.a = alpha;
+		return col;
 	}
 	
 	// Update is called once per frame
@@ -47,7 +62,7 @@ public class SkipScript : MonoBehaviour {
 			case State.kFadeIn:
 			{
 				float fadeVal = (Time.time - lastTimeStamp) / fadeTime;
-				transform.FindChild ("Message").GetComponent<Text>().color = Color.Lerp(new Color(1, 1, 1, 0), new Color(1, 1, 1, 0.75f), fadeVal);
+				SetSkipMessageAlpha(Mathf.Lerp(0, 0.75f, fadeVal));
 				if (fadeVal > 1){
 					lastTimeStamp = Time.time;
 					state = State.kShow;
@@ -66,7 +81,7 @@ public class SkipScript : MonoBehaviour {
 			case State.kFadeOut:
 			{
 				float fadeVal = (Time.time - lastTimeStamp) / fadeTime;
-				transform.FindChild ("Message").GetComponent<Text>().color = Color.Lerp(new Color(1, 1, 1, 0.75f), new Color(1, 1, 1, 0), fadeVal);
+				SetSkipMessageAlpha(Mathf.Lerp(0.75f, 0, fadeVal));
 				if (fadeVal > 1){
 					lastTimeStamp = Time.time;
 					state = State.kWaiting;
@@ -76,7 +91,7 @@ public class SkipScript : MonoBehaviour {
 			}
 		}
 		if (Input.GetKeyDown(KeyCode.M) && Time.timeScale != 0){	
-			confirmPanel.SetActive(true);
+			confirmPanelGO.SetActive(true);
 			cursorViz = Cursor.visible;
 			timeScale = Time.timeScale;
 			Cursor.visible = true;
@@ -94,7 +109,7 @@ public class SkipScript : MonoBehaviour {
 	}
 	
 	public void DontSkip(){
-		confirmPanel.gameObject.SetActive(false);
+		confirmPanelGO.gameObject.SetActive(false);
 		Cursor.visible = cursorViz;
 		Time.timeScale = timeScale;
 		
