@@ -45,7 +45,7 @@ public class GameMode : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		canvasGO.SetActive(true);
+		if (canvasGO) canvasGO.SetActive(true);
 		
 		if (!wasEndOfLevel && isEndOfLevel){
 			endOfLevelTime = Time.time;
@@ -68,13 +68,15 @@ public class GameMode : MonoBehaviour {
 			
 		}
 		else if (Time.timeSinceLevelLoad < endOfLevelFadeDuration){
-			endOfLevelPanelGO.SetActive(true);
+			if (endOfLevelPanelGO) endOfLevelPanelGO.SetActive(true);
 			float fadeVal = Time.timeSinceLevelLoad / endOfLevelFadeDuration;
-			endOfLevelPanelGO.GetComponent<Image>().color = Color.Lerp(new Color(0, 0, 0, 1), new Color(0, 0, 0, 0), fadeVal);
-			endOfLevelPanelGO.GetComponentInChildren<Text>().text = "";
+			if (endOfLevelPanelGO){
+				endOfLevelPanelGO.GetComponent<Image>().color = Color.Lerp(new Color(0, 0, 0, 1), new Color(0, 0, 0, 0), fadeVal);
+				endOfLevelPanelGO.GetComponentInChildren<Text>().text = "";
+			}
 		}
 		else{
-			endOfLevelPanelGO.SetActive(false);
+			if (endOfLevelPanelGO) endOfLevelPanelGO.SetActive(false);
 		}
 		
 		

@@ -51,7 +51,7 @@ public class Cell : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		resetPanelGO.SetActive(isTripped);
+		if (resetPanelGO) resetPanelGO.SetActive(isTripped);
 		if (isTripped){
 			cellElectrics.GetComponent<ElectricalComponent>().voltageRise = 0.001f;
 			if (!buzz.isPlaying){
