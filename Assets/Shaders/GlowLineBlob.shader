@@ -60,8 +60,12 @@
 		       	
 		        float4 CalcWireCol(v2f i){
 		        	float distToMove = _Offset - _Time[1] * _Speed;
+					int intDist = round(distToMove);
+					if (intDist < 0){
+		            	distToMove -= intDist;
+		            }
 
-			       	float4 col;
+			       	float4 col = float4(0, 0, 0, 0);
 			       	float xx = i.uv[0] * 4;
 			       	float yy = (i.uv[1] + distToMove) * 4;
 			       	

@@ -22,9 +22,6 @@ public class Terminal : MonoBehaviour {
 			isEditing = GameMode.singleton.isEditingCircuit;
 			
 		}
-		if (GameMode.singleton.isEditingCircuit && Input.GetKeyDown(KeyCode.C) && Time.timeScale != 0){
-			Circuit.singleton.RemoveAllWires();
-		}
 		
 		transform.FindChild("Text").gameObject.SetActive(isInTrigger || isEditing);
 		TextMesh textComponent = transform.FindChild("Text").GetComponent<TextMesh>();

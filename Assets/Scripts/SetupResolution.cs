@@ -6,7 +6,7 @@ using System.Linq;
 
 public class SetupResolution : MonoBehaviour {
 	
-	float targetFPS = 60;
+	public float targetFPS = 60;
 	float outlierDuration = 0.2f;	// 5 FPS is clearly erroneous and we should just ignore it
 	float sustainedBadFPSDuration = 10;
 	float smoothedFrameDuration = 1/30f;
@@ -110,7 +110,7 @@ public class SetupResolution : MonoBehaviour {
 			float widthRemaining = Screen.width - textSize.x;
 			GUI.Label(new Rect(widthRemaining * 0.5f, 20, textSize.x, 50), message);
 		}
-		//		GUI.Label(new Rect(10, 20, 200, 50), 1f/smoothedFrameDuration + " fps");
+		//GUI.Label(new Rect(10, 20, 200, 50), 1f/smoothedFrameDuration + " fps");
 	}
 	
 }
